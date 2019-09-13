@@ -9,7 +9,8 @@ using matrix = std::vector<std::vector<T>>;
 
 class Vertex {
 public:
-	Vertex(double inX, double inY, double inZ, double inW = 1.0) : x(inX), y(inY), z(inZ), w(inW) {}
+	Vertex(double inX, double inY, double inZ, double inW = 1.0)
+     : x(inX), y(inY), z(inZ), w(inW) {}
 	double x, y, z, w;
     friend Vertex operator+(Vertex lhs, Vertex rhs);
     friend Vertex operator-(Vertex lhs, Vertex rhs);
@@ -89,8 +90,8 @@ public:
 class Camera {
 public:
 	Vertex eyeL, eyeR;
-	bool activeEye; // if false, left eye. If true, right eye
-    Camera(Vertex inL, Vertex inR)
+	bool activeEye = true; // if false, left eye. If true, right eye
+    Camera(Vertex inL = Vertex(0.0,0.0,0.0), Vertex inR = Vertex(0.0,0.1,0.0))
     : eyeL(inL), eyeR(inR) {}
 
 	//matrix<Pixel> plane;
@@ -104,7 +105,8 @@ int main()
 {
 	Scene myScene;
 	myScene.initialize();
-	
+    //Can't run this on Ylvas computer - lack of memory?????????
+    Camera myCamera;
 
 	return 0;
 }
@@ -202,7 +204,6 @@ void Scene::initialize()
 
 Vertex* Scene::findInterTri(Ray arg, Triangle &t1)
 {
-	Vertex v1(0,0,0,0);
     for(int i = 0; i < scene.size(); i++) {
         if(scene[i].rayIntersection(arg)) {
             t1 = scene[i];
@@ -218,20 +219,15 @@ void Camera::render()
 
 void Camera::createImage()
 {
-	bitmap_image image(200, 200);
+	bitmap_image image(800, 800);
+    // set background to orange
+    image.set_all_channels(255, 150, 50);
 
-	// set background to orange
-	image.set_all_channels(255, 150, 50);
-
-	image_drawer draw(image);
-
-	draw.pen_width(3);
-	draw.pen_color(255, 0, 0);
-	draw.circle(image.width() / 2, image.height() / 2, 50);
-
-	draw.pen_width(1);
-	draw.pen_color(0, 0, 255);
-	draw.rectangle(50, 50, 150, 150);
-
-	image.save_image("output.bmp");
+    //Set pixels to the camera plane
+    for(int x = 0; x < 800; x++) {
+        for(int y = 0; y < 800; y++) {
+            image.set_pixel( x,  y, plane[x][y].color.r, plane[x][y].color.g, plane[x][y].color.b);
+        }
+    }
+	image.save_image("raytracing.bmp");
 }
