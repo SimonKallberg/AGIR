@@ -9,29 +9,42 @@ using matrix = std::vector<std::vector<T>>;
 
 class Vertex {
 public:
-	Vertex(double inX, double inY, double inZ, double inW) : x(inX), y(inY), z(inZ), w(inW) {}
+	Vertex(double inX, double inY, double inZ, double inW = 1.0) : x(inX), y(inY), z(inZ), w(inW) {}
 	double x, y, z, w;
 };
 
 class Direction {
 public:
 	double x, y, z;
+    
+    Direction(double inX, double inY, double inZ)
+    : x(inX), y(inY), z(inZ) {}
 };
 
 class ColorDbl {
 public:
 	double r, g, b;
+    
+    ColorDbl(double inR, double inG, double inB)
+    : r(inR), g(inG), b(inB){}
 };
 
 class Ray;
  
 class Triangle {
 public:
-	Vertex v0, v1, v2;
-	ColorDbl color;
-	Direction normal;
+    Vertex v0, v1, v2;
+    ColorDbl color;
+    Direction normal = Direction(0.0,0.0,0.0);
 
+    Triangle(Vertex inV0, Vertex inV1, Vertex inV2, ColorDbl inCol = ColorDbl(0.0,0.0,0.0))
+    : v0(inV0), v1(inV1), v2(inV2), color(inCol)
+    {
+        normal = calcNormal();
+    }
 	void rayIntersection(Ray arg1);
+    Direction calcNormal();
+
 };
 
 class Ray {
@@ -46,6 +59,8 @@ public:
 class Scene {
 public:
 	std::vector<Triangle> obj;
+
+	void initialize();
 
 	Vertex findInterTri(Ray arg, Triangle &t1);
 };
@@ -72,14 +87,64 @@ public:
 
 int main()
 {
-
+	Scene myScene;
+	myScene.initialize();
 	
 
 	return 0;
 }
 
+Direction Triangle::calcNormal() {
+    Direction vector1 = Direction(v0.x-v1.x, v0.y-v1.y, v0.z-v1.z);
+    Direction vector2 = Direction(v0.x-v2.x, v0.y-v2.y, v0.z-v2.z);
+    //Cross product to get normal
+    Direction normal = Direction((vector1.y*vector2.z)-(vector1.z*vector2.y),
+                                 -((vector1.x*vector2.z)-(vector1.z*vector2.x)),
+                                 (vector1.x*vector2.y)-(vector1.y*vector2.x));
+    //Normalize
+    double length = sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
+    normal = Direction(normal.x/length, normal.y/length, normal.z/length);
+    std::cout << normal.x << " " << normal.y << " " << normal.z << std::endl;
+    return normal;
+}
+
 void Triangle::rayIntersection(Ray arg1)
 {
+}
+
+void Scene::initialize()
+{
+	std::cout << "Setting up triangles...." << std::endl;
+
+    //Setting up a room shaped as a polygon
+    // Vägg numero uno
+	obj.push_back(Triangle(Vertex(-3,0,5), Vertex(0,6,5), Vertex(-3,0,-5)));
+    obj.push_back(Triangle(Vertex(0,6,5), Vertex(0,6,-5), Vertex(-3,0,-5)));
+    obj.push_back(Triangle(Vertex(0,6,5), Vertex(10,6,5), Vertex(0,6,-5)));
+    obj.push_back(Triangle(Vertex(10,6,5), Vertex(10,6,-5), Vertex(0,6,-5)));
+    obj.push_back(Triangle(Vertex(10,6,5), Vertex(13,0,5), Vertex(10,6,-5)));
+    obj.push_back(Triangle(Vertex(13,0,5), Vertex(13,0,-5), Vertex(10,6,-5)));
+    
+    //Vägg numero dos
+    obj.push_back(Triangle(Vertex(-3,0,-5), Vertex(0,-6,5), Vertex(-3,0,5)));
+    obj.push_back(Triangle(Vertex(-3,0,-5), Vertex(0,-6,-5), Vertex(0,-6,5)));
+    obj.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,5), Vertex(0,-6,5)));
+    obj.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,-5), Vertex(10,-6,5)));
+    obj.push_back(Triangle(Vertex(10,-6,5), Vertex(13,0,5), Vertex(10,-6,-5)));
+    obj.push_back(Triangle(Vertex(10,-6,5), Vertex(13,0,-5), Vertex(13,0,5)));
+    
+    //Toppen
+    obj.push_back(Triangle(Vertex(0,-6,5), Vertex(0,6,5), Vertex(-3,0,5)));
+    obj.push_back(Triangle(Vertex(0,-6,5), Vertex(10,6,5), Vertex(0,6,5)));
+    obj.push_back(Triangle(Vertex(0,-6,5), Vertex(10,-6,5), Vertex(10,6,5)));
+    obj.push_back(Triangle(Vertex(10,-6,5), Vertex(13,0,5), Vertex(10,6,5)));
+    
+    //Botten
+    obj.push_back(Triangle(Vertex(-3,0,-5), Vertex(0,6,-5), Vertex(0,-6,-5)));
+    obj.push_back(Triangle(Vertex(0,6,-5), Vertex(10,6,-5), Vertex(0,-6,-5)));
+    obj.push_back(Triangle(Vertex(10,6,-5), Vertex(10,-6,-5), Vertex(0,-6,-5)));
+    obj.push_back(Triangle(Vertex(10,6,-5), Vertex(13,0,-5), Vertex(10,-6,-5)));
+    
 }
 
 Vertex Scene::findInterTri(Ray arg, Triangle &t1)
