@@ -47,6 +47,9 @@ class Scene {
 public:
 	std::vector<Triangle> obj;
 
+	void initialize();
+
+
 	Vertex findInterTri(Ray arg, Triangle &t1);
 };
 
@@ -72,7 +75,8 @@ public:
 
 int main()
 {
-
+	Scene myScene;
+	myScene.initialize();
 	
 
 	return 0;
@@ -80,6 +84,13 @@ int main()
 
 void Triangle::rayIntersection(Ray arg1)
 {
+}
+
+void Scene::initialize()
+{
+	std::cout << "Setting up triangles...." << std::endl;
+
+	obj.push_back();
 }
 
 Vertex Scene::findInterTri(Ray arg, Triangle &t1)
