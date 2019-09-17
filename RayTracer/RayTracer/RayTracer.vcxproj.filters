@@ -26,5 +26,11 @@
     <ClInclude Include="..\..\bitmap_image.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="matrix.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="io.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

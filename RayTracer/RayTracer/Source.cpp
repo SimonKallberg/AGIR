@@ -94,8 +94,8 @@ public:
     Camera(Vertex inL = Vertex(0.0,0.0,0.0), Vertex inR = Vertex(0.0,0.1,0.0))
     : eyeL(inL), eyeR(inR) {}
 
-	//matrix<Pixel> plane;
-    Pixel plane[800][800];
+	matrix<Pixel> plane;
+    //Pixel plane[400][400];
 
 	void render();
 	void createImage();
@@ -226,7 +226,8 @@ void Camera::createImage()
     //Set pixels to the camera plane
     for(int x = 0; x < 800; x++) {
         for(int y = 0; y < 800; y++) {
-            image.set_pixel( x,  y, plane[x][y].color.r, plane[x][y].color.g, plane[x][y].color.b);
+
+           // image.set_pixel( x,  y, plane[x][y].color.r, plane[x][y].color.g, plane[x][y].color.b);
         }
     }
 	image.save_image("raytracing.bmp");
