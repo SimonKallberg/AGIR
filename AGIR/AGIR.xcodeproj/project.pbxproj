@@ -25,6 +25,7 @@
 /* Begin PBXFileReference section */
 		2F0B06A1232B8F09008AD67A /* AGIR */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AGIR; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F0B06AB232B8F40008AD67A /* Source.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Source.cpp; path = ../RayTracer/RayTracer/Source.cpp; sourceTree = "<group>"; };
+		2F4B511723311EAD008C17C6 /* matrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = matrix.hpp; path = ../RayTracer/RayTracer/matrix.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +43,7 @@
 			isa = PBXGroup;
 			children = (
 				2F0B06AB232B8F40008AD67A /* Source.cpp */,
+				2F4B511723311EAD008C17C6 /* matrix.hpp */,
 				2F0B06A3232B8F09008AD67A /* AGIR */,
 				2F0B06A2232B8F09008AD67A /* Products */,
 			);

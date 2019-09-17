@@ -2,10 +2,7 @@
 #include <vector>
 #include <cstdio>
 #include "bitmap_image.hpp"
-
-
-template<typename T>
-using matrix = std::vector<std::vector<T>>;
+#include "matrix.hpp"
 
 class Vertex {
 public:
@@ -107,6 +104,7 @@ int main()
 	myScene.initialize();
     //Can't run this on Ylvas computer - lack of memory?????????
     Camera myCamera;
+    myCamera.createImage();
 
 	return 0;
 }
@@ -226,9 +224,12 @@ void Camera::createImage()
     //Set pixels to the camera plane
     for(int x = 0; x < 800; x++) {
         for(int y = 0; y < 800; y++) {
-
-           // image.set_pixel( x,  y, plane[x][y].color.r, plane[x][y].color.g, plane[x][y].color.b);
+            //cout << plane(x,y).color.r << " " << plane(x,y).color.g << " " << plane(x,y).color.b << endl;
+            rgb_t color = make_colour(plane(x,y).color.r, plane(x,y).color.g, plane(x,y).color.b);
+            image.set_pixel( x,  y, jet_colormap[x]);
+            cout << image.get_pixel(x, y).red << endl;
         }
     }
+    cout << "Saving image..." << endl;
 	image.save_image("raytracing.bmp");
 }
