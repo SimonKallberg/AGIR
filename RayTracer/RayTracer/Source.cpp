@@ -92,7 +92,6 @@ public:
     : eyeL(inL), eyeR(inR) {}
 
 	matrix<Pixel> plane;
-    //Pixel plane[400][400];
 
 	void render();
 	void createImage();
@@ -102,7 +101,6 @@ int main()
 {
 	Scene myScene;
 	myScene.initialize();
-    //Can't run this on Ylvas computer - lack of memory?????????
     Camera myCamera;
     myCamera.createImage();
 
@@ -220,6 +218,7 @@ void Camera::createImage()
 	bitmap_image image(800, 800);
     // set background to orange
     image.set_all_channels(255, 150, 50);
+    image.save_image("ylvasellinghej.bmp");
 
     //Set pixels to the camera plane
     for(int x = 0; x < 800; x++) {
@@ -227,7 +226,7 @@ void Camera::createImage()
             //cout << plane(x,y).color.r << " " << plane(x,y).color.g << " " << plane(x,y).color.b << endl;
             rgb_t color = make_colour(plane(x,y).color.r, plane(x,y).color.g, plane(x,y).color.b);
             image.set_pixel( x,  y, jet_colormap[x]);
-            cout << image.get_pixel(x, y).red << endl;
+            //cout << image.get_pixel(x, y).red << endl;
         }
     }
     cout << "Saving image..." << endl;
