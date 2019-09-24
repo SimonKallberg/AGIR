@@ -25,17 +25,18 @@ public:
 	Vertex eyeL, eyeR;
 	Scene* theScene = nullptr;
 	bool activeEye = true; // if false, left eye. If true, right eye
-	Camera(Scene* inScene, Vertex inL = Vertex(-2.0, 0.0, 0.0), Vertex inR = Vertex(-1.0, 0.0, 0.0))
-		: theScene(inScene), eyeL(inL), eyeR(inR) {}
+	Camera(Scene* inScene, Vertex inL = Vertex(-2.0, 0.0, 0.0), Vertex inR = Vertex(-1.0, 0.0, 0.0),
+           int camWidth = 800, int camHeigth = 800)
+		: theScene(inScene), eyeL(inL), eyeR(inR), plane(camWidth, camHeigth), CAMERA_WIDTH(camWidth),
+        CAMERA_HEIGHT(camHeigth) {}
 
 	Vertex c1 = Vertex(0.0, -1.0, -1.0);
 	Vertex c2 = Vertex(0.0, 1.0, -1.0);
 	Vertex c3 = Vertex(0.0, 1.0, 1.0);
 	Vertex c4 = Vertex(0.0, -1.0, 1.0);
 
-	const int CAMERA_WIDTH = 800;
-	const int CAMERA_HEIGHT = 800;
-
+    int CAMERA_WIDTH;
+    int CAMERA_HEIGHT;
 
 	matrix<Pixel> plane;
 

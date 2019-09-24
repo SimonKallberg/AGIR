@@ -22,6 +22,7 @@ int main()
 	Scene myScene;
 	myScene.initialize();
 	Camera myCamera(&myScene);
+    //Camera myCamera(&myScene, Vertex(-2.0, 0.0, 0.0), Vertex(-1.0, 0.0, 0.0), 800, 1000);
 
 	myCamera.render();
 	myCamera.createImage("raytracing.bmp");

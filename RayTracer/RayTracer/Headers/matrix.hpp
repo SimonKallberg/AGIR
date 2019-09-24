@@ -9,9 +9,6 @@ using std::cout;
 using std::vector;
 using std::endl;
 
-const int ROWS = 800;
-const int COLS = 800;
-
 template <typename T>
 struct matrix_element {
     using type = T;
@@ -24,11 +21,14 @@ class matrix
     vector<vector<T>> s ;
 public:
     //Initialize the size of s to ROWS by COLS
-    matrix(): s(ROWS, vector<T>(COLS)) {}
+    matrix(int inR, int inC)
+        : s(inR, vector<T>(inC)), ROWS(inR), COLS(inC) {}
     
     typename matrix_element<T>::type& operator() (int row, int col);
     void readm();
     void printm();
+    int ROWS = 800;
+    int COLS = 800;
 
 };
 template<class T>
