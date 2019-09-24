@@ -14,6 +14,7 @@
 #include "Ray.hpp"
 #include "Direction.hpp"
 #include "ColorDbl.hpp"
+#include <cmath>
 
 class Scene;
 
@@ -35,4 +36,4 @@ public:
     
 };
 
-#endif Triangle_hpp 
+#endif

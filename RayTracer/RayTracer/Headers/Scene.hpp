@@ -23,4 +23,4 @@ public:
     Vertex* findInterTri(Ray arg, Triangle &t1);
 };
 
-#endif Scene_hpp
+#endif

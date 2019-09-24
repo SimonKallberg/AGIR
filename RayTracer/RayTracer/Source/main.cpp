@@ -14,6 +14,7 @@
 #include "matrix.hpp"
 #include "Scene.hpp"
 #include "Camera.hpp"
+#include <string>
 
 
 int main()
@@ -23,7 +24,7 @@ int main()
 	Camera myCamera(&myScene);
 
 	myCamera.render();
-	myCamera.createImage();
+	//myCamera.createImage("raytracing.bmp");
 
 	return 0;
 }

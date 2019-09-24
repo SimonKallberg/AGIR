@@ -28,4 +28,4 @@ public:
 	Pixel& operator=(Pixel p);
 };
 
-#endif Pixel_hpp 
+#endif

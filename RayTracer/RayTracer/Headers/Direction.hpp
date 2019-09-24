@@ -29,4 +29,4 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const Direction& v1);
 };
 
-#endif Direction_hpp
+#endif

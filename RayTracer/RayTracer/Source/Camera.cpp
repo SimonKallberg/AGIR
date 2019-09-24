@@ -20,6 +20,7 @@ void Camera::calcRay(int x, int y, Ray &r) {
 
 void Camera::render()
 {
+    cout << "Rendering image..." << endl;
 	for (int x = 0; x < CAMERA_WIDTH; x++)
 	{
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
@@ -33,7 +34,7 @@ void Camera::render()
 	}
 }
 
-void Camera::createImage()
+void Camera::createImage(std::string fileName)
 {
     bitmap_image image(CAMERA_WIDTH, CAMERA_HEIGHT);
     image.clear();
@@ -49,5 +50,5 @@ void Camera::createImage()
         }
     }
     cout << "Saving image..." << endl;
-    image.save_image("raytracing.bmp");
+    image.save_image(fileName);
 }

@@ -34,4 +34,4 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const Ray& v1);
 };
 
-#endif Ray_hpp
+#endif
