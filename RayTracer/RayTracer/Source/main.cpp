@@ -24,7 +24,7 @@ int main()
 	Camera myCamera(&myScene);
 
 	myCamera.render();
-	//myCamera.createImage("raytracing.bmp");
+	myCamera.createImage("raytracing.bmp");
 
 	return 0;
 }

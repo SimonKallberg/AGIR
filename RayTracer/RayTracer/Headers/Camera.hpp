@@ -41,7 +41,7 @@ public:
 
 	void calcRay(int x, int y, Ray &r);
 	void render();
-	void createImage();
+	void createImage(std::string fileName);
 };
 
-#endif Camera_hpp
+#endif
