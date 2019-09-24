@@ -39,7 +39,7 @@ public:
 
 	matrix<Pixel> plane;
 
-	Ray calcRay(int x, int y);
+	void calcRay(int x, int y, Ray &r);
 	void render();
 	void createImage();
 };
