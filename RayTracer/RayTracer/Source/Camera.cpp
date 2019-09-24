@@ -35,14 +35,12 @@ void Camera::render()
 
 void Camera::createImage()
 {
-    bitmap_image image(800, 800);
+    bitmap_image image(CAMERA_WIDTH, CAMERA_HEIGHT);
     image.clear();
-    // set background to orange
-    image.set_all_channels(255, 150, 50);
     
     //Set pixels to the camera plane
-    for(int x = 0; x < 800; x++) {
-        for(int y = 0; y < 800; y++) {
+    for(int x = 0; x < CAMERA_WIDTH; x++) {
+        for(int y = 0; y < CAMERA_HEIGHT; y++) {
 			unsigned int r = (int)(plane(x, y).color.r * 255);
 			unsigned int g = (int)(plane(x, y).color.g * 255);
 			unsigned int b = (int)(plane(x, y).color.b * 255);
@@ -51,5 +49,5 @@ void Camera::createImage()
         }
     }
     cout << "Saving image..." << endl;
-    image.save_image("raytracing123.bmp");
+    image.save_image("raytracing.bmp");
 }
