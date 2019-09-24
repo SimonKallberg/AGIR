@@ -9,6 +9,10 @@
 #define Scene_hpp
 
 #include <stdio.h>
+#include "Vertex.hpp"
+#include "Ray.hpp"
+#include <vector>
+#include "Triangle.hpp"
 
 class Scene {
 public:
@@ -19,4 +23,4 @@ public:
     Vertex* findInterTri(Ray arg, Triangle &t1);
 };
 
-#endif /* Scene_hpp */
+#endif Scene_hpp

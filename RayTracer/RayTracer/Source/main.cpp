@@ -2,33 +2,28 @@
 //  main.cpp
 //  AGIR
 //
-//  Created by Ylva Selling on 2019-09-20.
-//  Copyright © 2019 Ylva Selling. All rights reserved.
-//
+//  Created by Ylva Selling & Simon Källberg on 2019-09-20.
+//  Copyright © 2019 Ylva Bajsing. All rights reserved.
+
+
 
 #include <iostream>
 #include <vector>
 #include <cstdio>
 #include "bitmap_image.hpp"
 #include "matrix.hpp"
-#include "bitmap.h"
+#include "Scene.hpp"
+#include "Camera.hpp"
+
 
 int main()
 {
-    Scene myScene;
-    myScene.initialize();
-    Camera myCamera;
-    
-    //myScene.findInterTri();
-    myCamera.createImage();
-    Bitmap myImageTest;
-    PixelMatrix mypixelimage;
-    mypixelimage.at(0).push_back(Pixel(255, 255, 255));
-    
-    myImageTest.fromPixelMatrix(mypixelimage);
-    myImageTest.save("hello.bmp");
-    
-    
-    
-    return 0;
+	Scene myScene;
+	myScene.initialize();
+	Camera myCamera(&myScene);
+
+	myCamera.render();
+	myCamera.createImage();
+
+	return 0;
 }

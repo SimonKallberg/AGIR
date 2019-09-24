@@ -9,15 +9,23 @@
 #define Pixel_hpp
 
 #include <stdio.h>
+#include "ColorDbl.hpp"
+#include "Vertex.hpp"
+#include "Ray.hpp"
+#include <vector>
 
-//class Pixel {
-//public:
-//    Pixel(ColorDbl inCol);
-//    Pixel(double r = 0, double g = 0, double b = 0)
-//    : color(r, g, b) {}
-//    ColorDbl color;
-//    std::vector<Ray> rays;
-//
-//};
+class Pixel {
+public:
+    Pixel(ColorDbl inCol) 
+		: color(inCol.r, inCol.g, inCol.b) {}
+    Pixel(double r = 0, double g = 0, double b = 0)
+    : color(r, g, b) {}
 
-#endif /* Pixel_hpp */
+
+    ColorDbl color;
+    std::vector<Ray> rays;
+
+	Pixel& operator=(Pixel p);
+};
+
+#endif Pixel_hpp 

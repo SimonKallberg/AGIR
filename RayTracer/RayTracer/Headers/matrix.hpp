@@ -1,9 +1,14 @@
+#ifndef matrix_hpp
+#define matrix_hpp
+
 #include<iostream>
 #include<vector>
+
 using std::cin;
 using std::cout;
 using std::vector;
 using std::endl;
+
 const int ROWS = 800;
 const int COLS = 800;
 
@@ -21,13 +26,13 @@ public:
     //Initialize the size of s to ROWS by COLS
     matrix(): s(ROWS, vector<T>(COLS)) {}
     
-    typename matrix_element<T>::type operator() (int row, int col);
+    typename matrix_element<T>::type& operator() (int row, int col);
     void readm();
     void printm();
 
 };
 template<class T>
-typename matrix_element<T>::type matrix<T>::operator() (int row, int col) {
+typename matrix_element<T>::type& matrix<T>::operator() (int row, int col) {
     return s.at(row).at(col);
 }
 
@@ -48,3 +53,6 @@ void matrix<T>::printm()
         cout << endl;
     }
 }
+
+
+#endif matrix_hpp

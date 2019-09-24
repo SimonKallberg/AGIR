@@ -7,3 +7,9 @@
 //
 
 #include "Ray.hpp"
+
+
+std::ostream& operator<<(std::ostream& out, const Ray& v1) {
+	out << *v1.start << " " << *v1.end << std::endl;
+	return out;
+}

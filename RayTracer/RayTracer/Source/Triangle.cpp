@@ -8,6 +8,11 @@
 
 #include "Triangle.hpp"
 
+std::ostream& operator<<(std::ostream& out, const Triangle& v1) {
+	out << v1.v0 << " " << v1.v1 << " " << v1.v2 << std::endl;
+	return out;
+}
+
 Direction Triangle::calcNormal() {
     Direction vector1 = Direction(v0.x-v1.x, v0.y-v1.y, v0.z-v1.z);
     Direction vector2 = Direction(v0.x-v2.x, v0.y-v2.y, v0.z-v2.z);
@@ -16,7 +21,7 @@ Direction Triangle::calcNormal() {
     //Normalize
     double length = sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
     normal = Direction(normal.x/length, normal.y/length, normal.z/length);
-    std::cout << normal.x << " " << normal.y << " " << normal.z << std::endl;
+    //std::cout << normal.x << " " << normal.y << " " << normal.z << std::endl;
     return normal;
 }
 

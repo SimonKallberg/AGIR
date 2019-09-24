@@ -69,7 +69,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);D:\Skola\AGIR\AGIR\RayTracer\RayTracer\Headers</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -79,6 +81,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(PIXELINK_SDK_ROOT)\include</AdditionalLibraryDirectories>
+      <AdditionalDependencies>user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,13 +122,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Source\Camera.cpp" />
+    <ClCompile Include="Source\ColorDbl.cpp" />
+    <ClCompile Include="Source\Direction.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Pixel.cpp" />
+    <ClCompile Include="Source\Ray.cpp" />
+    <ClCompile Include="Source\Scene.cpp" />
+    <ClCompile Include="Source\Triangle.cpp" />
+    <ClCompile Include="Source\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\bitmap_image.hpp" />
     <ClInclude Include="Header.h" />
+    <ClInclude Include="Headers\bitmap_image.hpp" />
+    <ClInclude Include="Headers\Camera.hpp" />
+    <ClInclude Include="Headers\ColorDbl.hpp" />
+    <ClInclude Include="Headers\Direction.hpp" />
+    <ClInclude Include="Headers\io.hpp" />
+    <ClInclude Include="Headers\matrix.hpp" />
+    <ClInclude Include="Headers\Pixel.hpp" />
+    <ClInclude Include="Headers\Ray.hpp" />
+    <ClInclude Include="Headers\Scene.hpp" />
+    <ClInclude Include="Headers\Triangle.hpp" />
+    <ClInclude Include="Headers\Vertex.hpp" />
     <ClInclude Include="io.hpp" />
-    <ClInclude Include="matrix.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

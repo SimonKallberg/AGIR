@@ -7,6 +7,7 @@
 
 #include "Scene.hpp"
 
+
 void Scene::initialize()
 {
     std::cout << "Setting up triangles...." << std::endl;

@@ -11,14 +11,17 @@
 
 #include <stdio.h>
 #include "Vertex.hpp"
+#include <iostream>
 
 class Vertex {
 public:
-    Vertex(double inX, double inY, double inZ, double inW = 1.0)
-    : x(inX), y(inY), z(inZ), w(inW) {}
-    double x, y, z, w;
-    friend Vertex operator+(Vertex lhs, Vertex rhs);
-    friend Vertex operator-(Vertex lhs, Vertex rhs);
+	Vertex(double inX, double inY, double inZ, double inW = 1.0)
+		: x(inX), y(inY), z(inZ), w(inW) {}
+	double x, y, z, w;
+	friend Vertex operator+(Vertex lhs, Vertex rhs);
+	friend Vertex operator-(Vertex lhs, Vertex rhs);
+
+	friend std::ostream& operator<<(std::ostream& out, const Vertex& v1);
 };
 
 #endif /* Vertex_hpp */

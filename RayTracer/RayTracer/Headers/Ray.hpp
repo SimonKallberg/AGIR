@@ -10,6 +10,9 @@
 #define Ray_hpp
 
 #include <stdio.h>
+#include "Vertex.hpp"
+#include "ColorDbl.hpp"
+#include <iostream>
 
 class Vertex;
 class Triangle;
@@ -17,12 +20,18 @@ class ColorDbl;
 
 class Ray {
 public:
-    Vertex* start;
-    Vertex* end;
-    Vertex* intSectPoint;
-    
-    Triangle* endTri;
-    ColorDbl color;
+	Ray(Vertex* s, Vertex* e)
+		: start(s), end(e)
+	{}
+
+	Vertex* start;
+	Vertex* end;
+	Vertex* intSectPoint = nullptr;
+
+	Triangle* endTri = nullptr;
+	ColorDbl color = ColorDbl(0.0, 0.0, 0.0);
+
+	friend std::ostream& operator<<(std::ostream& out, const Ray& v1);
 };
 
-#endif /* Ray_hpp */
+#endif Ray_hpp

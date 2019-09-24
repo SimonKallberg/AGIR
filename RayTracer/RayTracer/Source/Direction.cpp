@@ -7,6 +7,11 @@
 
 #include "Direction.hpp"
 
+std::ostream& operator<<(std::ostream& out, const Direction& v1) {
+	out << v1.x << " " << v1.y << " " << v1.z << std::endl;
+	return out;
+}
+
 Direction operator+(Direction lhs, Direction rhs) {
     return Direction(lhs.x+rhs.x, lhs.y+rhs.y, lhs.z+rhs.z);
 }
@@ -22,5 +27,5 @@ Direction crossProduct(Direction vector1, Direction vector2) {
 }
 
 double dotProduct(Direction lhs, Direction rhs) {
-    return lhs.x*rhs.x+lhs.y+rhs.y+lhs.z+rhs.z;
+    return (lhs.x*rhs.x)+(lhs.y*rhs.y)+(lhs.z*rhs.z);
 }
