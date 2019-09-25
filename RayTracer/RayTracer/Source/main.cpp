@@ -6,7 +6,6 @@
 //  Copyright © 2019 Ylva Bajsing. All rights reserved.
 
 
-
 #include <iostream>
 #include <vector>
 #include <cstdio>
@@ -22,7 +21,7 @@ int main()
 	Scene myScene;
 	myScene.initialize();
 	Camera myCamera(&myScene);
-    //Camera myCamera(&myScene, Vertex(-2.0, 0.0, 0.0), Vertex(-1.0, 0.0, 0.0), 800, 1000);
+    //Camera myCamera(&myScene, Vertex(-2.0, 0.0, 0.0), Vertex(-1.0, 0.0, 0.0), 800, 800);
 
 	myCamera.render();
 	myCamera.createImage("raytracing.bmp");

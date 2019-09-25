@@ -7,14 +7,16 @@
 
 #include "Camera.hpp"
 
-void Camera::calcRay(int x, int y, Ray &r) {
-	double deltaWidth = (double)(c1.y - c3.y) / (double)CAMERA_WIDTH;
-	double deltaHeight = (double)(c1.z - c3.z) / (double)CAMERA_HEIGHT;
+Ray Camera::calcRay(int x, int y) {
+	double deltaWidth = abs((double)(c1.y - c3.y)) / (double)CAMERA_WIDTH;
+	double deltaHeight = abs((double)(c1.z - c3.z)) / (double)CAMERA_HEIGHT;
 
 	Vertex localCoord = Vertex(0.0, (double)x*deltaWidth, (double)y*deltaHeight);
-	Vertex end = c1 + localCoord;
-
-	r = Ray(&eyeL, &end);
+    //TODO resolve memory leak
+	Vertex *end = new Vertex(c1 + localCoord);
+    Ray theRay = Ray(&eyeL, end);
+    
+	return theRay;
 }
 
 
@@ -26,8 +28,7 @@ void Camera::render()
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
 			Triangle temp(Vertex(1.0, 1.0, 0.0), Vertex(1.0, -1.0, 0.0), Vertex(-1.0, -1.0, 0.0));
-			Ray myRay = Ray(&eyeL,&eyeR);
-			calcRay(x, y, myRay);
+			Ray myRay = calcRay(x, y);
 			theScene->findInterTri(myRay, temp);
 			plane(x, y).color = temp.color;
 		}

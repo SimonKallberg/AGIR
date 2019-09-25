@@ -20,7 +20,7 @@ public:
     
     void initialize();
     
-    Vertex* findInterTri(Ray arg, Triangle &t1);
+    Vertex* findInterTri(Ray &arg, Triangle &t1);
 };
 
 #endif

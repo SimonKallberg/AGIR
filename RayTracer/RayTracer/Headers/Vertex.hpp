@@ -19,7 +19,11 @@ public:
 		: x(inX), y(inY), z(inZ), w(inW) {}
 	double x, y, z, w;
 	friend Vertex operator+(Vertex lhs, Vertex rhs);
+    friend Vertex operator*(double lhs, Vertex rhs);
+    friend Vertex operator*(Vertex lhs, double rhs);
 	friend Vertex operator-(Vertex lhs, Vertex rhs);
+    friend bool operator<(Vertex lhs, double rhs);
+    friend bool operator>(Vertex lhs, double rhs);
 
 	friend std::ostream& operator<<(std::ostream& out, const Vertex& v1);
 };

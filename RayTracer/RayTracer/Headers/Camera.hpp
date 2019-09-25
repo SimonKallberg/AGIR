@@ -25,7 +25,7 @@ public:
 	Vertex eyeL, eyeR;
 	Scene* theScene = nullptr;
 	bool activeEye = true; // if false, left eye. If true, right eye
-	Camera(Scene* inScene, Vertex inL = Vertex(-2.0, 0.0, 0.0), Vertex inR = Vertex(-1.0, 0.0, 0.0),
+	Camera(Scene* inScene, Vertex inL = Vertex(-1.0, 0.0, 0.0), Vertex inR = Vertex(-2.0, 0.0, 0.0),
            int camWidth = 800, int camHeigth = 800)
 		: theScene(inScene), eyeL(inL), eyeR(inR), plane(camWidth, camHeigth), CAMERA_WIDTH(camWidth),
         CAMERA_HEIGHT(camHeigth) {}
@@ -40,7 +40,7 @@ public:
 
 	matrix<Pixel> plane;
 
-	void calcRay(int x, int y, Ray &r);
+	Ray calcRay(int x, int y);
 	void render();
 	void createImage(std::string fileName);
 };

@@ -23,6 +23,15 @@ public:
 	Ray(Vertex* s, Vertex* e)
 		: start(s), end(e)
 	{}
+    
+    //Copy constructor
+    Ray (const Ray &old_obj) {
+        start = old_obj.start;
+        end = old_obj.end;
+        intSectPoint = old_obj.intSectPoint;
+        endTri = old_obj.endTri;
+        color = old_obj.color;
+    }
 
 	Vertex* start;
 	Vertex* end;
