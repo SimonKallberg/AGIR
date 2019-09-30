@@ -8,12 +8,12 @@
 #include "Camera.hpp"
 
 Ray Camera::calcRay(int x, int y) {
-	double deltaWidth = abs((double)(c1.y - c3.y)) / (double)CAMERA_WIDTH;
-	double deltaHeight = abs((double)(c1.z - c3.z)) / (double)CAMERA_HEIGHT;
+	double deltaWidth = (double)abs((c1.vec3.y - c3.vec3.y)) / (double)CAMERA_WIDTH;
+	double deltaHeight = -(double)abs((c1.vec3.z - c3.vec3.z)) / (double)CAMERA_HEIGHT;
 
 	Vertex localCoord = Vertex(0.0, (double)x*deltaWidth, (double)y*deltaHeight);
     //TODO resolve memory leak
-	Vertex *end = new Vertex(c1 + localCoord);
+	Vertex *end = new Vertex(c4 + localCoord);
     Ray theRay = Ray(&eyeL, end);
     
 	return theRay;

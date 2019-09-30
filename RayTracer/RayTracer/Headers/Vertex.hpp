@@ -10,14 +10,26 @@
 #define Vertex_hpp
 
 #include <stdio.h>
-#include "Vertex.hpp"
 #include <iostream>
+#include "Vector3.hpp"
+
 
 class Vertex {
 public:
-	Vertex(double inX, double inY, double inZ, double inW = 1.0)
-		: x(inX), y(inY), z(inZ), w(inW) {}
-	double x, y, z, w;
+    Vector3 vec3;
+    double w;
+    
+    Vertex(double inX, double inY, double inZ, double inW = 1.0)
+        : vec3(inX, inY, inZ), w(inW) {}
+	Vertex(Vector3 inVec, double inW = 1.0)
+		: vec3(inVec), w(inW) {}
+    //Conversion from vec3
+    void operator=(Vector3 inVec)
+    {
+        vec3 = inVec;
+        w = 1.0;
+    }
+
 	friend Vertex operator+(Vertex lhs, Vertex rhs);
     friend Vertex operator*(double lhs, Vertex rhs);
     friend Vertex operator*(Vertex lhs, double rhs);

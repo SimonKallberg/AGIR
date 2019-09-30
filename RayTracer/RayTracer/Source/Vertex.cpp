@@ -9,31 +9,31 @@
 #include "Vertex.hpp"
 
 Vertex operator+(Vertex lhs, Vertex rhs) {
-    return Vertex(lhs.x+rhs.x, lhs.y+rhs.y, lhs.z+rhs.z);
+    return Vertex(lhs.vec3+rhs.vec3);
 }
 Vertex operator*(double lhs, Vertex rhs) {
-    return Vertex(lhs*rhs.x, lhs*rhs.y, lhs*rhs.z);
+    return Vertex(lhs*rhs.vec3);
 }
 Vertex operator*(Vertex lhs, double rhs) {
-    return Vertex(rhs*lhs.x, rhs*lhs.y, rhs*lhs.z);
+    return Vertex(lhs.vec3*rhs);
 }
 Vertex operator-(Vertex lhs, Vertex rhs) {
-    return Vertex(lhs.x-rhs.x, lhs.y-rhs.y, lhs.z-rhs.z);
+    return Vertex(lhs.vec3-rhs.vec3);
 }
 bool operator<(Vertex lhs, double rhs) {
-    if (lhs.x < rhs && lhs.y < rhs && lhs.z < rhs) {
+    if (lhs.vec3 < rhs) {
         return true;
     }
     else return false;
 }
 bool operator>(Vertex lhs, double rhs) {
-    if (lhs.x > rhs && lhs.y > rhs && lhs.z > rhs) {
+    if (lhs.vec3 > rhs) {
         return true;
     }
     else return false;
 }
 
 std::ostream& operator<<(std::ostream& out, const Vertex& v1) {
-	out << "(" << v1.x << "," << v1.y << "," << v1.z << ")" << std::endl;
+	out << v1.vec3 << std::endl;
 	return out;
 }

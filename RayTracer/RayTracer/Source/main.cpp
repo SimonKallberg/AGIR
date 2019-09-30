@@ -20,6 +20,8 @@ int main()
 {
 	Scene myScene;
 	myScene.initialize();
+    //Vertex(10,-6,0), Vertex(13,0,5), Vertex(10,6,5), ColorDbl(0.5, 0.3, 0.5))
+    myScene.addTetrahedron(Vertex(8.0, 0, 0), Vertex(8, -4, -4.0), Vertex(10, 0, -4.0), Vertex(8, 4, -4.0), ColorDbl(1.0, 0.0, 0.0));
 	Camera myCamera(&myScene);
     //Camera myCamera(&myScene, Vertex(-2.0, 0.0, 0.0), Vertex(-1.0, 0.0, 0.0), 800, 800);
 
