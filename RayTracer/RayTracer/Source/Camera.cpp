@@ -31,16 +31,25 @@ void Camera::render()
 			Ray myRay = calcRay(x, y);
             //Check which triangle ray intersects with
 			theScene->findInterTri(myRay, temp);
+            ColorDbl shadow = ColorDbl(1.0,1.0,1.0);
             
-            //Shoot shadow ray - DOESN'T WORK YET
-            //ColorDbl shadow = theScene->shootShadowRay(*myRay.intSectPoint);
+            //Shoot shadow ray if ray hits a triangle
+            if(myRay.intSectPoint != nullptr) {
+               shadow = theScene->shootShadowRay(*myRay.intSectPoint);
+            }
             
             //Check if ray intersects with sphere
             if(theScene->findInterSphere(myRay, tempS) != nullptr) {
                 plane(x, y).color = tempS.color;
             }
             else {
-                plane(x, y).color = temp.color;
+                //Is there a shadow? Set to black
+                if(shadow.r < 0.00001) {
+                    plane(x, y).color = shadow;
+                }
+                else {
+                    plane(x, y).color = temp.color;
+                }
             }
 		}
 	}

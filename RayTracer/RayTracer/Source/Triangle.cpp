@@ -25,7 +25,7 @@ Vector3 Triangle::calcNormal() {
     return normal;
 }
 
-bool Triangle::rayIntersection(Ray p)
+bool Triangle::rayIntersection(Ray &p)
 {
     Vector3 T = (*p.start-v0).vec3;
     Vector3 E1 = (v1-v0).vec3;
@@ -44,7 +44,7 @@ bool Triangle::rayIntersection(Ray p)
             //cout << "intersection!" << endl;
             p.endTri = this;
             p.intSectPoint = new Vertex(tuv.x*D.x, tuv.x*D.y ,tuv.x*D.z);
-            *p.intSectPoint = *p.intSectPoint + *p.start;
+            //*p.intSectPoint = *p.intSectPoint + *p.start;
             return true;
     }
     return false;

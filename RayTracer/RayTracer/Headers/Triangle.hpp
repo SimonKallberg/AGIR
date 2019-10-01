@@ -32,7 +32,7 @@ public:
 		normal = calcNormal();
 	}
 
-	bool rayIntersection(Ray arg1);
+	bool rayIntersection(Ray &arg1);
 	Vector3 calcNormal();
 
 	friend std::ostream& operator<<(std::ostream& out, const Triangle& v1);

@@ -98,8 +98,10 @@ void Scene::addPointLight(Vertex inCenter) {
 ColorDbl Scene::shootShadowRay(Vertex &inV) {
     Ray theRay = Ray(&inV, &pointLights[0].pos);
     Triangle tempT;
-    if(findInterTri(theRay, tempT)) {
-        return ColorDbl(-1,-1,-1);
+    Sphere tempS;
+    //If a sphere is in between point and light source, return color
+    if(findInterSphere(theRay, tempS)) {
+        return ColorDbl(0.0,0.0,0.0);
     }
-    return ColorDbl(0.0,0.0,0.0);
+    return ColorDbl(1,1,1);
 }
