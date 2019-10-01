@@ -8,8 +8,43 @@
 
 #include "Ray.hpp"
 
+//Copy constructor - deep copy
+Ray::Ray (const Ray &old_obj) {
+    //Check for null pointers
+    start = (old_obj.start != nullptr) ? new Vertex(*old_obj.start) : nullptr;
+    end = (old_obj.end != nullptr) ? new Vertex(*old_obj.end) : nullptr;
+    intSectPoint = (old_obj.intSectPoint != nullptr) ? new Vertex(*old_obj.intSectPoint) : nullptr;
+
+    
+    //TODO fix dangling pointers
+    endTri = old_obj.endTri;
+    endSphere = old_obj.endSphere;
+    color = old_obj.color;
+}
+
+Ray::~Ray() {
+//    delete start;
+//    delete end;
+//    delete intSectPoint;
+    
+    //TODO fix dangling pointers
+//    delete endTri;
+//    delete endSphere;
+}
 
 std::ostream& operator<<(std::ostream& out, const Ray& v1) {
-	out << *v1.start << " " << *v1.end << std::endl;
+    out << "Ray: starting point: ";
+    if (v1.start != nullptr) {
+        out << *v1.start;
+    }
+    out  << " end point: " ;
+    if (v1.end != nullptr) {
+        out << *v1.end;
+    }
+    out << " intersection point: ";
+    if (v1.intSectPoint != nullptr) {
+        out << *v1.intSectPoint;
+    }
+    out <<  std::endl;
 	return out;
 }

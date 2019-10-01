@@ -74,7 +74,7 @@ void Scene::addTetrahedron(Vertex top, Vertex corner1, Vertex corner2, Vertex co
 void Scene::addSphere(Vertex inCenter, double radius, ColorDbl inColor) {
     spheres.push_back(Sphere(inCenter, radius, inColor));
     
-    std::cout << "Added a sphere with center: " << inCenter << "color: " << inColor << "radius: " << radius << " to the scene!" << std::endl;
+    std::cout << "Added a sphere with center: " << inCenter << "color: " << inColor << "radius: " << radius << " to the scene!" << std::endl << std::endl;
 }
 
 Vertex* Scene::findInterSphere(Ray &arg, Sphere &s1)
@@ -85,5 +85,21 @@ Vertex* Scene::findInterSphere(Ray &arg, Sphere &s1)
             return arg.intSectPoint;
         }
     }
+    arg.intSectPoint = nullptr;
     return nullptr;
+}
+
+void Scene::addPointLight(Vertex inCenter) {
+    pointLights.push_back(PointLight(inCenter));
+    
+    std::cout << "Added a pointlight with center: " << inCenter << "to the scene!" << std::endl << std::endl;
+}
+
+ColorDbl Scene::shootShadowRay(Vertex &inV) {
+    Ray theRay = Ray(&inV, &pointLights[0].pos);
+    Triangle tempT;
+    if(findInterTri(theRay, tempT)) {
+        return ColorDbl(-1,-1,-1);
+    }
+    return ColorDbl(0.0,0.0,0.0);
 }

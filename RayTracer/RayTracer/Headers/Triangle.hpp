@@ -26,11 +26,12 @@ public:
 	ColorDbl color;
 	Vector3 normal = Vector3(0.0, 0.0, 0.0);
 
-	Triangle(Vertex inV0, Vertex inV1, Vertex inV2, ColorDbl inCol = ColorDbl(0.5, 0.5, 0.5))
+	Triangle(Vertex inV0 = Vertex(1.0, 1.0, 0.0), Vertex inV1 = Vertex(1.0, -1.0, 0.0), Vertex inV2 = Vertex(-1.0, -1.0, 0.0), ColorDbl inCol = ColorDbl(0.5, 0.5, 0.5))
 		: v0(inV0), v1(inV1), v2(inV2), color(inCol)
 	{
 		normal = calcNormal();
 	}
+
 	bool rayIntersection(Ray arg1);
 	Vector3 calcNormal();
 

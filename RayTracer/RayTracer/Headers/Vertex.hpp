@@ -23,11 +23,17 @@ public:
         : vec3(inX, inY, inZ), w(inW) {}
 	Vertex(Vector3 inVec, double inW = 1.0)
 		: vec3(inVec), w(inW) {}
+    //Copy constructor
+    Vertex (const Vertex &old_obj) {
+        vec3 = old_obj.vec3;
+        w = old_obj.w;
+    }
     //Conversion from vec3
-    void operator=(Vector3 inVec)
+    Vertex& operator=(Vector3 inVec)
     {
         vec3 = inVec;
         w = 1.0;
+        return *this;
     }
 
 	friend Vertex operator+(Vertex lhs, Vertex rhs);

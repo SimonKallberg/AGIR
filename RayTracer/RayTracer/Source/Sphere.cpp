@@ -36,10 +36,12 @@ bool Sphere::rayIntersection(Ray &p)
     //Check if x1 or x2 is on the sphere's surface
     if(((x1-centerPos.vec3).length()*(x1-centerPos.vec3).length() - r*r) < 0.001) {
         p.intSectPoint = new Vertex(x1);
+        p.endSphere = this;
         return true;
     }
     else if (((x2-centerPos.vec3).length()*(x2-centerPos.vec3).length() - r*r) < 0.001) {
         p.intSectPoint = new Vertex(x2);
+        p.endSphere = this;
         return true;
     }
     else {

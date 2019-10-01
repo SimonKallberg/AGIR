@@ -10,6 +10,8 @@
 #include <vector>
 #include <cstdio>
 #include "bitmap_image.hpp"
+#include "Triangle.hpp"
+#include "Ray.hpp"
 #include "matrix.hpp"
 #include "Scene.hpp"
 #include "Camera.hpp"
@@ -24,6 +26,7 @@ int main()
     myScene.addTetrahedron(Vertex(8.0, 0, 0), Vertex(8, -4, -4.0), Vertex(10, 0, -4.0), Vertex(8, 4, -4.0), ColorDbl(1.0, 0.0, 0.0));
     //Adding a grey sphere
     myScene.addSphere(Vertex(5.0,0.0,0.0), 2.0, ColorDbl(0.5, 0.5, 0.5));
+    myScene.addPointLight(Vertex(5.0,0.0,5.0));
 	Camera myCamera(&myScene);
 
 

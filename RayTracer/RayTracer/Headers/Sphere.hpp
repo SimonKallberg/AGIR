@@ -17,8 +17,10 @@
 
 class Sphere {
 public:
-    Sphere(Vertex inC, double inR, ColorDbl inColor)
+    Sphere(Vertex inC = Vertex(1.0, 1.0, 0.0), double inR =  1.0, ColorDbl inColor = ColorDbl(1.0, 1.0, 1.0))
       : r(inR), centerPos(inC), color(inColor) { }
+
+    
     bool rayIntersection(Ray &p);
     double r = 1.0;
     Vertex centerPos = Vertex(Vector3(0.0,0.0,0.0));

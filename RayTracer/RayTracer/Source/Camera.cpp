@@ -15,7 +15,6 @@ Ray Camera::calcRay(int x, int y) {
     //TODO resolve memory leak
 	Vertex *end = new Vertex(c4 + localCoord);
     Ray theRay = Ray(getActiveEye(), end);
-    
 	return theRay;
 }
 
@@ -27,10 +26,16 @@ void Camera::render()
 	{
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
-			Triangle temp(Vertex(1.0, 1.0, 0.0), Vertex(1.0, -1.0, 0.0), Vertex(-1.0, -1.0, 0.0));
-            Sphere tempS(Vertex(1.0, 1.0, 0.0), 1.0, ColorDbl(1.0, 1.0, 1.0));
+			Triangle temp;
+            Sphere tempS;
 			Ray myRay = calcRay(x, y);
+            //Check which triangle ray intersects with
 			theScene->findInterTri(myRay, temp);
+            
+            //Shoot shadow ray - DOESN'T WORK YET
+            //ColorDbl shadow = theScene->shootShadowRay(*myRay.intSectPoint);
+            
+            //Check if ray intersects with sphere
             if(theScene->findInterSphere(myRay, tempS) != nullptr) {
                 plane(x, y).color = tempS.color;
             }

@@ -15,10 +15,18 @@ class ColorDbl {
 public:
     double r, g, b;
     
-    ColorDbl(double inR, double inG, double inB)
+    ColorDbl(double inR = 0.0, double inG = 0.0, double inB = 0.0)
     : r(inR), g(inG), b(inB){}
 
-	ColorDbl& operator=(ColorDbl temp);
+    //Assignment operator
+    ColorDbl& operator=(const ColorDbl &temp);
+    
+    //Copy constructor
+    ColorDbl (const ColorDbl &old_obj) {
+        r = old_obj.r;
+        g = old_obj.g;
+        b = old_obj.b;
+    }
 
 	friend std::ostream& operator<<(std::ostream& out, const ColorDbl& v1);
 };
