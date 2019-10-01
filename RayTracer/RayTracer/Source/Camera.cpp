@@ -14,7 +14,7 @@ Ray Camera::calcRay(int x, int y) {
 	Vertex localCoord = Vertex(0.0, (double)x*deltaWidth, (double)y*deltaHeight);
     //TODO resolve memory leak
 	Vertex *end = new Vertex(c4 + localCoord);
-    Ray theRay = Ray(&eyeL, end);
+    Ray theRay = Ray(getActiveEye(), end);
     
 	return theRay;
 }
@@ -28,9 +28,15 @@ void Camera::render()
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
 			Triangle temp(Vertex(1.0, 1.0, 0.0), Vertex(1.0, -1.0, 0.0), Vertex(-1.0, -1.0, 0.0));
+            Sphere tempS(Vertex(1.0, 1.0, 0.0), 1.0, ColorDbl(1.0, 1.0, 1.0));
 			Ray myRay = calcRay(x, y);
 			theScene->findInterTri(myRay, temp);
-			plane(x, y).color = temp.color;
+            if(theScene->findInterSphere(myRay, tempS) != nullptr) {
+                plane(x, y).color = tempS.color;
+            }
+            else {
+                plane(x, y).color = temp.color;
+            }
 		}
 	}
 }
@@ -52,4 +58,13 @@ void Camera::createImage(std::string fileName)
     }
     cout << "Saving image..." << endl;
     image.save_image(fileName);
+}
+
+Vertex* Camera::getActiveEye() {
+    if(activeEye == RIGHT) {
+        return &eyeR;
+    }
+    else {
+        return &eyeL;
+    }
 }

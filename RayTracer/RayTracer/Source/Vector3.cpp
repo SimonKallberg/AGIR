@@ -12,8 +12,15 @@ double Vector3::length() {
     return sqrt((x*x) + (y*y) + (z*z));
 }
 
+void Vector3::normalize() {
+    double lengthVec = length();
+    x = x/lengthVec;
+    y = y/lengthVec;
+    z = z/lengthVec;
+}
+
 std::ostream& operator<<(std::ostream& out, const Vector3& v1) {
-    out << v1.x << " " << v1.y << " " << v1.z << std::endl;
+    out << "(" << v1.x << ", " << v1.y << ", " << v1.z << ")" << std::endl;
     return out;
 }
 

@@ -7,33 +7,42 @@
 //
 
 #include "Sphere.hpp"
+#include <cmath>
 
-bool Sphere::rayIntersection(Ray p)
+bool Sphere::rayIntersection(Ray &p)
 {
     //Start point
     Vector3 o = (*p.start).vec3;
+    
     //Normalized Vector3 from starting point
     Vector3 I = (*p.end-*p.start).vec3;
-    //Normalize I
-    I = I/I.length();
+    I.normalize();
+
     double a = 1.0;
- //   double b = dotProduct(2*I,o-centerPos);
-//    Vector3 D = *p.end - *p.start;
-//    Vector3 P = crossProduct(D, E2);
-//    Vector3 Q = crossProduct(T, E1);
-//    Vector3 tuv = Vector3(dotProduct(Q, E2)/dotProduct(P, E1),
-//                                       dotProduct(P, T)/dotProduct(P, E1),
-//                                       dotProduct(Q, D)/dotProduct(P, E1));
-//
-//    //Check if variables are in triangle area -> intersection!
-//    if( ((tuv.y + tuv.z <= 1) && (tuv.y >= 0) && (tuv.z >= 0)) && (tuv.x > 1) &&
-//      ((((tuv.y*(v1-v0)) + (tuv.z*(v2-v0)) - (tuv.x*(*p.end-*p.start)) - (*p.start-v0)) < 0.0001) ||
-//      (((tuv.y*(v1-v0)) + (tuv.z*(v2-v0)) - (tuv.x*(*p.end-*p.start)) - (*p.start-v0)) > 0.0001))) {
-//            //cout << "intersection!" << endl;
-//            p.endTri = this;
-//            p.intSectPoint = new Vertex(tuv.x*D.x, tuv.x*D.y ,tuv.x*D.z);
-//            *p.intSectPoint = *p.intSectPoint + *p.start;
-//            return true;
-//    }
-    return false;
+    double b = dotProduct((2*I),o-centerPos.vec3);
+    double c = dotProduct(o-centerPos.vec3, o-centerPos.vec3) - r*r;
+    
+    double d1 = (-b/2) + sqrt(((b/2)*(b/2))-(a*c));
+    double d2 = (-b/2) - sqrt(((b/2)*(b/2))-(a*c));
+    
+    //Check if root is imaginary - then the ray doesn't intersect
+    if(isnan(d1) || isnan(d2)) {
+        return false;
+    }
+    
+    Vector3 x1 = o + d1*I;
+    Vector3 x2 = o + d2*I;
+    
+    //Check if x1 or x2 is on the sphere's surface
+    if(((x1-centerPos.vec3).length()*(x1-centerPos.vec3).length() - r*r) < 0.001) {
+        p.intSectPoint = new Vertex(x1);
+        return true;
+    }
+    else if (((x2-centerPos.vec3).length()*(x2-centerPos.vec3).length() - r*r) < 0.001) {
+        p.intSectPoint = new Vertex(x2);
+        return true;
+    }
+    else {
+        return false;
+    }
 }

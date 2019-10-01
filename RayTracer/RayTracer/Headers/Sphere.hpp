@@ -13,12 +13,13 @@
 #include "Vertex.hpp"
 #include "ColorDbl.hpp"
 #include "Ray.hpp"
+#include <cmath>
 
 class Sphere {
 public:
     Sphere(Vertex inC, double inR, ColorDbl inColor)
       : r(inR), centerPos(inC), color(inColor) { }
-    bool rayIntersection(Ray p);
+    bool rayIntersection(Ray &p);
     double r = 1.0;
     Vertex centerPos = Vertex(Vector3(0.0,0.0,0.0));
     ColorDbl color = ColorDbl(1.0,1.0,1.0);

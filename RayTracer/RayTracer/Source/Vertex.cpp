@@ -34,6 +34,6 @@ bool operator>(Vertex lhs, double rhs) {
 }
 
 std::ostream& operator<<(std::ostream& out, const Vertex& v1) {
-	out << v1.vec3 << std::endl;
+	out << v1.vec3;
 	return out;
 }

@@ -22,9 +22,11 @@
 
 class Camera {
 public:
+    bool RIGHT = true;
+    bool LEFT = false;
 	Vertex eyeL, eyeR;
 	Scene* theScene = nullptr;
-	bool activeEye = true; // if false, left eye. If true, right eye
+	bool activeEye = LEFT; // if false, left eye. If true, right eye
 	Camera(Scene* inScene, Vertex inL = Vertex(-1.0, 0.0, 0.0), Vertex inR = Vertex(-2.0, 0.0, 0.0),
            int camWidth = 800, int camHeigth = 800)
 		: theScene(inScene), eyeL(inL), eyeR(inR), plane(camWidth, camHeigth), CAMERA_WIDTH(camWidth),
@@ -43,6 +45,7 @@ public:
 	Ray calcRay(int x, int y);
 	void render();
 	void createImage(std::string fileName);
+    Vertex* getActiveEye();
 };
 
 #endif

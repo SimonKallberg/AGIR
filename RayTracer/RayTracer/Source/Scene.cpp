@@ -53,12 +53,8 @@ void Scene::initialize()
 Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 {
     for(int i = 0; i < scene.size(); i++) {
-        //std::cout << i << std::endl;
         if(scene[i].rayIntersection(arg)) {
-            std::cout << i << std::endl;
             t1 = scene[i];
-            //std::cout << scene[i].color << std::endl;
-            //std::cout << t1.color << std::endl;
             return arg.intSectPoint;
         }
     }
@@ -72,20 +68,19 @@ void Scene::addTetrahedron(Vertex top, Vertex corner1, Vertex corner2, Vertex co
     scene.push_back(Triangle(top, corner1, corner3, incolor));
     //Bottom
     scene.push_back(Triangle(corner1, corner2, corner3, incolor));
-    std::cout << scene.size() << std::endl;
+    std::cout << "Added a tetrahedron to the scene!" << std::endl;
 }
 
 void Scene::addSphere(Vertex inCenter, double radius, ColorDbl inColor) {
     spheres.push_back(Sphere(inCenter, radius, inColor));
     
-    std::cout << scene.size() << std::endl;
+    std::cout << "Added a sphere with center: " << inCenter << "color: " << inColor << "radius: " << radius << " to the scene!" << std::endl;
 }
 
 Vertex* Scene::findInterSphere(Ray &arg, Sphere &s1)
 {
     for(int i = 0; i < spheres.size(); i++) {
         if(spheres[i].rayIntersection(arg)) {
-            std::cout << i << std::endl;
             s1 = spheres[i];
             return arg.intSectPoint;
         }
