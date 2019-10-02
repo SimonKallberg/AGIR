@@ -245,3 +245,5 @@ Progress_images/
 RayTracer/RayTracer/RayTracer.vcxproj.filters
 
 RayTracer/RayTracer/RayTracer.vcxproj
+
+*.vcxproj

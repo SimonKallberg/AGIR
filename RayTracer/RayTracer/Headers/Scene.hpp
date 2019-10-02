@@ -16,6 +16,8 @@
 #include "Sphere.hpp"
 #include "PointLight.hpp"
 #include "ColorDbl.hpp"
+#include <algorithm>
+#include <iterator>
 
 class Scene {
 public:

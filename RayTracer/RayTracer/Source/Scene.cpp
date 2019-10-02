@@ -8,6 +8,7 @@
 #include "Scene.hpp"
 
 
+
 void Scene::initialize()
 {
     std::cout << "Setting up triangles...." << std::endl;
@@ -54,30 +55,35 @@ void Scene::initialize()
 
 Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 {
+	std::vector<Vertex> intersections;
+	std::vector<double> lengths;
 
     for(int i = 0; i < scene.size(); i++) {
         if(scene[i].rayIntersection(arg)) {
-            t1 = scene[i];
-            return arg.intSectPoint;
+           
+			intersections.push_back(*arg.intSectPoint);
+			Vector3 dir = arg.intSectPoint - arg.start;
+			lengths.push_back(dir.length());
         }
     }
-    return nullptr;
+	std::vector<double>::iterator result = std::min_element(std::begin(lengths),std::end(lengths));
+	int i = std::distance(std::begin(lengths), result);
+	t1 = scene[i];
+	arg.intSectPoint = new Vertex(intersections[i]);
+    return arg.intSectPoint;
 }
 
 Vertex* Scene::findInterTetra(Ray &arg, Triangle &t1)
 {
-    Vertex* result = nullptr;
+
     for(int i = 0; i < tetrahedra.size(); i++) {
         if(tetrahedra[i].rayIntersection(arg)) {
-            if(result != nullptr ) {
-                if( (*arg.intSectPoint - *arg.start).vec3.length() < ((*result-*arg.start).vec3.length()) ) {
-                    t1 = tetrahedra[i];
-                    result = arg.intSectPoint;
-                }
-            }
+			t1 = tetrahedra[i];
+			return arg.intSectPoint;
         }
     }
-    return result;
+	arg.intSectPoint = nullptr;
+    return nullptr;
 }
 
 void Scene::addTetrahedron(Vertex top, Vertex corner1, Vertex corner2, Vertex corner3, ColorDbl incolor) {
