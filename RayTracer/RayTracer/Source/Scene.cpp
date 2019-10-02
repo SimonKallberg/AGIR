@@ -95,17 +95,17 @@ void Scene::addPointLight(Vertex inCenter) {
     std::cout << "Added a pointlight with center: " << inCenter << "to the scene!" << std::endl << std::endl;
 }
 
-ColorDbl Scene::shootShadowRay(Vertex &inV) {
+bool Scene::shootShadowRay(Vertex &inV) {
     Ray theRay = Ray(&inV, &pointLights[0].pos);
     Triangle tempT;
     Sphere tempS;
     //If a sphere is in between point and light source, return color
-    if(findInterSphere(theRay, tempS)) {
-        return ColorDbl(0.0,0.0,0.0);
+    if(findInterSphere(theRay, tempS) != nullptr) {
+        return true;
     }
-    //If a tringale is in between point and light source, return color
-//    if(findInterTri(theRay, tempT)) {
-//        return ColorDbl(0.0,0.0,0.0);
+    //If a triangle is in between point and light source, return color
+//    if(findInterTri(theRay, tempT) != nullptr) {
+//       return true;
 //    }
-    return ColorDbl(1,1,1);
+    return false;
 }

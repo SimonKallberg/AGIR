@@ -27,7 +27,7 @@ public:
     void addTetrahedron(Vertex top, Vertex corner1, Vertex corner2, Vertex corner3, ColorDbl incolor);
     void addSphere(Vertex inCenter, double radius, ColorDbl inColor);
     void addPointLight(Vertex inCenter);
-    ColorDbl shootShadowRay(Vertex &inV);
+    bool shootShadowRay(Vertex &inV);
     
     Vertex* findInterTri(Ray &arg, Triangle &t1);
     Vertex* findInterSphere(Ray &arg, Sphere &s1);

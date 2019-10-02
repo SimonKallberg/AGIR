@@ -31,7 +31,7 @@ void Camera::render()
 			Ray myRay = calcRay(x, y);
             //Check which triangle ray intersects with
 			theScene->findInterTri(myRay, temp);
-            ColorDbl shadow = ColorDbl(1.0,1.0,1.0);
+            bool shadow = false;
             
             //Shoot shadow ray if ray hits something
             if(myRay.intSectPoint != nullptr) {
@@ -45,8 +45,8 @@ void Camera::render()
                    shadow = theScene->shootShadowRay(*myRay.intSectPoint);
                }
                 //Is there a shadow? Set to black
-                if(shadow.r < 0.00001) {
-                    plane(x, y).color = shadow;
+                if(shadow) {
+                    plane(x, y).color = ColorDbl(0.0,0.0,0.0);
                 }
                 else {
                     plane(x, y).color = tempS.color;
@@ -54,8 +54,8 @@ void Camera::render()
             }
             else {
                 //Is there a shadow? Set to black
-                if(shadow.r < 0.00001) {
-                    plane(x, y).color = shadow;
+                if(shadow) {
+                    plane(x, y).color = ColorDbl(0.0,0.0,0.0);
                 }
                 else {
                     plane(x, y).color = temp.color;

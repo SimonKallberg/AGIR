@@ -30,26 +30,37 @@ bool Sphere::rayIntersection(Ray &p)
         return false;
     }
     //Check if point is same as starting point - then the ray doesn't intersect
-    if(d1 < 0.001 && d2 < 0.001) {
+    if(d1 < 0.0001 && d2 < 0.0001) {
         return false;
     }
     
-    
-    Vector3 x1 = o + d1*I;
-    Vector3 x2 = o + d2*I;
-    
-    //Check if x1 or x2 is on the sphere's surface & starting point of ray isn't on spheres surface
-    if(abs((x1-centerPos.vec3).length()*(x1-centerPos.vec3).length() - r*r) < 0.001){
-        p.intSectPoint = new Vertex(x1);
-        p.endSphere = this;
-        return true;
-    }
-    else if ((abs((x2-centerPos.vec3).length()*(x2-centerPos.vec3).length() - r*r) < 0.001)){
+    if(d1 > d2) {
+        Vector3 x2 = o + d2*I;
         p.intSectPoint = new Vertex(x2);
         p.endSphere = this;
         return true;
     }
     else {
-        return false;
+       Vector3 x1 = o + d1*I;
+        p.intSectPoint = new Vertex(x1);
+        p.endSphere = this;
+        return true;
     }
+    
+    
+    
+    
+    
+    
+    
+//    //Check if x1 or x2 is on the sphere's surface & starting point of ray isn't on spheres surface
+//    if(abs((x1-centerPos.vec3).length()*(x1-centerPos.vec3).length() - r*r) < 0.001){
+
+//    }
+//    else if ((abs((x2-centerPos.vec3).length()*(x2-centerPos.vec3).length() - r*r) < 0.001)){
+
+//    }
+//    else {
+//        return false;
+//    }
 }
