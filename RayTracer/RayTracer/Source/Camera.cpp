@@ -36,6 +36,7 @@ void Camera::render()
             //Shoot shadow ray if ray hits something
             if(myRay.intSectPoint != nullptr) {
                shadow = theScene->shootShadowRay(*myRay.intSectPoint);
+                //cout << shadow << endl;
             }
             
             //Check if ray intersects with sphere

@@ -52,7 +52,7 @@ void Scene::initialize()
 
 Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 {
-    for(int i = scene.size(); i > 0; i--) {
+    for(int i = (int)scene.size(); i > 0; i--) {
         if(scene[i].rayIntersection(arg)) {
             t1 = scene[i];
             return arg.intSectPoint;
@@ -104,8 +104,15 @@ bool Scene::shootShadowRay(Vertex &inV) {
         return true;
     }
     //If a triangle is in between point and light source, return color
-//    if(findInterTri(theRay, tempT) != nullptr) {
-//       return true;
-//    }
+    if(findInterTri(theRay, tempT) != nullptr) {
+        if( (theRay.end->vec3 - theRay.start->vec3).length() >
+           (theRay.intSectPoint->vec3 - theRay.start->vec3).length()) {
+            return false;
+        }
+//        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.3) {
+//            return false;
+//        }
+       return true;
+    }
     return false;
 }
