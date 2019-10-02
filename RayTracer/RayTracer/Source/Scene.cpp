@@ -64,13 +64,24 @@ Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
     return nullptr;
 }
 
+Vertex* Scene::findInterTetra(Ray &arg, Triangle &t1)
+{
+    for(int i = 0; i < tetrahedra.size(); i++) {
+        if(tetrahedra[i].rayIntersection(arg)) {
+            t1 = tetrahedra[i];
+            return arg.intSectPoint;
+        }
+    }
+    return nullptr;
+}
+
 void Scene::addTetrahedron(Vertex top, Vertex corner1, Vertex corner2, Vertex corner3, ColorDbl incolor) {
     //Sides
-    scene.push_back(Triangle(top, corner1, corner2, incolor));
-    scene.push_back(Triangle(top, corner2, corner3, incolor));
-    scene.push_back(Triangle(top, corner1, corner3, incolor));
+    tetrahedra.push_back(Triangle(top, corner1, corner2, incolor));
+    tetrahedra.push_back(Triangle(top, corner2, corner3, incolor));
+    tetrahedra.push_back(Triangle(top, corner1, corner3, incolor));
     //Bottom
-    scene.push_back(Triangle(corner1, corner2, corner3, incolor));
+    tetrahedra.push_back(Triangle(corner1, corner2, corner3, incolor));
     std::cout << "Added a tetrahedron to the scene!" << std::endl;
 }
 
@@ -82,7 +93,7 @@ void Scene::addSphere(Vertex inCenter, double radius, ColorDbl inColor) {
 
 Vertex* Scene::findInterSphere(Ray &arg, Sphere &s1)
 {
-    for(int i = 0; i < spheres.size(); i++) {
+    for(int i = 0; i < (int)spheres.size(); i++) {
         if(spheres[i].rayIntersection(arg)) {
             s1 = spheres[i];
             return arg.intSectPoint;
@@ -107,14 +118,10 @@ bool Scene::shootShadowRay(Vertex &inV) {
         return true;
     }
     //If a triangle is in between point and light source, return color
-    if(findInterTri(theRay, tempT) != nullptr) {
-        if( (theRay.end->vec3 - theRay.start->vec3).length() >
-           (theRay.intSectPoint->vec3 - theRay.start->vec3).length()) {
+    if(findInterTetra(theRay, tempT) != nullptr) {
+        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.3) {
             return false;
         }
-//        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.3) {
-//            return false;
-//        }
        return true;
     }
     return false;

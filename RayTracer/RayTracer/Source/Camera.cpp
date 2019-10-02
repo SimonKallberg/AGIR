@@ -27,9 +27,10 @@ void Camera::render()
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
 			Triangle temp;
+            Triangle tempTetra;
             Sphere tempS;
 			Ray myRay = calcRay(x, y);
-            //Check which triangle ray intersects with
+            //Check for ray intersection with room
 			theScene->findInterTri(myRay, temp);
             bool shadow = false;
             
@@ -53,6 +54,20 @@ void Camera::render()
                     plane(x, y).color = tempS.color;
                }
             }
+            //Check if ray intersects with tetra
+            else if(theScene->findInterTetra(myRay, tempTetra) != nullptr) {
+                  //Shoot shadow ray if ray hits something
+                  if(myRay.intSectPoint != nullptr) {
+                     shadow = theScene->shootShadowRay(*myRay.intSectPoint);
+                 }
+                  //Is there a shadow? Set to black
+                  if(shadow) {
+                      plane(x, y).color = ColorDbl(0.0,0.0,0.0);
+                  }
+                  else {
+                      plane(x, y).color = tempTetra.color;
+                 }
+              }
             else {
                 //Is there a shadow? Set to black
                 if(shadow) {

@@ -59,7 +59,7 @@ bool Triangle::rayIntersection(Ray &p)
         return false;
     }
     
-    if(t > 0.00001 || t < 1000000) {
+    if(t > 0.0 || t < 1000000) {
         p.endTri = this;
         Vector3 intersection = p.start->vec3 + t*D;
         p.intSectPoint = new Vertex(intersection);
