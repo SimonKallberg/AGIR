@@ -34,6 +34,7 @@ public:
 
 	bool rayIntersection(Ray &arg1);
 	Vector3 calcNormal();
+    void flipNormal();
 
 	friend std::ostream& operator<<(std::ostream& out, const Triangle& v1);
     

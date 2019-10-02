@@ -18,6 +18,7 @@
 #include "Ray.hpp"
 #include "Triangle.hpp"
 #include "Scene.hpp"
+#include "Surface.hpp"
 
 
 class Camera {

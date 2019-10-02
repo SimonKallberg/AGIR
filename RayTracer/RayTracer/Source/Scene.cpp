@@ -16,7 +16,7 @@ void Scene::initialize()
 
     
     //Wall2 - purple
-    scene.push_back(Triangle(Vertex(0,6,5), Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(9.0, 0.0, 9.0)));
+    scene.push_back(Triangle(Vertex(0,6,5), Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(1.0, 0.0, 1.0)));
     scene.push_back(Triangle(Vertex(10,6,5), Vertex(10,6,-5), Vertex(0,6,-5), ColorDbl(1.0, 0.0, 1.0)));
 	
     //Wall 3 - turqoise
@@ -66,13 +66,18 @@ Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 
 Vertex* Scene::findInterTetra(Ray &arg, Triangle &t1)
 {
+    Vertex* result = nullptr;
     for(int i = 0; i < tetrahedra.size(); i++) {
         if(tetrahedra[i].rayIntersection(arg)) {
-            t1 = tetrahedra[i];
-            return arg.intSectPoint;
+            if(result != nullptr ) {
+                if( (*arg.intSectPoint - *arg.start).vec3.length() < ((*result-*arg.start).vec3.length()) ) {
+                    t1 = tetrahedra[i];
+                    result = arg.intSectPoint;
+                }
+            }
         }
     }
-    return nullptr;
+    return result;
 }
 
 void Scene::addTetrahedron(Vertex top, Vertex corner1, Vertex corner2, Vertex corner3, ColorDbl incolor) {
@@ -120,7 +125,7 @@ bool Scene::shootShadowRay(Vertex &inV) {
     //If a triangle is in between point and light source, return color
     if(findInterTetra(theRay, tempT) != nullptr) {
         //Margin - checks that point of intersection isn't same as start point
-        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.000001) {
+        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.01) {
             return false;
         }
        return true;

@@ -77,6 +77,29 @@ void Camera::render()
                     plane(x, y).color = temp.color;
                 }
             }
+            if(theScene->findInterTetra(myRay, tempTetra) != nullptr) {
+                //Shoot shadow ray if ray hits something
+                if(myRay.intSectPoint != nullptr) {
+                   Vector3 dir = calcPerfectReflection(myRay, myRay.endTri->normal);
+                    Vertex dirVert = *myRay.intSectPoint + dir;
+                    Ray mirroredRay = Ray(myRay.intSectPoint, &dirVert);
+                    
+                    if (theScene->findInterSphere(mirroredRay, tempS) != nullptr){
+                        plane(x, y).color = tempS.color;
+                    }
+                    else if (theScene->findInterTri(mirroredRay, temp) != nullptr) {
+                        plane(x, y).color = temp.color;
+                    }
+                    else if(theScene->findInterTetra(mirroredRay, tempTetra) != nullptr) {
+                        plane(x, y).color = tempTetra.color;
+                    }
+                    else {
+                        
+                    }
+                }
+                
+            }
+            
 		}
 	}
 }
