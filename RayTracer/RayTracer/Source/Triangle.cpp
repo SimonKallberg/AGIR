@@ -19,33 +19,52 @@ Vector3 Triangle::calcNormal() {
     //Cross product to get normal
     Vector3 normal = crossProduct(vector1, vector2);
     //Normalize
-    double length = normal.length();
-    normal = Vector3(normal/length);
+    normal.normalize();
     //std::cout << normal.x << " " << normal.y << " " << normal.z << std::endl;
     return normal;
 }
 
 bool Triangle::rayIntersection(Ray &p)
 {
+    //Start ray
     Vector3 T = (*p.start-v0).vec3;
+    //Edge 1
     Vector3 E1 = (v1-v0).vec3;
+    //Edge 2
     Vector3 E2 = (v2-v0).vec3;
+    //Direction
     Vector3 D = (*p.end - *p.start).vec3;
+    D.normalize();
+    //Edge normal
     Vector3 P = crossProduct(D, E2);
+    //Determinant
+    double determinant = dotProduct(P, E1);
+    
+    if(abs(determinant) < 0.001 ) {
+        return false;
+    }
+    
     Vector3 Q = crossProduct(T, E1);
-    Vector3 tuv = Vector3(dotProduct(Q, E2)/dotProduct(P, E1),
-                                       dotProduct(P, T)/dotProduct(P, E1),
-                                       dotProduct(Q, D)/dotProduct(P, E1));
+    
+    double t = dotProduct(Q, E2)/determinant;
+    double u = dotProduct(T, P)/determinant;
+    double v = dotProduct(D, Q)/determinant;
     
     //Check if variables are in triangle area -> intersection!
-    if( ((tuv.y + tuv.z <= 1) && (tuv.y >= 0) && (tuv.z >= 0)) && (tuv.x > 1) &&
-      ((((tuv.y*(v1-v0)) + (tuv.z*(v2-v0)) - (tuv.x*(*p.end-*p.start)) - (*p.start-v0)) < 0.0001) ||
-      (((tuv.y*(v1-v0)) + (tuv.z*(v2-v0)) - (tuv.x*(*p.end-*p.start)) - (*p.start-v0)) > 0.0001))) {
-            //cout << "intersection!" << endl;
-            p.endTri = this;
-            p.intSectPoint = new Vertex(tuv.x*D.x, tuv.x*D.y ,tuv.x*D.z);
-            //*p.intSectPoint = *p.intSectPoint + *p.start;
-            return true;
+    if(u < 0.0 || u > 1.0) {
+        return false;
+    }
+    
+    if(v < 0.0 || u + v > 1.0) {
+        return false;
+    }
+    
+    if(t > 0.0001 || t < 1000000) {
+
+        p.endTri = this;
+        Vector3 intersection = p.start->vec3 + t*D;
+        p.intSectPoint = new Vertex(intersection);
+        return true;
     }
     return false;
 }

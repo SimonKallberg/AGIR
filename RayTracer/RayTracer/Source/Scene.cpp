@@ -52,7 +52,7 @@ void Scene::initialize()
 
 Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 {
-    for(int i = 0; i < scene.size(); i++) {
+    for(int i = scene.size(); i > 0; i--) {
         if(scene[i].rayIntersection(arg)) {
             t1 = scene[i];
             return arg.intSectPoint;
@@ -103,5 +103,9 @@ ColorDbl Scene::shootShadowRay(Vertex &inV) {
     if(findInterSphere(theRay, tempS)) {
         return ColorDbl(0.0,0.0,0.0);
     }
+    //If a tringale is in between point and light source, return color
+//    if(findInterTri(theRay, tempT)) {
+//        return ColorDbl(0.0,0.0,0.0);
+//    }
     return ColorDbl(1,1,1);
 }
