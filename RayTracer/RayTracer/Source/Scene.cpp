@@ -13,13 +13,7 @@ void Scene::initialize()
     std::cout << "Setting up triangles...." << std::endl;
     
     //Setting up a room shaped as a polygon
-    // Wall 1 - yellow
-    scene.push_back(Triangle(Vertex(-3,0,5), Vertex(0,6,5), Vertex(-3,0,-5), ColorDbl(1.0, 1.0,0.0)));
-    scene.push_back(Triangle(Vertex(0,6,5), Vertex(0,6,-5), Vertex(-3,0,-5), ColorDbl(1.0, 1.0, 0.0)));
-    
-    //Wall 4 - red
-    scene.push_back(Triangle(Vertex(-3,0,-5), Vertex(0,-6,5), Vertex(-3,0,5), ColorDbl(1.0, 0.0, 0.0)));
-    scene.push_back(Triangle(Vertex(-3,0,-5), Vertex(0,-6,-5), Vertex(0,-6,5), ColorDbl(1.0, 0.0, 0.0)));
+
     
     //Wall2 - purple
     scene.push_back(Triangle(Vertex(0,6,5), Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(9.0, 0.0, 9.0)));
@@ -48,11 +42,20 @@ void Scene::initialize()
     scene.push_back(Triangle(Vertex(0,6,-5), Vertex(10,6,-5), Vertex(0,-6,-5), ColorDbl(1, 0.9, 1)));
     scene.push_back(Triangle(Vertex(10,6,-5), Vertex(10,-6,-5), Vertex(0,-6,-5), ColorDbl(0.9, 1, 1)));
     scene.push_back(Triangle(Vertex(10,6,-5), Vertex(13,0,-5), Vertex(10,-6,-5), ColorDbl(0.9, 0.9, 1)));
+
+	// Wall 1 - yellow
+	scene.push_back(Triangle(Vertex(-3, 0, 5), Vertex(0, 6, 5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
+	scene.push_back(Triangle(Vertex(0, 6, 5), Vertex(0, 6, -5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
+
+	//Wall 4 - red
+	scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, 5), Vertex(-3, 0, 5), ColorDbl(1.0, 0.0, 0.0)));
+	scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, -5), Vertex(0, -6, 5), ColorDbl(1.0, 0.0, 0.0)));
 }
 
 Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 {
-    for(int i = (int)scene.size(); i > 0; i--) {
+
+    for(int i = 0; i < scene.size(); i++) {
         if(scene[i].rayIntersection(arg)) {
             t1 = scene[i];
             return arg.intSectPoint;
