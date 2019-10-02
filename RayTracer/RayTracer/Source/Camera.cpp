@@ -54,7 +54,7 @@ void Camera::render()
                     plane(x, y).color = tempS.color;
                }
             }
-            //Check if ray intersects with tetra
+            //Check if ray intersects with tetrahedra
             else if(theScene->findInterTetra(myRay, tempTetra) != nullptr) {
                   //Shoot shadow ray if ray hits something
                   if(myRay.intSectPoint != nullptr) {

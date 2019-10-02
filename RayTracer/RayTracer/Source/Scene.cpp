@@ -119,7 +119,8 @@ bool Scene::shootShadowRay(Vertex &inV) {
     }
     //If a triangle is in between point and light source, return color
     if(findInterTetra(theRay, tempT) != nullptr) {
-        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.3) {
+        //Margin - checks that point of intersection isn't same as start point
+        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.000001) {
             return false;
         }
        return true;
