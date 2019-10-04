@@ -123,10 +123,42 @@ Vertex* Scene::findInterSphere(Ray &arg, Sphere &s1)
     return arg.intSectPoint = result;
 }
 
-Vertex* findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
+Vertex* Scene::findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
     
+    Vertex* result = nullptr;
+    double minlength = 10000000000;
+    Ray inRay = arg;
     
-    return arg.intSectPoint;
+    if(findInterTri(arg, t1)) {
+        double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
+        if(length < minlength) {
+            minlength = length;
+            result = arg.intSectPoint;
+            t1 = *arg.endTri;
+            arg.endSphere = nullptr;
+        }
+    }
+    if(findInterSphere(arg, s1)) {
+        double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
+        if(length < minlength) {
+            minlength = length;
+            result = arg.intSectPoint;
+            s1 = *arg.endSphere;
+            arg.endTri = nullptr;
+        }
+    }
+    if(findInterTetra(arg, t1)) {
+        double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
+        if(length < minlength) {
+            minlength = length;
+            result = arg.intSectPoint;
+            t1 = *arg.endTri;
+            arg.endSphere = nullptr;
+        }
+    }
+    
+
+    return arg.intSectPoint = result;
 }
 
 void Scene::addPointLight(Vertex inCenter) {
