@@ -29,6 +29,7 @@ public:
     }
 
 	friend std::ostream& operator<<(std::ostream& out, const ColorDbl& v1);
+	friend ColorDbl operator*(ColorDbl lhs, double rhs);
 };
 
 #endif /* ColorDbl_hpp */

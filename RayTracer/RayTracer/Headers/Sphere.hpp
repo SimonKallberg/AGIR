@@ -18,8 +18,8 @@
 
 class Sphere {
 public:
-    Sphere(Vertex inC = Vertex(1.0, 1.0, 0.0), double inR =  1.0, ColorDbl inColor = ColorDbl(1.0, 1.0, 1.0))
-      : r(inR), centerPos(inC), color(inColor) { }
+    Sphere(Vertex inC = Vertex(1.0, 1.0, 0.0), double inR =  1.0, ColorDbl inColor = ColorDbl(1.0, 1.0, 1.0), int refType = 0)
+      : r(inR), centerPos(inC), surf(refType,inColor) { }
 
     
     bool rayIntersection(Ray &p);

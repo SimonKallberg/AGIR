@@ -14,3 +14,13 @@ Vector3 calcPerfectReflection(Ray &inRay, Vector3 normal) {
     
     return (I - 2*(dotProduct(I,normal)*normal));
 }
+
+ColorDbl Surface::diffuseReflection(ColorDbl inC)
+{
+	return (inC * (reflectionCo/3.1415));
+}
+
+ColorDbl Surface::specularReflection(ColorDbl inC)
+{
+	return inC;
+}

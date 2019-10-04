@@ -15,10 +15,20 @@
 
 Vector3 calcPerfectReflection(Ray &inRay, Vector3 normal);
 
+
 class Surface {
-    
+  
 public:
-    
+	Surface(int reflection = 0, ColorDbl col = ColorDbl(1,1,1)) 
+		: reflectionType(reflection), color(col) 
+	{	}
+	ColorDbl diffuseReflection(ColorDbl inC);
+	ColorDbl specularReflection(ColorDbl inC);
+	int reflectionType;
+	ColorDbl color;
+
+	double reflectionCo = 0.8;
+
 };
 
 #endif /* Surface_hpp */

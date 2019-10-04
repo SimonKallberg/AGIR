@@ -38,10 +38,14 @@ void Camera::render()
                      shadow = theScene->shootShadowRay(*myRay.intSectPoint);
                      //Is there a shadow? Set to black
                      if(shadow) {
-                         plane(x, y).color = ColorDbl(temp.color.r-0.3,temp.color.g-0.3,temp.color.b-0.3);
+                         plane(x, y).color = ColorDbl(temp.surf.color.r-0.3,temp.surf.color.g-0.3,temp.surf.color.b-0.3);
                      }
                      else {
-                         plane(x, y).color = temp.color;
+						 Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
+						 rayToLight.normalize();
+						 double alpha = dotProduct(myRay.endTri->normal, rayToLight);
+
+                         plane(x, y).color = temp.surf.color * alpha;
                      }
                 }
             }
@@ -51,10 +55,10 @@ void Camera::render()
                      shadow = theScene->shootShadowRay(*myRay.intSectPoint);
                      //Is there a shadow? Set to black
                      if(shadow) {
-                         plane(x, y).color = ColorDbl(tempS.color.r-0.3,tempS.color.g-0.3,tempS.color.b-0.3);
+                         plane(x, y).color = ColorDbl(tempS.surf.color.r-0.3,tempS.surf.color.g-0.3,tempS.surf.color.b-0.3);
                      }
                      else {
-                         plane(x, y).color = tempS.color;
+                         plane(x, y).color = tempS.surf.color;
                      }
                 }
             }

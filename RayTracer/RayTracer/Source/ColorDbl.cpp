@@ -13,6 +13,11 @@ std::ostream & operator<<(std::ostream & out, const ColorDbl & v1)
 	return out;
 }
 
+ColorDbl operator*(ColorDbl lhs, double rhs)
+{
+	return ColorDbl(lhs.r*rhs, lhs.g*rhs, lhs.b*rhs);
+}
+
 ColorDbl & ColorDbl::operator=(const ColorDbl &temp)
 {
 	r = temp.r;

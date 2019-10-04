@@ -35,16 +35,17 @@ void Scene::initialize()
     scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,-5), Vertex(10,-6,5), ColorDbl(0.0, 0.0, 1.0)));
 	
     //Wall 6 - green
-    scene.push_back(Triangle(Vertex(10,-6,5), Vertex(13,0,5), Vertex(10,-6,-5), ColorDbl(0.0, 1.0, 0.0)));
+    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,5), Vertex(10,-6,5), ColorDbl(0.0, 1.0, 0.0)));
     scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,-5), Vertex(13,0,5), ColorDbl(0.0, 1.0, 0.0)));
     
-    //Floor - white
-    scene.push_back(Triangle(Vertex(0,-6,5), Vertex(0,6,5), Vertex(-3,0,5), ColorDbl(1, 1, 0.1)));
+    //celing - white
+    scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(0,6,5), Vertex(-3, 0, 5), ColorDbl(1, 1, 0.1)));
+	cout << scene[12].normal << endl;
     scene.push_back(Triangle(Vertex(0,-6,5), Vertex(10,6,5), Vertex(0,6,5), ColorDbl(1, 1, 1)));
-    scene.push_back(Triangle(Vertex(0,-6,5), Vertex(10,-6,5), Vertex(10,6,5), ColorDbl(1, 1, 1)));
+    scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(10,-6,5), Vertex(10, 6, 5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(10,-6,5), Vertex(13,0,5), Vertex(10,6,5), ColorDbl(1, 1, 1)));
     
-    //Ceiling - white
+    //floor - white
     scene.push_back(Triangle(Vertex(-3,0,-5), Vertex(0,6,-5), Vertex(0,-6,-5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(0,6,-5), Vertex(10,6,-5), Vertex(0,-6,-5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(10,6,-5), Vertex(10,-6,-5), Vertex(0,-6,-5), ColorDbl(1, 1, 1)));
@@ -88,10 +89,19 @@ Vertex* Scene::findInterTetra(Ray &arg, Triangle &t1)
     return arg.intSectPoint = result;
 }
 
-void Scene::addTetrahedron(Vertex top, Vertex corner1, Vertex corner2, Vertex corner3, ColorDbl incolor) {
+void Scene::addTetrahedron(Vertex inV, ColorDbl incolor) {
+	double scale = 1.5;
+	Vertex top = inV + Vertex(0.0, 0.0, 2.0);
+	/*Vertex corner1 = inV + Vertex(sqrt(8.0/9.0), 0, -(1.0/3.0));
+	Vertex corner2 = inV + Vertex(-1*sqrt(2.0 / 9.0), sqrt(2.0 / 3.0), -(1.0/3.0));
+	Vertex corner3 = inV + Vertex(-1*sqrt(2.0 / 9.0), -1 * sqrt(2.0 / 3.0), -(1.0/3.0));*/
+	Vertex corner1 = inV + Vertex(2, 0, -2);
+	Vertex corner2 = inV + Vertex(-2, 2, -2);
+	Vertex corner3 = inV + Vertex(-2, -2, -2);
+
     //Sides
-    tetrahedra.push_back(Triangle(top, corner1, corner2, incolor));
-    tetrahedra.push_back(Triangle(top, corner2, corner3, incolor));
+    tetrahedra.push_back(Triangle(top, corner2, corner1, incolor));
+    tetrahedra.push_back(Triangle(top, corner3, corner2, incolor));
     tetrahedra.push_back(Triangle(top, corner1, corner3, incolor));
     //Bottom
     tetrahedra.push_back(Triangle(corner1, corner2, corner3, incolor));

@@ -20,8 +20,9 @@ Vector3 Triangle::calcNormal() {
     Vector3 normal = crossProduct(vector1, vector2);
     //Normalize
     normal.normalize();
+	
     //std::cout << normal.x << " " << normal.y << " " << normal.z << std::endl;
-    return normal;
+    return normal*-1;
 }
 
 bool Triangle::rayIntersection(Ray &p)
