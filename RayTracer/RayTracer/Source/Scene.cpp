@@ -53,9 +53,6 @@ void Scene::initialize()
 
 Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 {
-	std::vector<Vertex> intersections;
-	std::vector<double> lengths;
-    
     Vertex* result = nullptr;
     double minlength = 10000000000;
 
@@ -74,15 +71,21 @@ Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 
 Vertex* Scene::findInterTetra(Ray &arg, Triangle &t1)
 {
+    Vertex* result = nullptr;
+    double minlength = 10000000000;
 
     for(int i = 0; i < tetrahedra.size(); i++) {
         if(tetrahedra[i].rayIntersection(arg)) {
-			t1 = tetrahedra[i];
-			return arg.intSectPoint;
+            double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
+            if(length < minlength) {
+                minlength = length;
+                result = arg.intSectPoint;
+                t1 = tetrahedra[i];
+            }
         }
     }
-	arg.intSectPoint = nullptr;
-    return nullptr;
+    
+    return arg.intSectPoint = result;
 }
 
 void Scene::addTetrahedron(Vertex top, Vertex corner1, Vertex corner2, Vertex corner3, ColorDbl incolor) {
@@ -103,14 +106,27 @@ void Scene::addSphere(Vertex inCenter, double radius, ColorDbl inColor) {
 
 Vertex* Scene::findInterSphere(Ray &arg, Sphere &s1)
 {
+    
+    Vertex* result = nullptr;
+    double minlength = 10000000000;
+    
     for(int i = 0; i < (int)spheres.size(); i++) {
         if(spheres[i].rayIntersection(arg)) {
-            s1 = spheres[i];
-            return arg.intSectPoint;
+            double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
+            if(length < minlength) {
+                minlength = length;
+                result = arg.intSectPoint;
+                s1 = spheres[i];
+            }
         }
     }
-    arg.intSectPoint = nullptr;
-    return nullptr;
+    return arg.intSectPoint = result;
+}
+
+Vertex* findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
+    
+    
+    return arg.intSectPoint;
 }
 
 void Scene::addPointLight(Vertex inCenter) {
