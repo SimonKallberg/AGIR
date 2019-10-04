@@ -38,7 +38,7 @@ void Camera::render()
                      shadow = theScene->shootShadowRay(*myRay.intSectPoint);
                      //Is there a shadow? Set to black
                      if(shadow) {
-                         plane(x, y).color = ColorDbl(temp.surf.color.r-0.3,temp.surf.color.g-0.3,temp.surf.color.b-0.3);
+                         plane(x, y).color = ColorDbl(0.0,0.0,0.0);
                      }
                      else {
 						 Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);

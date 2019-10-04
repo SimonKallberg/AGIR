@@ -56,6 +56,7 @@ Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
 {
     Vertex* result = nullptr;
     double minlength = 10000000000;
+    arg.intSectPoint = nullptr;
 
     for(int i = 0; i < scene.size(); i++) {
         if(scene[i].rayIntersection(arg)) {
@@ -74,6 +75,7 @@ Vertex* Scene::findInterTetra(Ray &arg, Triangle &t1)
 {
     Vertex* result = nullptr;
     double minlength = 10000000000;
+    arg.intSectPoint = nullptr;
 
     for(int i = 0; i < tetrahedra.size(); i++) {
         if(tetrahedra[i].rayIntersection(arg)) {
@@ -98,13 +100,15 @@ void Scene::addTetrahedron(Vertex inV, ColorDbl incolor) {
 	Vertex corner1 = inV + Vertex(2, 0, -2);
 	Vertex corner2 = inV + Vertex(-2, 2, -2);
 	Vertex corner3 = inV + Vertex(-2, -2, -2);
+    
+    cout << top << " " << corner1 << " " << corner2 << " " << corner3 << " " << endl;
 
     //Sides
-    tetrahedra.push_back(Triangle(top, corner2, corner1, incolor));
-    tetrahedra.push_back(Triangle(top, corner3, corner2, incolor));
-    tetrahedra.push_back(Triangle(top, corner1, corner3, incolor));
+    scene.push_back(Triangle(top, corner1, corner2, incolor));
+    scene.push_back(Triangle(top, corner2, corner3, incolor));
+    scene.push_back(Triangle(top, corner3, corner1, incolor));
     //Bottom
-    tetrahedra.push_back(Triangle(corner1, corner2, corner3, incolor));
+    scene.push_back(Triangle(corner1, corner3, corner2, incolor));
     std::cout << "Added a tetrahedron to the scene!" << std::endl;
 }
 
@@ -119,6 +123,7 @@ Vertex* Scene::findInterSphere(Ray &arg, Sphere &s1)
     
     Vertex* result = nullptr;
     double minlength = 10000000000;
+    arg.intSectPoint = nullptr;
     
     for(int i = 0; i < (int)spheres.size(); i++) {
         if(spheres[i].rayIntersection(arg)) {
@@ -181,14 +186,26 @@ bool Scene::shootShadowRay(Vertex &inV) {
     Ray theRay = Ray(&inV, &pointLights[0].pos);
     Triangle tempT;
     Sphere tempS;
+    
+
     //If a sphere is in between point and light source, return color
     if(findInterSphere(theRay, tempS) != nullptr) {
+        //Margin - checks that point of intersection isn't same as start point
+//        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.01) {
+//            return false;
+//        }
+        if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) - 0.0000001 > abs((theRay.end->vec3 - theRay.start->vec3).length())){
+            return false;
+        }
         return true;
     }
     //If a triangle is in between point and light source, return color
-    if(findInterTetra(theRay, tempT) != nullptr) {
+    if(findInterTri(theRay, tempT) != nullptr) {
         //Margin - checks that point of intersection isn't same as start point
-        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.01) {
+        if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) < 0.00001) {
+            return false;
+        }
+        if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) - 0.0000001 > abs((theRay.end->vec3 - theRay.start->vec3).length())) {
             return false;
         }
        return true;
