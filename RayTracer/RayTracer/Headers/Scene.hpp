@@ -24,7 +24,6 @@ public:
     std::vector<Triangle> scene;
     std::vector<Sphere> spheres;
     std::vector<PointLight> pointLights;
-    std::vector<Triangle> tetrahedra;
     
     void initialize();
     void addTetrahedron(Vertex inV, ColorDbl incolor);
@@ -34,7 +33,6 @@ public:
     
     Vertex* findInterTri(Ray &arg, Triangle &t1);
     Vertex* findInterSphere(Ray &arg, Sphere &s1);
-    Vertex* findInterTetra(Ray &arg, Triangle &t1);
     Vertex* findInterObj(Ray &arg, Triangle &t1, Sphere &s1);
 };
 

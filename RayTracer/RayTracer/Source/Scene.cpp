@@ -71,26 +71,6 @@ Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
     return arg.intSectPoint = result;
 }
 
-Vertex* Scene::findInterTetra(Ray &arg, Triangle &t1)
-{
-    Vertex* result = nullptr;
-    double minlength = 10000000000;
-    arg.intSectPoint = nullptr;
-
-    for(int i = 0; i < tetrahedra.size(); i++) {
-        if(tetrahedra[i].rayIntersection(arg)) {
-            double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
-            if(length < minlength) {
-                minlength = length;
-                result = arg.intSectPoint;
-                t1 = tetrahedra[i];
-            }
-        }
-    }
-    
-    return arg.intSectPoint = result;
-}
-
 void Scene::addTetrahedron(Vertex inV, ColorDbl incolor) {
 	double scale = 1.5;
 	Vertex top = inV + Vertex(0.0, 0.0, 2.0);
@@ -106,9 +86,9 @@ void Scene::addTetrahedron(Vertex inV, ColorDbl incolor) {
     //Sides
     scene.push_back(Triangle(top, corner1, corner2, incolor));
     scene.push_back(Triangle(top, corner2, corner3, incolor));
-    scene.push_back(Triangle(top, corner3, corner1, incolor));
+    scene.push_back(Triangle(top, corner3, corner1,  incolor));
     //Bottom
-    scene.push_back(Triangle(corner1, corner3, corner2, incolor));
+    scene.push_back(Triangle(corner1, corner3, corner2, ColorDbl(1,0,0)));
     std::cout << "Added a tetrahedron to the scene!" << std::endl;
 }
 
@@ -162,17 +142,6 @@ Vertex* Scene::findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
             arg.endTri = nullptr;
         }
     }
-//    if(findInterTetra(arg, t1)) {
-//        double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
-//        if(length < minlength) {
-//            minlength = length;
-//            result = arg.intSectPoint;
-//            t1 = *arg.endTri;
-//            arg.endSphere = nullptr;
-//        }
-//    }
-    
-
     return arg.intSectPoint = result;
 }
 
@@ -186,26 +155,16 @@ bool Scene::shootShadowRay(Vertex &inV) {
     Ray theRay = Ray(&inV, &pointLights[0].pos);
     Triangle tempT;
     Sphere tempS;
-    bool shadow = false;
     
-    //If a sphere is in between point and light source, return color
-    if(findInterSphere(theRay, tempS) != nullptr) {
-        if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) - 0.0000001 > abs((theRay.end->vec3 - theRay.start->vec3).length())){
-            shadow =  false;
-        }
-        else {
-             return true;
-        }
-    }
-    //If a triangle is in between point and light source, return color
-    if(findInterTri(theRay, tempT) != nullptr) {
-        //Check so the distance to the intersection point is shorter than ray to light
-        if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) > abs((theRay.end->vec3 - theRay.start->vec3).length())) {
-            shadow = false;
-        }
-        else {
-            shadow = true;
+    //Check if an object is intersecting ray to light
+    if(findInterObj(theRay, tempT, tempS) != nullptr) {
+        //Check so distance to light is greater than distance to intersecting object
+        double distToLight = (theRay.end->vec3 - theRay.start->vec3).length();
+        double distToIntersection = (theRay.intSectPoint->vec3 - theRay.start->vec3).length();
+        
+        if( distToIntersection < distToLight ){
+            return true;
         }
     }
-    return shadow;
+    return false;
 }

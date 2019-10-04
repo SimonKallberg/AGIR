@@ -25,7 +25,7 @@ int main()
 	myScene.initialize();
     //Adding a red tetrahedron
 	
-    myScene.addTetrahedron(Vertex(11.0, 3.0, 0.0), ColorDbl(0.5, 0.5, 0.5));
+    myScene.addTetrahedron(Vertex(9.0, -3.0, -2.0), ColorDbl(0.5, 0.5, 0.5));
 
     
     
