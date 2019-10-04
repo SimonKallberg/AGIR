@@ -14,6 +14,7 @@
 #include "ColorDbl.hpp"
 #include "Ray.hpp"
 #include <cmath>
+#include "Surface.hpp"
 
 class Sphere {
 public:
@@ -25,6 +26,7 @@ public:
     double r = 1.0;
     Vertex centerPos = Vertex(Vector3(0.0,0.0,0.0));
     ColorDbl color = ColorDbl(1.0,1.0,1.0);
+    Surface surf;
 };
 
 #endif /* Sphere_hpp */

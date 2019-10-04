@@ -59,9 +59,6 @@ void Camera::render()
                 }
             }
 
-
-            
-
 //            if(theScene->findInterTetra(myRay, tempTetra) != nullptr) {
 //                //Shoot shadow ray if ray hits something
 //                if(myRay.intSectPoint != nullptr) {
