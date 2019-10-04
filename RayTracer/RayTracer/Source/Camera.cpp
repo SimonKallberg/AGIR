@@ -61,53 +61,7 @@ void Camera::render()
 
 
             
-            //Check for ray intersection with room
-//			theScene->findInterTri(myRay, temp);
-//
-//
-//            //Shoot shadow ray if ray hits something
-//            if(myRay.intSectPoint != nullptr) {
-//               shadow = theScene->shootShadowRay(*myRay.intSectPoint);
-//                //cout << shadow << endl;
-//            }
-//
-//            //Check if ray intersects with sphere
-//            if(theScene->findInterSphere(myRay, tempS) != nullptr) {
-//                //Shoot shadow ray if ray hits something
-//                if(myRay.intSectPoint != nullptr) {
-//                   shadow = theScene->shootShadowRay(*myRay.intSectPoint);
-//               }
-//                //Is there a shadow? Set to black
-//                if(shadow) {
-//                    plane(x, y).color = ColorDbl(tempS.color.r-0.3,tempS.color.g-0.3,tempS.color.b-0.3);
-//                }
-//                else {
-//                    plane(x, y).color = tempS.color;
-//               }
-//            }
-//            //Check if ray intersects with tetrahedra
-//            else if(theScene->findInterTetra(myRay, tempTetra) != nullptr) {
-//                  //Shoot shadow ray if ray hits something
-//                  if(myRay.intSectPoint != nullptr) {
-//                     shadow = theScene->shootShadowRay(*myRay.intSectPoint);
-//                 }
-//                  //Is there a shadow? Set to black
-//                  if(shadow) {
-//                      plane(x, y).color = ColorDbl(0.0,0.0,0.0);
-//                  }
-//                  else {
-//                      plane(x, y).color = tempTetra.color;
-//                 }
-//              }
-//            else {
-//                //Is there a shadow? Set to black
-//                if(shadow) {
-//                    plane(x, y).color = ColorDbl(temp.color.r-0.3,temp.color.g-0.3,temp.color.b-0.3);
-//                }
-//                else {
-//                    plane(x, y).color = temp.color;
-//                }
-//            }
+
 //            if(theScene->findInterTetra(myRay, tempTetra) != nullptr) {
 //                //Shoot shadow ray if ray hits something
 //                if(myRay.intSectPoint != nullptr) {
@@ -121,9 +75,6 @@ void Camera::render()
 //                    else if (theScene->findInterTri(mirroredRay, temp) != nullptr) {
 //                        plane(x, y).color = temp.color;
 //                    }
-////                    else if(theScene->findInterTetra(mirroredRay, tempTetra) != nullptr) {
-////                        plane(x, y).color = tempTetra.color;
-////                    }
 //                    else {
 //
 //                    }
