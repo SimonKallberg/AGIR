@@ -26,7 +26,7 @@ public:
     std::vector<PointLight> pointLights;
     
     void initialize();
-    void addTetrahedron(Vertex inV, ColorDbl incolor);
+    void addTetrahedron(Vertex inV, double scale, ColorDbl incolor);
     void addSphere(Vertex inCenter, double radius, ColorDbl inColor);
     void addPointLight(Vertex inCenter);
     bool shootShadowRay(Vertex &inV);

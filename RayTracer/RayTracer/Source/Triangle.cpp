@@ -17,12 +17,12 @@ Vector3 Triangle::calcNormal() {
     Vector3 vector1 = Vector3(v0.vec3-v1.vec3);
     Vector3 vector2 = Vector3(v0.vec3-v2.vec3);
     //Cross product to get normal
-    Vector3 normal = crossProduct(vector1, vector2);
+    Vector3 normal = crossProduct(vector2, vector1);
     //Normalize
     normal.normalize();
 	
     //std::cout << normal.x << " " << normal.y << " " << normal.z << std::endl;
-    return normal*-1;
+    return normal;
 }
 
 bool Triangle::rayIntersection(Ray &p)

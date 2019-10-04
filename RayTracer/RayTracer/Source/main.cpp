@@ -25,13 +25,14 @@ int main()
 	myScene.initialize();
     //Adding a red tetrahedron
 	
-    myScene.addTetrahedron(Vertex(9.0, -3.0, -2.0), ColorDbl(0.5, 0.5, 0.5));
+    myScene.addTetrahedron(Vertex(7.0, 2.0, -2.0), 2, ColorDbl(0.9, 0.1, 0.7));
+    //myScene.addTetrahedron(Vertex(7.0, 2.0, 0.0), 1, ColorDbl(0.5, 0.5, 0.5));
 
     
     
     //Adding a grey sphere
-    myScene.addSphere(Vertex(6.0,0.0,-4.0), 2.0, ColorDbl(0.5, 0.5, 0.5));
-    myScene.addPointLight(Vertex(8.0,-3.0,4.5));
+    myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5));
+    myScene.addPointLight(Vertex(5.0,0.0,4.5));
 	Camera myCamera(&myScene);
 
 
