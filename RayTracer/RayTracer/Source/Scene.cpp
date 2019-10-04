@@ -162,15 +162,15 @@ Vertex* Scene::findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
             arg.endTri = nullptr;
         }
     }
-    if(findInterTetra(arg, t1)) {
-        double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
-        if(length < minlength) {
-            minlength = length;
-            result = arg.intSectPoint;
-            t1 = *arg.endTri;
-            arg.endSphere = nullptr;
-        }
-    }
+//    if(findInterTetra(arg, t1)) {
+//        double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
+//        if(length < minlength) {
+//            minlength = length;
+//            result = arg.intSectPoint;
+//            t1 = *arg.endTri;
+//            arg.endSphere = nullptr;
+//        }
+//    }
     
 
     return arg.intSectPoint = result;
@@ -186,29 +186,26 @@ bool Scene::shootShadowRay(Vertex &inV) {
     Ray theRay = Ray(&inV, &pointLights[0].pos);
     Triangle tempT;
     Sphere tempS;
+    bool shadow = false;
     
-
     //If a sphere is in between point and light source, return color
     if(findInterSphere(theRay, tempS) != nullptr) {
-        //Margin - checks that point of intersection isn't same as start point
-//        if((theRay.intSectPoint->vec3 - theRay.start->vec3).length() < 0.01) {
-//            return false;
-//        }
         if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) - 0.0000001 > abs((theRay.end->vec3 - theRay.start->vec3).length())){
-            return false;
+            shadow =  false;
         }
-        return true;
+        else {
+             return true;
+        }
     }
     //If a triangle is in between point and light source, return color
     if(findInterTri(theRay, tempT) != nullptr) {
-        //Margin - checks that point of intersection isn't same as start point
-        if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) < 0.00001) {
-            return false;
+        //Check so the distance to the intersection point is shorter than ray to light
+        if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) > abs((theRay.end->vec3 - theRay.start->vec3).length())) {
+            shadow = false;
         }
-        if(abs((theRay.intSectPoint->vec3 - theRay.start->vec3).length()) - 0.0000001 > abs((theRay.end->vec3 - theRay.start->vec3).length())) {
-            return false;
+        else {
+            shadow = true;
         }
-       return true;
     }
-    return false;
+    return shadow;
 }

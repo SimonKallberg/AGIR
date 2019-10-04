@@ -55,7 +55,7 @@ void Camera::render()
                      shadow = theScene->shootShadowRay(*myRay.intSectPoint);
                      //Is there a shadow? Set to black
                      if(shadow) {
-                         plane(x, y).color = ColorDbl(tempS.surf.color.r-0.3,tempS.surf.color.g-0.3,tempS.surf.color.b-0.3);
+                         plane(x, y).color = ColorDbl(0,0,0);
                      }
                      else {
                          plane(x, y).color = tempS.surf.color;
