@@ -8,7 +8,7 @@
 
 #include "Vector3.hpp"
 
-double Vector3::length() {
+double Vector3::length() const {
     return sqrt((x*x) + (y*y) + (z*z));
 }
 

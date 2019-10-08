@@ -21,7 +21,7 @@ public:
     Vector3(double inX = 0.0, double inY = 0.0, double inZ = 0.0)
         : x(inX), y(inY), z(inZ)  {}
     
-    double length();
+    double length() const;
     Vector3* normalize();
     friend Vector3 crossProduct(Vector3 vector1, Vector3 vector2);
     friend Vector3 operator+(Vector3 lhs, Vector3 rhs);

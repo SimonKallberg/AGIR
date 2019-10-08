@@ -32,6 +32,17 @@ Ray::~Ray() {
 //    delete endSphere;
 }
 
+void Ray::sortIntersections() {
+    //Sort the intersections by length of vector
+    sort(intSectPoints.begin(), intSectPoints.end(),
+        [](const intersection & a, const intersection & b) -> bool
+    {
+        return a.distance < b.distance;
+    });
+    
+}
+
+
 std::ostream& operator<<(std::ostream& out, const Ray& v1) {
     out << "Ray: starting point: ";
     if (v1.start != nullptr) {

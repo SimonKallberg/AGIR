@@ -31,8 +31,6 @@ public:
     void addPointLight(Vertex inCenter);
     bool shootShadowRay(Vertex &inV);
     
-    Vertex* findInterTri(Ray &arg, Triangle &t1);
-    Vertex* findInterSphere(Ray &arg, Sphere &s1);
     Vertex* findInterObj(Ray &arg, Triangle &t1, Sphere &s1);
 };
 

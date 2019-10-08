@@ -13,11 +13,19 @@
 #include "Vertex.hpp"
 #include "ColorDbl.hpp"
 #include <iostream>
+#include <vector>
 
 
 class Triangle;
 class ColorDbl;
 class Sphere;
+
+struct intersection {
+    Vertex interSectPoint;
+    double distance = 0;
+    Triangle* tri;
+    Sphere* sphere;
+};
 
 class Ray {
 public:
@@ -29,9 +37,11 @@ public:
     Ray (const Ray &old_obj);
     ~Ray();
 
+    void sortIntersections();
 	Vertex* start = nullptr;
 	Vertex* end = nullptr;
-	Vertex* intSectPoint = nullptr;
+    Vertex* intSectPoint = nullptr;
+    std::vector<intersection> intSectPoints;
 
 	Triangle* endTri = nullptr;
     Sphere* endSphere = nullptr;

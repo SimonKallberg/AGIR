@@ -38,7 +38,6 @@ void Scene::initialize()
     
     //celing - white
     scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(0,6,5), Vertex(-3, 0, 5), ColorDbl(1, 1, 0.1)));
-	cout << scene[12].normal << endl;
     scene.push_back(Triangle(Vertex(0,-6,5), Vertex(10,6,5), Vertex(0,6,5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(10,-6,5), Vertex(10, 6, 5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(10,-6,5), Vertex(13,0,5), Vertex(10,6,5), ColorDbl(1, 1, 1)));
@@ -54,24 +53,7 @@ void Scene::initialize()
        scene.push_back(Triangle(Vertex(0, 6, 5), Vertex(0, 6, -5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
 }
 
-Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
-{
-    Vertex* result = nullptr;
-    double minlength = 10000000000;
-    arg.intSectPoint = nullptr;
 
-    for(int i = 0; i < scene.size(); i++) {
-        if(scene[i].rayIntersection(arg)) {
-            double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
-            if(length < minlength) {
-                minlength = length;
-                result = arg.intSectPoint;
-                t1 = scene[i];
-            }
-        }
-    }
-    return arg.intSectPoint = result;
-}
 
 void Scene::addTetrahedron(Vertex inV, double scale, ColorDbl incolor) {
 	
@@ -86,14 +68,15 @@ void Scene::addTetrahedron(Vertex inV, double scale, ColorDbl incolor) {
     cout << top << " " << corner1 << " " << corner2 << " " << corner3 << " " << endl;
 
     //Sides
-    //Front right
-    scene.push_back(Triangle(top, corner1, corner2, ColorDbl(0,0,1)));
-    //Front left
-    scene.push_back(Triangle(top, corner3, corner1,  incolor));
+
     //Back
     scene.push_back(Triangle(top, corner2, corner3, incolor));
     //Bottom
-    scene.push_back(Triangle(corner1, corner3, corner2, ColorDbl(1,0,0)));
+    scene.push_back(Triangle(corner1, corner3, corner2, incolor));
+    //Front right
+    scene.push_back(Triangle(top, corner1, corner2, incolor));
+    //Front left
+    scene.push_back(Triangle(top, corner3, corner1,  incolor));
 
 
     std::cout << "Added a tetrahedron to the scene!" << std::endl;
@@ -105,51 +88,33 @@ void Scene::addSphere(Vertex inCenter, double radius, ColorDbl inColor) {
     std::cout << "Added a sphere with center: " << inCenter << "color: " << inColor << "radius: " << radius << " to the scene!" << std::endl << std::endl;
 }
 
-Vertex* Scene::findInterSphere(Ray &arg, Sphere &s1)
-{
-    
-    Vertex* result = nullptr;
-    double minlength = 10000000000;
-    arg.intSectPoint = nullptr;
+Vertex* Scene::findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
+        
+    for(int i = 0; i < (int)scene.size(); i++) {
+        scene[i].rayIntersection(arg);
+    }
     
     for(int i = 0; i < (int)spheres.size(); i++) {
-        if(spheres[i].rayIntersection(arg)) {
-            double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
-            if(length < minlength) {
-                minlength = length;
-                result = arg.intSectPoint;
-                s1 = spheres[i];
-            }
-        }
+        spheres[i].rayIntersection(arg);
     }
-    return arg.intSectPoint = result;
-}
-
-Vertex* Scene::findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
     
-    Vertex* result = nullptr;
-    double minlength = 10000000000;
-    Ray inRay = arg;
-    
-    if(findInterTri(arg, t1)) {
-        double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
-        if(length < minlength) {
-            minlength = length;
-            result = arg.intSectPoint;
-            t1 = *arg.endTri;
-            arg.endSphere = nullptr;
+    if(arg.intSectPoints.size() > 0) {
+        arg.sortIntersections();
+        arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
+        
+        if(arg.intSectPoints[0].tri != nullptr ) {
+            t1 = *arg.intSectPoints[0].tri;
+            arg.endTri = arg.intSectPoints[0].tri;
         }
-    }
-    if(findInterSphere(arg, s1)) {
-        double length = (arg.intSectPoint->vec3-arg.start->vec3).length();
-        if(length < minlength) {
-            minlength = length;
-            result = arg.intSectPoint;
-            s1 = *arg.endSphere;
-            arg.endTri = nullptr;
+        else {
+            s1 = *arg.intSectPoints[0].sphere;
+            arg.endSphere = arg.intSectPoints[0].sphere;
         }
+        
+    return arg.intSectPoint;
+        
     }
-    return arg.intSectPoint = result;
+    return nullptr;
 }
 
 void Scene::addPointLight(Vertex inCenter) {

@@ -56,14 +56,14 @@ bool Triangle::rayIntersection(Ray &p)
         return false;
     }
     
-    if(v < 0.0 || u + v > 1.0 || v > 1) {
+    if(v < 0.0 || u + v > 1.0 ) {
         return false;
     }
     
     if(t > 0.00000001 && t < 1000000) {
-        p.endTri = this;
         Vector3 intersection = p.start->vec3 + (t*D);
-        p.intSectPoint = new Vertex(intersection);
+        double length = (intersection - p.start->vec3).length();
+        p.intSectPoints.push_back({Vertex(intersection), length, this, nullptr});
         return true;
     }
     return false;

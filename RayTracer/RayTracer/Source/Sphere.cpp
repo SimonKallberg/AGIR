@@ -43,31 +43,14 @@ bool Sphere::rayIntersection(Ray &p)
     
     if(d1 > d2) {
         Vector3 x2 = o + d2*I;
-        p.intSectPoint = new Vertex(x2);
-        p.endSphere = this;
+        double distance = (x2-p.start->vec3).length();
+        p.intSectPoints.push_back({Vertex(x2), distance , nullptr, this});
         return true;
     }
     else {
-       Vector3 x1 = o + d1*I;
-        p.intSectPoint = new Vertex(x1);
-        p.endSphere = this;
+        Vector3 x1 = o + d1*I;
+        double distance = (x1-p.start->vec3).length();
+        p.intSectPoints.push_back({Vertex(x1), distance , nullptr, this});
         return true;
     }
-    
-    
-    
-    
-    
-    
-    
-//    //Check if x1 or x2 is on the sphere's surface & starting point of ray isn't on spheres surface
-//    if(abs((x1-centerPos.vec3).length()*(x1-centerPos.vec3).length() - r*r) < 0.001){
-
-//    }
-//    else if ((abs((x2-centerPos.vec3).length()*(x2-centerPos.vec3).length() - r*r) < 0.001)){
-
-//    }
-//    else {
-//        return false;
-//    }
 }

@@ -22,12 +22,13 @@ const int SPECULAR = 1;
 int main()
 {
 	Scene myScene;
-	myScene.initialize();
     //Adding a red tetrahedron
+    
 	
     myScene.addTetrahedron(Vertex(7.0, 2.0, -2.0), 2, ColorDbl(0.9, 0.1, 0.7));
     //myScene.addTetrahedron(Vertex(7.0, 2.0, 0.0), 1, ColorDbl(0.5, 0.5, 0.5));
-
+    myScene.initialize();
+    
     
     
     //Adding a grey sphere

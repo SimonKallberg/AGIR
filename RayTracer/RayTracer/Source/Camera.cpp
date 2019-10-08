@@ -31,6 +31,7 @@ void Camera::render()
 			Ray myRay = calcRay(x, y);
             bool shadow = false;
             theScene->findInterObj(myRay, temp, tempS);
+            
             //If the ray hits a tringle
             if(myRay.endTri) {
                 //Shoot shadow ray
@@ -38,14 +39,15 @@ void Camera::render()
                      shadow = theScene->shootShadowRay(*myRay.intSectPoint);
                      //Is there a shadow? Set to black
                      if(shadow) {
-                         plane(x, y).color = temp.surf.color*0.3;
+                         plane(x, y).color = ColorDbl(0,0,0);
                      }
+                    //Add shading to objects that are hit by light
                      else {
 						 Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
 						 rayToLight.normalize();
 						 double alpha = dotProduct(myRay.endTri->normal, rayToLight);
                          if ( alpha > 0 ) {
-                            plane(x, y).color = temp.surf.color * alpha;
+                            plane(x, y).color = temp.surf.color*alpha;
                          }
                          else {
                              plane(x, y).color = temp.surf.color;
@@ -56,6 +58,7 @@ void Camera::render()
             //If the ray hits a sphere
             else {
                 if(myRay.intSectPoint) {
+                    
                      shadow = theScene->shootShadowRay(*myRay.intSectPoint);
                      //Is there a shadow? Set to black
                      if(shadow) {
@@ -65,7 +68,12 @@ void Camera::render()
                          Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
                          rayToLight.normalize();
                          double alpha = dotProduct(myRay.endSphere->calcNormal(myRay), rayToLight);
-                         plane(x, y).color = tempS.surf.color*alpha;
+                         if ( alpha > 0 ) {
+                            plane(x, y).color = tempS.surf.color*alpha;
+                         }
+                         else {
+                             plane(x, y).color = tempS.surf.color;
+                         }
                      }
                 }
             }
