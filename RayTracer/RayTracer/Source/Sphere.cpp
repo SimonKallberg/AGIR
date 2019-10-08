@@ -9,6 +9,13 @@
 #include "Sphere.hpp"
 #include <cmath>
 
+Vector3 Sphere::calcNormal(Ray &p) {
+    
+    Vector3 normal = p.intSectPoint->vec3 - centerPos.vec3;
+    normal.normalize();
+    return normal;
+}
+
 bool Sphere::rayIntersection(Ray &p)
 {
     //Start point

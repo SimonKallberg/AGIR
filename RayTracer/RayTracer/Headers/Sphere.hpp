@@ -22,6 +22,7 @@ public:
       : r(inR), centerPos(inC), surf(refType,inColor) { }
 
     
+    Vector3 calcNormal(Ray &p);
     bool rayIntersection(Ray &p);
     double r = 1.0;
     Vertex centerPos = Vertex(Vector3(0.0,0.0,0.0));

@@ -48,7 +48,7 @@ void Camera::render()
                             plane(x, y).color = temp.surf.color * alpha;
                          }
                          else {
-                             plane(x, y).color = temp.surf.color*0;
+                             plane(x, y).color = temp.surf.color;
                          }
                      }
                 }
@@ -62,7 +62,10 @@ void Camera::render()
                          plane(x, y).color = ColorDbl(0,0,0);
                      }
                      else {
-                         plane(x, y).color = tempS.surf.color;
+                         Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
+                         rayToLight.normalize();
+                         double alpha = dotProduct(myRay.endSphere->calcNormal(myRay), rayToLight);
+                         plane(x, y).color = tempS.surf.color*alpha;
                      }
                 }
             }

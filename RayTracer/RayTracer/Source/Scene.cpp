@@ -14,9 +14,7 @@ void Scene::initialize()
     std::cout << "Setting up triangles...." << std::endl;
     
     //Setting up a room shaped as a polygon
-    // Wall 1 - yellow
-    scene.push_back(Triangle(Vertex(-3, 0, 5), Vertex(0, 6, 5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
-    scene.push_back(Triangle(Vertex(0, 6, 5), Vertex(0, 6, -5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
+   
     
     //Wall2 - purple
     scene.push_back(Triangle(Vertex(0,6,5), Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(1.0, 0.0, 1.0)));
@@ -50,6 +48,10 @@ void Scene::initialize()
     scene.push_back(Triangle(Vertex(0,6,-5), Vertex(10,6,-5), Vertex(0,-6,-5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(10,6,-5), Vertex(10,-6,-5), Vertex(0,-6,-5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(10,6,-5), Vertex(13,0,-5), Vertex(10,-6,-5), ColorDbl(1, 1, 1)));
+    
+    // Wall 1 - yellow
+       scene.push_back(Triangle(Vertex(-3, 0, 5), Vertex(0, 6, 5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
+       scene.push_back(Triangle(Vertex(0, 6, 5), Vertex(0, 6, -5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
 }
 
 Vertex* Scene::findInterTri(Ray &arg, Triangle &t1)
@@ -84,14 +86,15 @@ void Scene::addTetrahedron(Vertex inV, double scale, ColorDbl incolor) {
     cout << top << " " << corner1 << " " << corner2 << " " << corner3 << " " << endl;
 
     //Sides
+    //Front right
+    scene.push_back(Triangle(top, corner1, corner2, ColorDbl(0,0,1)));
+    //Front left
+    scene.push_back(Triangle(top, corner3, corner1,  incolor));
     //Back
     scene.push_back(Triangle(top, corner2, corner3, incolor));
     //Bottom
-    scene.push_back(Triangle(corner1, corner3, corner2, incolor));
-    //Front right
-    scene.push_back(Triangle(top, corner1, corner2, incolor));
-    //Front left
-    scene.push_back(Triangle(top, corner3, corner1,  incolor));
+    scene.push_back(Triangle(corner1, corner3, corner2, ColorDbl(1,0,0)));
+
 
     std::cout << "Added a tetrahedron to the scene!" << std::endl;
 }
