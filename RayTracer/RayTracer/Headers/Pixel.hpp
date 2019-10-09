@@ -23,7 +23,7 @@ public:
 
 
     ColorDbl color;
-    std::vector<Ray> rays;
+    Ray* ray = nullptr;
 
 	Pixel& operator=(Pixel p);
 };

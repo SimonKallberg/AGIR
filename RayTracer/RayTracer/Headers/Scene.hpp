@@ -26,12 +26,13 @@ public:
     std::vector<PointLight> pointLights;
     
     void initialize();
-    void addTetrahedron(Vertex inV, double scale, ColorDbl incolor);
-    void addSphere(Vertex inCenter, double radius, ColorDbl inColor);
+    void addTetrahedron(Vertex inV, double scale, ColorDbl incolor, int reflType = 0);
+    void addSphere(Vertex inCenter, double radius, ColorDbl inColor, int inReflType);
     void addPointLight(Vertex inCenter);
     bool shootShadowRay(Vertex &inV);
     
     Vertex* findIntersection(Ray &arg);
+    void rayTracing(Ray* arg);
 };
 
 #endif

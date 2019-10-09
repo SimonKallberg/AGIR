@@ -26,58 +26,113 @@ void Camera::render()
 	{
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
-			Triangle temp;
-            Sphere tempS;
-			Ray myRay = calcRay(x, y);
+            Ray theRay = calcRay(x,y);
+            
+            //Find intersection with ray
+            theScene->findIntersection(theRay);
+            //Shoot out ray
+            theScene->rayTracing(&theRay);
+            
+            //Pointer to loop through the ray
+            Ray* endRay = &theRay;
+            //Access the leaf of the tree
+            while(endRay->reflectedRay) {
+                endRay = endRay->reflectedRay;
+            }
             bool shadow = false;
-            theScene->findIntersection(myRay);
+            //If the ray hits a triangle
+            if(endRay->endTri) {
+                 shadow = theScene->shootShadowRay(*endRay->intSectPoint);
+                 //Is there a shadow? Set to black
+                 if(shadow) {
+                     plane(x, y).color = ColorDbl(0,0,0);
+                 }
+                //Add shading to objects that are hit by light
+                 else {
+                     Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - endRay->intSectPoint->vec3);
+                     rayToLight.normalize();
+                     double alpha = dotProduct(endRay->endTri->normal, rayToLight);
+                     if ( alpha > 0 ) {
+                        plane(x, y).color = endRay->endTri->surf.color*alpha;
+                     }
+                     else {
+                         plane(x, y).color = ColorDbl(0,0,0);
+                     }
+                 }
+            }
             
+            
+            //If the ray its a sphere
+            else if(endRay->endSphere) {
+                shadow = theScene->shootShadowRay(*endRay->intSectPoint);
+                //Is there a shadow? Set to black
+                if(shadow) {
+                    plane(x, y).color = ColorDbl(0,0,0);
+                }
+                else {
+                    Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - endRay->intSectPoint->vec3);
+                    rayToLight.normalize();
+                    double alpha = dotProduct(endRay->endSphere->calcNormal(*endRay), rayToLight);
+                    if ( alpha > 0 ) {
+                       plane(x, y).color = endRay->endSphere->surf.color*alpha;
+                    }
+                    else {
+                        plane(x, y).color = ColorDbl(0,0,0);
+                    }
+                }
+            }
+            else
+            {}
+            
+            
+     
+   //OLD THIS WORKS
             //If the ray hits a tringle
-            if(myRay.endTri) {
-                //Shoot shadow ray
-                if(myRay.intSectPoint) {
-                     shadow = theScene->shootShadowRay(*myRay.intSectPoint);
-                     //Is there a shadow? Set to black
-                     if(shadow) {
-                         plane(x, y).color = ColorDbl(0,0,0);
-                     }
-                    //Add shading to objects that are hit by light
-                     else {
-						 Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
-						 rayToLight.normalize();
-						 double alpha = dotProduct(myRay.endTri->normal, rayToLight);
-                         if ( alpha > 0 ) {
-                            plane(x, y).color = myRay.endTri->surf.color*alpha;
-                         }
-                         else {
-                             plane(x, y).color = myRay.endTri->surf.color;
-                         }
-                     }
-                }
-            }
-            //If the ray hits a sphere
-            else {
-                if(myRay.intSectPoint) {
-                    
-                     shadow = theScene->shootShadowRay(*myRay.intSectPoint);
-                     //Is there a shadow? Set to black
-                     if(shadow) {
-                         plane(x, y).color = ColorDbl(0,0,0);
-                     }
-                     else {
-                         Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
-                         rayToLight.normalize();
-                         double alpha = dotProduct(myRay.endSphere->calcNormal(myRay), rayToLight);
-                         if ( alpha > 0 ) {
-                            plane(x, y).color = myRay.endSphere->surf.color*alpha;
-                         }
-                         else {
-                             plane(x, y).color = myRay.endSphere->surf.color;
-                         }
-                     }
-                }
-            }
-            
+//            if(myRay.endTri) {
+//                //Shoot shadow ray
+//                if(myRay.intSectPoint) {
+//                     shadow = theScene->shootShadowRay(*myRay.intSectPoint);
+//                     //Is there a shadow? Set to black
+//                     if(shadow) {
+//                         plane(x, y).color = ColorDbl(0,0,0);
+//                     }
+//                    //Add shading to objects that are hit by light
+//                     else {
+//						 Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
+//						 rayToLight.normalize();
+//						 double alpha = dotProduct(myRay.endTri->normal, rayToLight);
+//                         if ( alpha > 0 ) {
+//                            plane(x, y).color = myRay.endTri->surf.color*alpha;
+//                         }
+//                         else {
+//                             plane(x, y).color = myRay.endTri->surf.color;
+//                         }
+//                     }
+//                }
+//            }
+//            //If the ray hits a sphere
+//            else {
+//                if(myRay.intSectPoint) {
+//
+//                     shadow = theScene->shootShadowRay(*myRay.intSectPoint);
+//                     //Is there a shadow? Set to black
+//                     if(shadow) {
+//                         plane(x, y).color = ColorDbl(0,0,0);
+//                     }
+//                     else {
+//                         Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
+//                         rayToLight.normalize();
+//                         double alpha = dotProduct(myRay.endSphere->calcNormal(myRay), rayToLight);
+//                         if ( alpha > 0 ) {
+//                            plane(x, y).color = myRay.endSphere->surf.color*alpha;
+//                         }
+//                         else {
+//                             plane(x, y).color = myRay.endSphere->surf.color;
+//                         }
+//                     }
+//                }
+//            }
+//
             //Perfect refraction
 //            if(myRay.endSphere) {
 //                //Shoot shadow ray if ray hits something

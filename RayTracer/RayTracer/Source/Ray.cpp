@@ -23,13 +23,19 @@ Ray::Ray (const Ray &old_obj) {
 }
 
 Ray::~Ray() {
-//    delete start;
-//    delete end;
-//    delete intSectPoint;
-    
-    //TODO fix dangling pointers
-//    delete endTri;
-//    delete endSphere;
+
+    Ray* ptr = reflectedRay;
+    //Delete the ray tree
+    while(ptr) {
+        Ray* temp = reflectedRay;
+        ptr = ptr->reflectedRay;
+        delete temp;
+    }
+    reflectedRay = nullptr;
+    start = nullptr;
+    end = nullptr;
+    endTri = nullptr;
+    endSphere = nullptr;
 }
 
 void Ray::sortIntersections() {

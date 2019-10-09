@@ -20,8 +20,7 @@ Vector3 Triangle::calcNormal() {
     Vector3 normal = crossProduct(vector2, vector1);
     //Normalize
     normal.normalize();
-	
-    //std::cout << normal.x << " " << normal.y << " " << normal.z << std::endl;
+
     return normal;
 }
 
