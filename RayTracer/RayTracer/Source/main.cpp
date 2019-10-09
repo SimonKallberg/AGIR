@@ -29,13 +29,10 @@ int main()
     //myScene.addTetrahedron(Vertex(7.0, 2.0, 0.0), 1, ColorDbl(0.5, 0.5, 0.5));
     myScene.initialize();
     
-    
-    
     //Adding a grey sphere
     myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5));
     myScene.addPointLight(Vertex(5.0,0.0,4.5));
 	Camera myCamera(&myScene);
-
 
 	myCamera.render();
 	myCamera.createImage("raytracing.bmp");

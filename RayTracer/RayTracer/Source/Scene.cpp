@@ -14,7 +14,6 @@ void Scene::initialize()
     std::cout << "Setting up triangles...." << std::endl;
     
     //Setting up a room shaped as a polygon
-   
     
     //Wall2 - purple
     scene.push_back(Triangle(Vertex(0,6,5), Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(1.0, 0.0, 1.0)));
@@ -37,7 +36,7 @@ void Scene::initialize()
     scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,-5), Vertex(13,0,5), ColorDbl(0.0, 1.0, 0.0)));
     
     //celing - white
-    scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(0,6,5), Vertex(-3, 0, 5), ColorDbl(1, 1, 0.1)));
+    scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(0,6,5), Vertex(-3, 0, 5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(0,-6,5), Vertex(10,6,5), Vertex(0,6,5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(10,-6,5), Vertex(10, 6, 5), ColorDbl(1, 1, 1)));
     scene.push_back(Triangle(Vertex(10,-6,5), Vertex(13,0,5), Vertex(10,6,5), ColorDbl(1, 1, 1)));
@@ -64,11 +63,8 @@ void Scene::addTetrahedron(Vertex inV, double scale, ColorDbl incolor) {
     //Left back
 	Vertex corner3 = inV + scale*Vertex(sqrt(2.0 / 9.0), -1* sqrt(2.0 / 3.0), -(1.0/3.0));
     Vertex top = inV.vec3 + scale*Vertex(0.0, 0.0, 1.0);
-    
-    cout << top << " " << corner1 << " " << corner2 << " " << corner3 << " " << endl;
 
-    //Sides
-
+    //Adding triangles to scene vector
     //Back
     scene.push_back(Triangle(top, corner2, corner3, incolor));
     //Bottom
@@ -77,7 +73,6 @@ void Scene::addTetrahedron(Vertex inV, double scale, ColorDbl incolor) {
     scene.push_back(Triangle(top, corner1, corner2, incolor));
     //Front left
     scene.push_back(Triangle(top, corner3, corner1,  incolor));
-
 
     std::cout << "Added a tetrahedron to the scene!" << std::endl;
 }
@@ -88,7 +83,7 @@ void Scene::addSphere(Vertex inCenter, double radius, ColorDbl inColor) {
     std::cout << "Added a sphere with center: " << inCenter << "color: " << inColor << "radius: " << radius << " to the scene!" << std::endl << std::endl;
 }
 
-Vertex* Scene::findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
+Vertex* Scene::findIntersection(Ray &arg) {
         
     for(int i = 0; i < (int)scene.size(); i++) {
         scene[i].rayIntersection(arg);
@@ -103,11 +98,9 @@ Vertex* Scene::findInterObj(Ray &arg, Triangle &t1, Sphere &s1) {
         arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
         
         if(arg.intSectPoints[0].tri != nullptr ) {
-            t1 = *arg.intSectPoints[0].tri;
             arg.endTri = arg.intSectPoints[0].tri;
         }
         else {
-            s1 = *arg.intSectPoints[0].sphere;
             arg.endSphere = arg.intSectPoints[0].sphere;
         }
         
@@ -124,15 +117,12 @@ void Scene::addPointLight(Vertex inCenter) {
 }
 
 bool Scene::shootShadowRay(Vertex &inV) {
-    bool shadow = false;
     
     for(int i = 0; i < (int)pointLights.size(); i++) {
         Ray theRay = Ray(&inV, &pointLights[i].pos);
-        Triangle tempT;
-        Sphere tempS;
         
         //Check if an object is intersecting ray to light
-        if(findInterObj(theRay, tempT, tempS) != nullptr) {
+        if(findIntersection(theRay) != nullptr) {
             //Check so distance to light is greater than distance to intersecting object
             double distToLight = (theRay.end->vec3 - theRay.start->vec3).length();
             double distToIntersection = (theRay.intSectPoint->vec3 - theRay.start->vec3).length();

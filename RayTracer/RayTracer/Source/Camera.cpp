@@ -30,7 +30,7 @@ void Camera::render()
             Sphere tempS;
 			Ray myRay = calcRay(x, y);
             bool shadow = false;
-            theScene->findInterObj(myRay, temp, tempS);
+            theScene->findIntersection(myRay);
             
             //If the ray hits a tringle
             if(myRay.endTri) {
@@ -47,10 +47,10 @@ void Camera::render()
 						 rayToLight.normalize();
 						 double alpha = dotProduct(myRay.endTri->normal, rayToLight);
                          if ( alpha > 0 ) {
-                            plane(x, y).color = temp.surf.color*alpha;
+                            plane(x, y).color = myRay.endTri->surf.color*alpha;
                          }
                          else {
-                             plane(x, y).color = temp.surf.color;
+                             plane(x, y).color = myRay.endTri->surf.color;
                          }
                      }
                 }
@@ -69,34 +69,59 @@ void Camera::render()
                          rayToLight.normalize();
                          double alpha = dotProduct(myRay.endSphere->calcNormal(myRay), rayToLight);
                          if ( alpha > 0 ) {
-                            plane(x, y).color = tempS.surf.color*alpha;
+                            plane(x, y).color = myRay.endSphere->surf.color*alpha;
                          }
                          else {
-                             plane(x, y).color = tempS.surf.color;
+                             plane(x, y).color = myRay.endSphere->surf.color;
                          }
                      }
                 }
             }
-
-//            if(theScene->findInterTetra(myRay, tempTetra) != nullptr) {
+            
+            //Perfect refraction
+//            if(myRay.endSphere) {
 //                //Shoot shadow ray if ray hits something
 //                if(myRay.intSectPoint != nullptr) {
-//                   Vector3 dir = calcPerfectReflection(myRay, myRay.endTri->normal);
+//                    Vector3 dir = calcRefraction(myRay, myRay.endSphere->calcNormal(myRay), 0.2, 0.8);
 //                    Vertex dirVert = *myRay.intSectPoint + dir;
 //                    Ray mirroredRay = Ray(myRay.intSectPoint, &dirVert);
+//                    theScene->findIntersection(mirroredRay);
 //
-//                    if (theScene->findInterSphere(mirroredRay, tempS) != nullptr){
-//                        plane(x, y).color = tempS.color;
+//                    if(mirroredRay.intSectPoints.size() >= 2) {
+//                        if (mirroredRay.intSectPoints[1].tri != nullptr){
+//                            plane(x, y).color = mirroredRay.intSectPoints[1].tri->surf.color;
+//                        }
+//                        else if (mirroredRay.intSectPoints[1].sphere != nullptr) {
+//                            plane(x, y).color = mirroredRay.intSectPoints[1].sphere->surf.color;
+//                        }
+//                        else {
+//
+//                        }
 //                    }
-//                    else if (theScene->findInterTri(mirroredRay, temp) != nullptr) {
-//                        plane(x, y).color = temp.color;
+//                }
+//
+
+            //Perfect mirror
+//            if(myRay.endSphere) {
+//                //Shoot shadow ray if ray hits something
+//                if(myRay.intSectPoint != nullptr) {
+//                    Vector3 dir = calcPerfectReflection(myRay, myRay.endSphere->calcNormal(myRay));
+//                    Vertex dirVert = *myRay.intSectPoint + dir;
+//                    Ray mirroredRay = Ray(myRay.intSectPoint, &dirVert);
+//                    theScene->findIntersection(mirroredRay);
+//
+//                    if (mirroredRay.endTri != nullptr){
+//                        plane(x, y).color = mirroredRay.endTri->surf.color;
+//                    }
+//                    else if (mirroredRay.endSphere != nullptr) {
+//                        plane(x, y).color = mirroredRay.endSphere->surf.color;
 //                    }
 //                    else {
 //
 //                    }
 //                }
-//
-//            }
+
+           // }
             
 		}
 	}

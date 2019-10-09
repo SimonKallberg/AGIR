@@ -14,6 +14,7 @@
 #include "Vector3.hpp"
 
 Vector3 calcPerfectReflection(Ray &inRay, Vector3 normal);
+Vector3 calcRefraction(Ray &inRay, Vector3 normal, double n1, double n2);
 
 
 class Surface {
