@@ -28,6 +28,7 @@ public:
     Vertex centerPos = Vertex(Vector3(0.0,0.0,0.0));
     ColorDbl color = ColorDbl(1.0,1.0,1.0);
     Surface surf;
+    double refractionIndex = 1;
 };
 
 #endif /* Sphere_hpp */

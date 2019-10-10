@@ -166,12 +166,15 @@ void Scene::rayTracing(Ray* arg) {
         return;
     }
     else {
-        //Get normal
+        //Get normal and refraction index
+        double n2 = 1;
         if(arg->endTri) {
             normal = arg->endTri->calcNormal();
+            n2 = arg->endTri->refractionIndex;
         }
         else if(arg->endSphere) {
             normal = arg->endSphere->calcNormal(*arg);
+            n2 = arg->endSphere->refractionIndex;
         }
         else {
             return;
@@ -182,7 +185,26 @@ void Scene::rayTracing(Ray* arg) {
         Vertex* endVertex = new Vertex(*arg->intSectPoint + dir);
         arg->reflectedRay = new Ray(arg->intSectPoint, endVertex);
         
-        //Recurse
+        //Perfectly refracted ray
+        double n1 = 1;
+        if(arg->parent != nullptr) {
+            if(arg->parent->endTri) {
+                n1 = arg->parent->endTri->refractionIndex;
+            }
+            else if(arg->parent->endSphere) {
+                n1 = arg->parent->endSphere->refractionIndex;
+            }
+        }
+        
+        Vector3 dirRefr = calcRefraction(*arg, normal, 1, 1);
+        dirRefr.normalize();
+        Vertex* endRefrVertex = new Vertex(*arg->intSectPoint + dirRefr);
+        arg->refractedRay = new Ray(arg->intSectPoint, endRefrVertex);
+
+        //Recurse reflection
         rayTracing(arg->reflectedRay);
+        
+        //Recurse refraction
+        rayTracing(arg->refractedRay);
     }
 }
