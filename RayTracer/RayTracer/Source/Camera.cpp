@@ -26,18 +26,23 @@ void Camera::render()
 	{
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
-            Ray theRay = calcRay(x,y);
+            Ray myRay = calcRay(x,y);
+            Ray *theRay = new Ray(new Vertex(myRay.start->vec3), new Vertex(myRay.end->vec3));
             
             //Find intersection with ray
-            theScene->findIntersection(theRay);
+            theScene->findIntersection(*theRay);
             //Shoot out ray
-            theScene->rayTracing(&theRay);
+            int iteration = 0;
+            theScene->rayTracing(theRay, iteration);
             
+            int counter = 0;
             //Pointer to loop through the ray
-            Ray* endRay = &theRay;
+            Ray* endRay = theRay;
             //Access the leaf of the tree
-            while(endRay->reflectedRay) {
-                endRay = endRay->reflectedRay;
+            while(endRay->refractedRay) {
+                endRay = endRay->refractedRay;
+                //cout << counter << endl;
+                //counter++;
             }
             bool shadow = false;
             //If the ray hits a triangle
@@ -133,13 +138,13 @@ void Camera::render()
 //                }
 //            }
 //
-            //Perfect refraction
-//            if(myRay.endSphere) {
+//            //Perfect refraction
+//            if(theRay.endSphere) {
 //                //Shoot shadow ray if ray hits something
-//                if(myRay.intSectPoint != nullptr) {
-//                    Vector3 dir = calcRefraction(myRay, myRay.endSphere->calcNormal(myRay), 0.2, 0.8);
-//                    Vertex dirVert = *myRay.intSectPoint + dir;
-//                    Ray mirroredRay = Ray(myRay.intSectPoint, &dirVert);
+//                if(theRay.intSectPoint != nullptr) {
+//                    Vector3 dir = calcRefraction(theRay, theRay.endSphere->calcNormal(theRay), 1, 1.65);
+//                    Vertex dirVert = *theRay.intSectPoint + dir;
+//                    Ray mirroredRay = Ray(theRay.intSectPoint, &dirVert);
 //                    theScene->findIntersection(mirroredRay);
 //
 //                    if(mirroredRay.intSectPoints.size() >= 2) {
@@ -154,6 +159,7 @@ void Camera::render()
 //                        }
 //                    }
 //                }
+//            }
 //
 
             //Perfect mirror
