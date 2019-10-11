@@ -29,18 +29,16 @@ void Camera::render()
             Ray myRay = calcRay(x,y);
             Ray *theRay = new Ray(new Vertex(myRay.start->vec3), new Vertex(myRay.end->vec3));
             
-            //Find intersection with ray
-            theScene->findIntersection(*theRay);
             //Shoot out ray
             int iteration = 0;
             theScene->rayTracing(theRay, iteration);
             
-            int counter = 0;
+            //int counter = 0;
             //Pointer to loop through the ray
             Ray* endRay = theRay;
             //Access the leaf of the tree
-            while(endRay->refractedRay) {
-                endRay = endRay->refractedRay;
+            while(endRay->reflectedRay) {
+                endRay = endRay->reflectedRay;
                 //cout << counter << endl;
                 //counter++;
             }
@@ -88,7 +86,6 @@ void Camera::render()
             }
             else
             {}
-            
             
      
    //OLD THIS WORKS

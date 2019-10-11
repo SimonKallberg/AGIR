@@ -26,18 +26,25 @@ Ray::~Ray() {
 
     Ray* ptr = reflectedRay;
     //Delete the reflected ray tree
-    while(ptr && ptr->reflectedRay) {
-        Ray* temp = reflectedRay;
+    while(ptr) {
+        std::cout << "deleting reflected ray!"<< std::endl;
+        Ray* temp = ptr;
         ptr = ptr->reflectedRay;
         delete temp;
+        temp = nullptr;
     }
     //Delete the refracted ray tree
-    Ray* ptr1 = refractedRay;
-    while(ptr1 && ptr1->refractedRay) {
-        Ray* temp = refractedRay;
-        ptr = ptr1->refractedRay;
-        delete temp;
-    }
+//    Ray* ptr1 = refractedRay;
+//    std::cout << ptr1 << std::endl;
+//    while(ptr1 != nullptr) {
+//        std::cout << "deleting refracted ray!"<< std::endl;
+//        Ray* temp = ptr1;
+//        ptr1 = ptr1->refractedRay;
+//        delete temp;
+//        temp = nullptr;
+//    }
+    
+    //refractedRay = nullptr;
     reflectedRay = nullptr;
     start = nullptr;
     end = nullptr;

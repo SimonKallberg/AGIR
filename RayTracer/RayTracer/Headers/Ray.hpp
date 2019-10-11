@@ -42,7 +42,7 @@ public:
     //Tree structure
     Ray* parent = nullptr;
     Ray* reflectedRay = nullptr;
-    Ray* refractedRay = nullptr;
+    //Ray* refractedRay = nullptr;
 
     //Pointing towards vertexes
 	Vertex* start = nullptr;

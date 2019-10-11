@@ -38,23 +38,32 @@ Vector3 calcRefraction(Ray &inRay, Vector3 normal, double n1, double n2) {
     double c = dotProduct(normal, I);
     double k = 1-((r*r)*(1-(c*c)));
     
-    Vector3 T = r*I - normal * (r*c + sqrt(k));
+    if(dotProduct(normal, I) < 0) {
+        //cout << "flip the normal" << endl;
+        c = -c;
+    }
+    else {
+        std::swap(n1, n2);
+        normal = -1*normal;
+    }
+    
+    Vector3 T = r*I + normal * (r*c - sqrt(k));
     T.normalize();
     
     //From thick to thin medium, e.g. glass into air
     if(k < 0) {
         //Angle between incoming ray and normal
-        double alpha = acos(dotProduct(I,normal)/(I.length()*normal.length()));
-        
-        //Brewster angle
-        double alpham = atan(n2/n1);
-        
-        //No refraction exists!
-        if(alpha > alpham) {
-            std::cout << "No refraction exists!" << std::endl;
-            return Vector3(0,0,0);
-        }
-        //std::cout << "No case here..." << std::endl;
+//        double alpha = acos(dotProduct(I,normal)/(I.length()*normal.length()));
+//        
+//        //Brewster angle
+//        double alpham = atan(n2/n1);
+//        
+//        //No refraction exists!
+//        if(alpha > alpham) {
+//            std::cout << "No refraction exists!" << std::endl;
+//            return calcPerfectReflection(inRay, normal);
+//        }
+        std::cout << "k < 0" << std::endl;
         return Vector3(0,0,0);
     }
     
