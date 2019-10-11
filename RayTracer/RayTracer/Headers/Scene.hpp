@@ -35,4 +35,5 @@ public:
     void rayTracing(Ray* arg, int iteration);
 };
 
+
 #endif
