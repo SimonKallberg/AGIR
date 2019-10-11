@@ -37,7 +37,7 @@ bool Sphere::rayIntersection(Ray &p)
         return false;
     }
     //Check if point is same as starting point - then the ray doesn't intersect
-    if(abs(d1) < 0.0001 && abs(d2) < 0.0001) {
+    if(abs(d1) < 0.001 && abs(d2) < 0.001) {
         return false;
     }
     

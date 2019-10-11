@@ -98,12 +98,13 @@ Vertex* Scene::findIntersection(Ray &arg) {
         //Check if start point is the same as end point
         arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
         int i = 0;
-        if( (arg.start->vec3 - arg.intSectPoint->vec3).length() < 0.00001 ) {
-            cout << "Intersection point same as starting point" << endl;
-            if((int)arg.intSectPoints.size() > 1) {
-                i = 1;
-            }
-        }
+//        if( (arg.start->vec3 - arg.intSectPoint->vec3).length() < 0.00001 ) {
+//            cout << "Intersection point same as starting point" << endl;
+//            if((int)arg.intSectPoints.size() > 1) {
+//                cout << "Changing intersection point" << endl;
+//                i = 1;
+//            }
+//        }
         arg.intSectPoint = &arg.intSectPoints[i].interSectPoint;
         
         if(arg.intSectPoints[i].tri != nullptr ) {
@@ -150,6 +151,7 @@ bool Scene::shootShadowRay(Vertex &inV) {
 void Scene::rayTracing(Ray* arg, int iteration) {
     
     if(iteration > 10) {
+        //cout << "breaking" << endl;
         return;
     }
     
@@ -165,7 +167,6 @@ void Scene::rayTracing(Ray* arg, int iteration) {
         //cout << "break 2" << endl;
         return;
     }
-    
     
     //If the ray hits a diffuse triangle, stop the recursion!
     if(arg->endTri && arg->endTri->surf.reflectionType == 0) {
@@ -199,36 +200,29 @@ void Scene::rayTracing(Ray* arg, int iteration) {
         arg->reflectedRay->parent = arg;
         
         //Perfectly refracted ray
-        bool inside = false;
-        double n1 = 1;
-        double n2 = arg->refractionIndex;
-        if(arg->parent != nullptr) {
-            n1 = arg->parent->refractionIndex;
-        }
-        if(n1 - 1.5 < 0.1) {
-            //cout << "flip the normal" << endl;
-            inside = true;
-        }
-        if(inside) {
-           normal = -1*normal;
-        }
+//        bool inside = false;
+//        double n1 = 1;
+//        double n2 = arg->refractionIndex;
+//        if(arg->parent != nullptr) {
+//            n1 = arg->parent->refractionIndex;
+//        }
+//
+//        Vector3 dirRefr = calcRefraction(*arg, normal, n1, n2);
+//        //No refraction exists!
+//        if( dirRefr < 0.1) {
+//            return;
+//        }
         
-        Vector3 dirRefr = calcRefraction(*arg, normal, n1, n2);
-        //No refraction exists!
-        if( dirRefr < 0.1) {
-            return;
-        }
-        
-        Vertex* newStartPoint = new Vertex(*arg->intSectPoint);
-        Vertex* endRefrVertex = new Vertex(*arg->intSectPoint + dirRefr);
-        arg->refractedRay = new Ray(newStartPoint, endRefrVertex);
-        arg->refractedRay->parent = arg;
-        //cout << arg->refractedRay->parent << endl;
+//        Vertex* newStartPoint = new Vertex(*arg->intSectPoint + (normal*0.01));
+//        Vertex* endRefrVertex = new Vertex(*arg->intSectPoint + dirRefr);
+//        arg->refractedRay = new Ray(newStartPoint, endRefrVertex);
+//        arg->refractedRay->parent = arg;
+        //cout << *arg->refractedRay->parent << endl;
         //cout << *arg->intSectPoint << endl;
         //cout << *arg->refractedRay << endl;
             
         //Recurse refraction
-        rayTracing(arg->refractedRay, iteration + 1);
+        //rayTracing(arg->refractedRay, iteration + 1);
         
         //Recurse reflection
         rayTracing(arg->reflectedRay, iteration + 1);
