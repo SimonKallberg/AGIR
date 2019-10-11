@@ -25,10 +25,17 @@ Ray::Ray (const Ray &old_obj) {
 Ray::~Ray() {
 
     Ray* ptr = reflectedRay;
-    //Delete the ray tree
-    while(ptr) {
+    //Delete the reflected ray tree
+    while(ptr && ptr->reflectedRay) {
         Ray* temp = reflectedRay;
         ptr = ptr->reflectedRay;
+        delete temp;
+    }
+    //Delete the refracted ray tree
+    Ray* ptr1 = refractedRay;
+    while(ptr1 && ptr1->refractedRay) {
+        Ray* temp = refractedRay;
+        ptr = ptr1->refractedRay;
         delete temp;
     }
     reflectedRay = nullptr;

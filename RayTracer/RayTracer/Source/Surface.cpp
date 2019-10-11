@@ -31,30 +31,34 @@ Vector3 calcPerfectReflection(Ray &inRay, Vector3 normal) {
 //Snell's law of refraction
 Vector3 calcRefraction(Ray &inRay, Vector3 normal, double n1, double n2) {
     
+    //std::cout << "n1: " << n1 << " n2: " << n2 << std::endl;
     Vector3 I = (*inRay.end - *inRay.start).vec3;
     I.normalize();
-    Vector3 T = (n1/n2)*I + normal*((-1*(n1/n2)*(dotProduct(normal, I)))
-                -sqrt(1-(n1/n2)*(n1/n2)*(1-(dotProduct(normal, I)*dotProduct(normal, I)))));
+    double r = n1/n2;
+    double c = dotProduct(normal, I);
+    double k = 1-((r*r)*(1-(c*c)));
     
-    //From thick to thin medium, e.g. air into glass
-    if(n1 < n2) {
-        T.normalize();
-        return T;
-    }
-    else {
+    Vector3 T = r*I - normal * (r*c + sqrt(k));
+    T.normalize();
+    
+    //From thick to thin medium, e.g. glass into air
+    if(k < 0) {
         //Angle between incoming ray and normal
         double alpha = acos(dotProduct(I,normal)/(I.length()*normal.length()));
+        
         //Brewster angle
-        double alpham = acos(n2/n1);
+        double alpham = atan(n2/n1);
         
         //No refraction exists!
         if(alpha > alpham) {
+            std::cout << "No refraction exists!" << std::endl;
             return Vector3(0,0,0);
         }
-        
+        //std::cout << "No case here..." << std::endl;
+        return Vector3(0,0,0);
     }
     
-    return normal;
+    return T;
 }
 
 ColorDbl Surface::diffuseReflection(ColorDbl inC)

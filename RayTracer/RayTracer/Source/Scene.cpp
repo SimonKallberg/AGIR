@@ -95,15 +95,25 @@ Vertex* Scene::findIntersection(Ray &arg) {
     
     if(arg.intSectPoints.size() > 0) {
         arg.sortIntersections();
+        //Check if start point is the same as end point
         arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
+        int i = 0;
+        if( (arg.start->vec3 - arg.intSectPoint->vec3).length() < 0.00001 ) {
+            cout << "Intersection point same as starting point" << endl;
+            if((int)arg.intSectPoints.size() > 1) {
+                i = 1;
+            }
+        }
+        arg.intSectPoint = &arg.intSectPoints[i].interSectPoint;
         
-        if(arg.intSectPoints[0].tri != nullptr ) {
-            arg.endTri = arg.intSectPoints[0].tri;
+        if(arg.intSectPoints[i].tri != nullptr ) {
+            arg.endTri = arg.intSectPoints[i].tri;
+            arg.refractionIndex = arg.endTri->refractionIndex;
         }
         else {
-            arg.endSphere = arg.intSectPoints[0].sphere;
+            arg.endSphere = arg.intSectPoints[i].sphere;
+            arg.refractionIndex = arg.endSphere->refractionIndex;
         }
-        
         
     return arg.intSectPoint;
         
@@ -137,74 +147,91 @@ bool Scene::shootShadowRay(Vertex &inV) {
 }
 
 //Whitted ray-tracing
-void Scene::rayTracing(Ray* arg) {
+void Scene::rayTracing(Ray* arg, int iteration) {
+    
+    if(iteration > 10) {
+        return;
+    }
     
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
+        //cout << "break 1" << endl;
         return;
     }
     //Add intersections to ray
     findIntersection(*arg);
     
     if(arg->intSectPoint == nullptr) {
+        //cout << "break 2" << endl;
         return;
     }
     
-    if( (arg->start->vec3 - arg->intSectPoint->vec3) < 0.1 ||
-       -1*(arg->start->vec3 - arg->intSectPoint->vec3) > 0.1 ) {
-        return;
-    }
-    
-    Vector3 normal;
     
     //If the ray hits a diffuse triangle, stop the recursion!
     if(arg->endTri && arg->endTri->surf.reflectionType == 0) {
+        //cout << "break 4" << endl;
         return;
     }
     //If the ray hits a diffuse sphere, stop the recursion!
     else if(arg->endSphere && arg->endSphere->surf.reflectionType == 0) {
+        //cout << "break 5" << endl;
         return;
     }
     else {
         //Get normal and refraction index
-        double n2 = 1;
+        Vector3 normal;
         if(arg->endTri) {
             normal = arg->endTri->calcNormal();
-            n2 = arg->endTri->refractionIndex;
         }
         else if(arg->endSphere) {
             normal = arg->endSphere->calcNormal(*arg);
-            n2 = arg->endSphere->refractionIndex;
+            //cout << "Sphere: n2" << n2 << endl;
         }
         else {
+            //cout << "break 6" << endl;
             return;
         }
-            
+        
         //Perfectly reflected ray
         Vector3 dir = calcPerfectReflection(*arg, normal);
         Vertex* endVertex = new Vertex(*arg->intSectPoint + dir);
         arg->reflectedRay = new Ray(arg->intSectPoint, endVertex);
+        arg->reflectedRay->parent = arg;
         
         //Perfectly refracted ray
+        bool inside = false;
         double n1 = 1;
+        double n2 = arg->refractionIndex;
         if(arg->parent != nullptr) {
-            if(arg->parent->endTri) {
-                n1 = arg->parent->endTri->refractionIndex;
-            }
-            else if(arg->parent->endSphere) {
-                n1 = arg->parent->endSphere->refractionIndex;
-            }
+            n1 = arg->parent->refractionIndex;
+        }
+        if(n1 - 1.5 < 0.1) {
+            //cout << "flip the normal" << endl;
+            inside = true;
+        }
+        if(inside) {
+           normal = -1*normal;
         }
         
-        Vector3 dirRefr = calcRefraction(*arg, normal, 1, 1);
-        dirRefr.normalize();
-        Vertex* endRefrVertex = new Vertex(*arg->intSectPoint + dirRefr);
-        arg->refractedRay = new Ray(arg->intSectPoint, endRefrVertex);
-
-        //Recurse reflection
-        rayTracing(arg->reflectedRay);
+        Vector3 dirRefr = calcRefraction(*arg, normal, n1, n2);
+        //No refraction exists!
+        if( dirRefr < 0.1) {
+            return;
+        }
         
+        Vertex* newStartPoint = new Vertex(*arg->intSectPoint);
+        Vertex* endRefrVertex = new Vertex(*arg->intSectPoint + dirRefr);
+        arg->refractedRay = new Ray(newStartPoint, endRefrVertex);
+        arg->refractedRay->parent = arg;
+        //cout << arg->refractedRay->parent << endl;
+        //cout << *arg->intSectPoint << endl;
+        //cout << *arg->refractedRay << endl;
+            
         //Recurse refraction
-        rayTracing(arg->refractedRay);
+        rayTracing(arg->refractedRay, iteration + 1);
+        
+        //Recurse reflection
+        rayTracing(arg->reflectedRay, iteration + 1);
     }
 }
+
