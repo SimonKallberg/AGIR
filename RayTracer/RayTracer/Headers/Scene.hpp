@@ -32,7 +32,7 @@ public:
     bool shootShadowRay(Vertex &inV);
     
     Vertex* findIntersection(Ray &arg);
-    void rayTracing(Ray* arg, int iteration);
+    void rayTracing(Ray* arg);
 };
 
 #endif

@@ -7,7 +7,6 @@
 
 const int DIFFUSE = 0;
 const int SPECULAR = 1;
-const int TRANSPARENT = 2;
 
 #include <iostream>
 #include <vector>
@@ -32,7 +31,7 @@ int main()
     //myScene.addTetrahedron(Vertex(7.0, 2.0, 0.0), 1, ColorDbl(0.5, 0.5, 0.5));
     
     //Adding a sphere
-    myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5), TRANSPARENT);
+    myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5), SPECULAR);
     myScene.addPointLight(Vertex(5.0,0.0,4.5));
 	Camera myCamera(&myScene);
 
