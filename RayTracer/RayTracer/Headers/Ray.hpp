@@ -14,7 +14,7 @@
 #include "ColorDbl.hpp"
 #include <iostream>
 #include <vector>
-
+#include <algorithm>
 
 class Triangle;
 class ColorDbl;
