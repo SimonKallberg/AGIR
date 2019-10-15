@@ -136,13 +136,15 @@ bool Scene::shootShadowRay(Vertex &inV) {
     return false;
 }
 
-//Whitted ray-tracing
-void Scene::rayTracing(Ray* arg) {
+//Whitted ray-tracing & monte carlo
+void Scene::rayTracing(Ray* arg, int iteration) {
     
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
         return;
     }
+    if(iteration > 5) return;
+    
     //Add intersections to ray
     findIntersection(*arg);
     
@@ -157,15 +159,15 @@ void Scene::rayTracing(Ray* arg) {
     
     Vector3 normal;
     
-    transformToLocalCoordinateSystem(*arg);
-    
     //If the ray hits a diffuse triangle, stop the recursion!
     if(arg->endTri && arg->endTri->surf.reflectionType == 0) {
-        return;
+        arg->monteCarloRay = monteCarloRayTracing(*arg);
+        rayTracing(arg->monteCarloRay, iteration +1);
     }
     //If the ray hits a diffuse sphere, stop the recursion!
     else if(arg->endSphere && arg->endSphere->surf.reflectionType == 0) {
-        return;
+        arg->monteCarloRay = monteCarloRayTracing(*arg);
+        rayTracing(arg->monteCarloRay, iteration +1);
     }
     else {
         //Get normal
@@ -185,7 +187,7 @@ void Scene::rayTracing(Ray* arg) {
         arg->reflectedRay = new Ray(arg->intSectPoint, endVertex);
         
         //Recurse
-        rayTracing(arg->reflectedRay);
+        rayTracing(arg->reflectedRay, iteration + 1);
     }
 }
 
@@ -212,10 +214,10 @@ matrix<double> Scene::transformToLocalCoordinateSystem(Ray &arg) {
     return transform;
 }
 
-Ray Scene::monteCarloRayTracing(Ray &arg) {
+Ray* Scene::monteCarloRayTracing(Ray &arg) {
     
     //If the ray doesn't intersect, there can't be a reflected ray
-    if(!arg.intSectPoint) return Ray(nullptr, nullptr);
+    if(!arg.intSectPoint) return new Ray(nullptr, nullptr);
     //Setting up the estimator by generating 2 random numbers [0,1]
     double randX = ((double) rand() / (RAND_MAX));
     double randY = ((double) rand() / (RAND_MAX));
@@ -225,17 +227,17 @@ Ray Scene::monteCarloRayTracing(Ray &arg) {
     double azimuthAngle = 2*PI*randX;
     double inclinationAngle = asin(sqrt(randY));
     
-    //Azimuth rotation
-    Vector3 col1 = Vector3(cos(azimuthAngle), sin(azimuthAngle), 0);
-    Vector3 col2 = Vector3(-sin(azimuthAngle), cos(azimuthAngle), 0);
-    Vector3 col3 = Vector3(0,0,1);
-    matrix<double> azimuthRotation(col1, col2, col3);
-    
     //Inclination rotation
-    col1 = Vector3(1, 0, 0);
-    col2 = Vector3(0, cos(inclinationAngle), sin(inclinationAngle));
-    col3 = Vector3(0, -sin(inclinationAngle), cos(inclinationAngle));
+    Vector3 col1 = Vector3(cos(inclinationAngle), sin(inclinationAngle), 0);
+    Vector3 col2 = Vector3(-sin(inclinationAngle), cos(inclinationAngle), 0);
+    Vector3 col3 = Vector3(0,0,1);
     matrix<double> inclinationRotation(col1, col2, col3);
+    
+    //Azimuth rotation
+    col1 = Vector3(1, 0, 0);
+    col2 = Vector3(0, cos(azimuthAngle), sin(azimuthAngle));
+    col3 = Vector3(0, -sin(azimuthAngle), cos(azimuthAngle));
+    matrix<double> azimuthRotation(col1, col2, col3);
     
     //Total rotation
     matrix<double> rotation(4,4);
@@ -253,6 +255,6 @@ Ray Scene::monteCarloRayTracing(Ray &arg) {
     outDirGlobal = changeCoords.multiply(outDirLocal);
     Vertex* endVertex = new Vertex(arg.intSectPoint->vec3 + outDirGlobal);
     
-    Ray outRay = Ray(arg.start, endVertex);
+    Ray *outRay = new Ray(endVertex, arg.start);
     return outRay;
 }

@@ -31,19 +31,19 @@ void Camera::render()
             //Find intersection with ray
             theScene->findIntersection(theRay);
             //Shoot out ray
-            theScene->rayTracing(&theRay);
-            
-            theScene->monteCarloRayTracing(theRay);
+            theScene->rayTracing(&theRay, 0);
             
             //Pointer to loop through the ray
             Ray* endRay = &theRay;
             //Access the leaf of the tree
-            while(endRay->reflectedRay) {
-                endRay = endRay->reflectedRay;
+            while(endRay->monteCarloRay) {
+                endRay = endRay->monteCarloRay;
             }
             bool shadow = false;
             //If the ray hits a triangle
             if(endRay->endTri) {
+                plane(x, y).color = endRay->endTri->surf.color;
+                
                  shadow = theScene->shootShadowRay(*endRay->intSectPoint);
                  //Is there a shadow? Set to black
                  if(shadow) {
@@ -62,7 +62,6 @@ void Camera::render()
                      }
                  }
             }
-            
             
             //If the ray its a sphere
             else if(endRay->endSphere) {
@@ -84,7 +83,9 @@ void Camera::render()
                 }
             }
             else
-            {}
+            {
+                plane(x, y).color = ColorDbl(1,0,0);
+            }
             
             
      

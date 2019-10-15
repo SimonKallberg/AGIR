@@ -31,12 +31,13 @@ public:
     void addTetrahedron(Vertex inV, double scale, ColorDbl incolor, int reflType = 0);
     void addSphere(Vertex inCenter, double radius, ColorDbl inColor, int inReflType);
     void addPointLight(Vertex inCenter);
-    bool shootShadowRay(Vertex &inV);
     
+    bool shootShadowRay(Vertex &inV);
     Vertex* findIntersection(Ray &arg);
-    void rayTracing(Ray* arg);
     matrix<double> transformToLocalCoordinateSystem(Ray &arg);
-    Ray monteCarloRayTracing(Ray &arg);
+    
+    void rayTracing(Ray* arg, int iteration);
+    Ray* monteCarloRayTracing(Ray &arg);
 };
 
 #endif
