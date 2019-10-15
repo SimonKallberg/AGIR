@@ -35,6 +35,7 @@ int main()
     myScene.addPointLight(Vertex(5.0,0.0,4.5));
 	Camera myCamera(&myScene);
 
+    
 	myCamera.render();
 	myCamera.createImage("raytracing.bmp");
 

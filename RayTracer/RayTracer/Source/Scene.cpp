@@ -157,6 +157,8 @@ void Scene::rayTracing(Ray* arg) {
     
     Vector3 normal;
     
+    transformToLocalCoordinateSystem(*arg);
+    
     //If the ray hits a diffuse triangle, stop the recursion!
     if(arg->endTri && arg->endTri->surf.reflectionType == 0) {
         return;
@@ -185,4 +187,29 @@ void Scene::rayTracing(Ray* arg) {
         //Recurse
         rayTracing(arg->reflectedRay);
     }
+}
+
+Vector3 Scene::transformToLocalCoordinateSystem(Ray &arg) {
+    Vector3 result = Vector3(0,0,0);
+    Vector3 I = (*arg.end - *arg.start).vec3;
+    Vector3 z = arg.endTri ? arg.endTri->normal : arg.endSphere->calcNormal(arg);
+    z.normalize();
+    Vector3 x = I - dotProduct(I, z) * z;
+    x.normalize();
+    Vector3 y = crossProduct(-1*x, z);
+    y.normalize();
+    
+    matrix<double> translation(x, y, z);
+    matrix<double> rotation(-1*(arg.intSectPoint->vec3));
+    matrix<double> transform(4,4);
+    transform.multiply(translation, rotation);
+    matrix<double> localCoord(4, 1);
+    localCoord(0,0) = I.x;
+    localCoord(1,0) = I.y;
+    localCoord(2,0) = I.z;
+    localCoord(3,0) = 1;
+    
+    
+    
+    return result;
 }

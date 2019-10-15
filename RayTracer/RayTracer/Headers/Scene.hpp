@@ -18,6 +18,7 @@
 #include "ColorDbl.hpp"
 #include <algorithm>
 #include <iterator>
+#include "matrix.hpp"
 
 class Scene {
 public:
@@ -33,6 +34,7 @@ public:
     
     Vertex* findIntersection(Ray &arg);
     void rayTracing(Ray* arg);
+    Vector3 transformToLocalCoordinateSystem(Ray &arg);
 };
 
 #endif
