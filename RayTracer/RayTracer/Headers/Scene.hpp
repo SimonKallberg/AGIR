@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <iterator>
 #include "matrix.hpp"
+#include <random>
 
 class Scene {
 public:
@@ -34,7 +35,8 @@ public:
     
     Vertex* findIntersection(Ray &arg);
     void rayTracing(Ray* arg);
-    Vector3 transformToLocalCoordinateSystem(Ray &arg);
+    matrix<double> transformToLocalCoordinateSystem(Ray &arg);
+    void monteCarloRayTracing(Ray &arg);
 };
 
 #endif

@@ -33,6 +33,8 @@ void Camera::render()
             //Shoot out ray
             theScene->rayTracing(&theRay);
             
+            theScene->monteCarloRayTracing(theRay);
+            
             //Pointer to loop through the ray
             Ray* endRay = &theRay;
             //Access the leaf of the tree

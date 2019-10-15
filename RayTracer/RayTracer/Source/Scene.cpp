@@ -189,27 +189,62 @@ void Scene::rayTracing(Ray* arg) {
     }
 }
 
-Vector3 Scene::transformToLocalCoordinateSystem(Ray &arg) {
-    Vector3 result = Vector3(0,0,0);
+matrix<double> Scene::transformToLocalCoordinateSystem(Ray &arg) {
+
     Vector3 I = (*arg.end - *arg.start).vec3;
-    Vector3 z = arg.endTri ? arg.endTri->normal : arg.endSphere->calcNormal(arg);
+    Vector3 z = arg.endTri ? arg.endTri->normal : arg.endSphere ? arg.endSphere->calcNormal(arg) : Vector3(0,0,0);
     z.normalize();
     Vector3 x = I - dotProduct(I, z) * z;
     x.normalize();
     Vector3 y = crossProduct(-1*x, z);
     y.normalize();
-    
-    matrix<double> translation(x, y, z);
-    matrix<double> rotation(-1*(arg.intSectPoint->vec3));
     matrix<double> transform(4,4);
-    transform.multiply(translation, rotation);
-    matrix<double> localCoord(4, 1);
-    localCoord(0,0) = I.x;
-    localCoord(1,0) = I.y;
-    localCoord(2,0) = I.z;
-    localCoord(3,0) = 1;
     
+    if(arg.intSectPoint) {
+        matrix<double> translation(x, y, z);
+        Vector3 col1 = Vector3(1, 0, 0);
+        Vector3 col2 = Vector3(0, 1, 0);
+        Vector3 col3 = Vector3(0, 0, 1);
+        matrix<double> rotation(col1, col2, col3, -1*(arg.intSectPoint->vec3));
+        transform.multiply(translation, rotation);
+    }
     
+    return transform;
+}
+
+void Scene::monteCarloRayTracing(Ray &arg) {
     
-    return result;
+    //Setting up the estimator by generating 2 random numbers [0,1]
+    double randX = ((double) rand() / (RAND_MAX));
+    double randY = ((double) rand() / (RAND_MAX));
+    double PI = 3.14;
+    
+    //Monte Carlo solution with a cosine estimator
+    double azimuthAngle = 2*PI*randX;
+    double inclinationAngle = asin(sqrt(randY));
+    
+    //Azimuth rotation
+    Vector3 col1 = Vector3(cos(azimuthAngle), sin(azimuthAngle), 0);
+    Vector3 col2 = Vector3(-sin(azimuthAngle), cos(azimuthAngle), 0);
+    Vector3 col3 = Vector3(0,0,1);
+    matrix<double> azimuthRotation(col1, col2, col3);
+    
+    //Inclination rotation
+    col1 = Vector3(1, 0, 0);
+    col2 = Vector3(0, cos(inclinationAngle), sin(inclinationAngle));
+    col3 = Vector3(0, -sin(inclinationAngle), cos(inclinationAngle));
+    matrix<double> inclinationRotation(col1, col2, col3);
+    
+    //Total rotation
+    matrix<double> rotation(4,4);
+    rotation.multiply(azimuthRotation, inclinationRotation);
+    
+    //Getting outgoing direction by transforming to local coordinate system
+    matrix<double> toLocalCoords = transformToLocalCoordinateSystem(arg);
+    Vector3 inDir = (*arg.end - *arg.start).vec3;
+    Vector3 inDirLocal = toLocalCoords.multiply(inDir);
+    Vector3 outDir = rotation.multiply(inDirLocal);
+    
+    //Transform to global coordinate system
+
 }
