@@ -36,7 +36,7 @@ public:
     Vertex* findIntersection(Ray &arg);
     void rayTracing(Ray* arg);
     matrix<double> transformToLocalCoordinateSystem(Ray &arg);
-    void monteCarloRayTracing(Ray &arg);
+    Ray monteCarloRayTracing(Ray &arg);
 };
 
 #endif

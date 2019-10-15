@@ -212,8 +212,10 @@ matrix<double> Scene::transformToLocalCoordinateSystem(Ray &arg) {
     return transform;
 }
 
-void Scene::monteCarloRayTracing(Ray &arg) {
+Ray Scene::monteCarloRayTracing(Ray &arg) {
     
+    //If the ray doesn't intersect, there can't be a reflected ray
+    if(!arg.intSectPoint) return Ray(nullptr, nullptr);
     //Setting up the estimator by generating 2 random numbers [0,1]
     double randX = ((double) rand() / (RAND_MAX));
     double randY = ((double) rand() / (RAND_MAX));
@@ -240,11 +242,17 @@ void Scene::monteCarloRayTracing(Ray &arg) {
     rotation.multiply(azimuthRotation, inclinationRotation);
     
     //Getting outgoing direction by transforming to local coordinate system
-    matrix<double> toLocalCoords = transformToLocalCoordinateSystem(arg);
+    matrix<double> changeCoords = transformToLocalCoordinateSystem(arg);
     Vector3 inDir = (*arg.end - *arg.start).vec3;
-    Vector3 inDirLocal = toLocalCoords.multiply(inDir);
-    Vector3 outDir = rotation.multiply(inDirLocal);
+    Vector3 inDirLocal = changeCoords.multiply(inDir);
+    Vector3 outDirLocal = rotation.multiply(inDirLocal);
+    Vector3 outDirGlobal;
     
     //Transform to global coordinate system
-
+    changeCoords.invert();
+    outDirGlobal = changeCoords.multiply(outDirLocal);
+    Vertex* endVertex = new Vertex(arg.intSectPoint->vec3 + outDirGlobal);
+    
+    Ray outRay = Ray(arg.start, endVertex);
+    return outRay;
 }
