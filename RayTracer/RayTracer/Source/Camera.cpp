@@ -31,9 +31,9 @@ void Camera::render()
             Ray theRay = calcRay(x,y);
             
             //Find intersection with ray
-            theScene->findIntersection(theRay);
+           // theScene->findIntersection(theRay);
             //Shoot out ray
-            theScene->rayTracing(&theRay, 0);
+            theScene->traceRay(&theRay, 0);
             
             //Pointer to loop through the ray
             Ray* endRay = &theRay;
