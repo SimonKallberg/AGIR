@@ -26,6 +26,8 @@ void Camera::render()
 	{
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
+//    int x = 0;
+//    int y = 0;
             Ray theRay = calcRay(x,y);
             
             //Find intersection with ray

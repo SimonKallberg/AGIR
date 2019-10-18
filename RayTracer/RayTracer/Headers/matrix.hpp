@@ -69,12 +69,69 @@ public:
     void printm();
     int ROWS = 800;
     int COLS = 800;
-    void multiply(matrix<T>& B, matrix<T>& C);
-    matrix<T>& transpose();
-    void invers(matrix<T>& A);
-    matrix<T>& invert();
+    matrix<T>& multiply(matrix<T>& B, matrix<T>& C);
     Vector3 multiply(Vector3 inDir);
+    matrix<T>& multiply(double factor);
+    
+    friend Vector3 multiply(Vector3 inVec, matrix<T>& rhs);
+    
+    matrix<T>& transpose();
+    bool invert();
+    double determinant(int n);
+    matrix<T>& normalize();
+    matrix<T>& identity();
 };
+template<typename T>
+Vector3 multiply(Vector3 inVec, matrix<T>& rhs) {
+    
+    matrix<T> lhs(inVec);
+    matrix<T> result(Vector3(0,0,0));
+    
+    if(lhs.COLS != rhs.ROWS) {
+        std::cout << "Matrix dimensions do not match!" << std::endl;
+        return Vector3(0,0,0);
+    }
+    //Matrix multiplication
+    for(int i = 0; i < result.ROWS; i++) {
+        for(int j = 0; j < result.COLS; j++) {
+            for(int k = 0; k < lhs.COLS; k++) {
+                //cout << lhs(i,k) << endl;
+                auto lhsElem = lhs(i, k);
+                auto rhsElem = rhs(k, j);
+                result(i, j) += lhsElem * rhsElem;
+            }
+        }
+    }
+    
+    return Vector3(result(0,0), result(1,0), result(2,0));
+}
+
+template<typename T>
+matrix<T>& matrix<T>::identity()
+{
+    int row, col;
+      
+    for (row = 0; row < ROWS; row++)
+    {
+        for (col = 0; col < COLS; col++)
+        {
+            // Checking if row is equal to column
+            if (row == col) {
+                (*this)(row, col) = 1.0;
+            }
+        }
+    }
+    return *this;
+}
+
+template<typename T>
+matrix<T>& matrix<T>::normalize() {
+    
+    double det = determinant(COLS);
+    multiply(1/det);
+    
+    return *this;
+}
 
 
 template<typename T>
@@ -91,23 +148,47 @@ matrix<T>& matrix<T>::transpose() {
     return *this;
 }
 
+template<typename T>
+double matrix<T>::determinant(int n) {
+   double det = 0;
+   matrix<double> submatrix(4,4);
+   if (n == 2)
+      return ((*this)(0,0) * (*this)(1,1) - ((*this)(1,0) * (*this)(0,1)));
+   else {
+      for (int x = 0; x < n; x++) {
+            int subi = 0;
+            for (int i = 1; i < n; i++) {
+               int subj = 0;
+               for (int j = 0; j < n; j++) {
+                  if (j == x)
+                  continue;
+                  submatrix(subi,subj) = (*this)(i,j);
+                  subj++;
+               }
+               subi++;
+            }
+            det = det + (pow(-1, x) * (*this)(0,x) * submatrix.determinant(n - 1 ));
+      }
+   }
+   return det;
+}
 
 
 
 
 template<typename T>
-matrix<T>& matrix<T>::invert()
+bool matrix<T>::invert()
 {
     unsigned N = COLS == ROWS ? COLS : 0;
     if(N == 0) {
         std::cout << "The matrix isn't square!" << std::endl;
-        return *this;
+        return false;
     }
         
-    Vector3 col1 = Vector3(1, 0 ,0);
-    Vector3 col2 = Vector3(0, 1 ,0);
-    Vector3 col3 = Vector3(0, 0 ,1);
-    matrix<T> mat(col1, col2, col3);
+
+    matrix<T> mat(4,4);
+    mat.identity();
+    
     for (unsigned column = 0; column < N; ++column) {
         // Swap row in case our pivot point is not working
         if ((*this)(column, column) == 0) {
@@ -116,7 +197,11 @@ matrix<T>& matrix<T>::invert()
                 if (fabs((*this)(row,column)) > fabs((*this)(big,column))) big = row;
             
             // Print this is a singular matrix, return identity ?
-            if (big == column) fprintf(stderr, "Singular matrix\n");
+            if (big == column) {
+                //return identity matrix
+                *this = mat;
+                return false;
+            }
             // Swap rows
             else for (unsigned j = 0; j < N; ++j) {
                 std::swap((*this)(column,j), (*this)(big,j));
@@ -146,29 +231,29 @@ matrix<T>& matrix<T>::invert()
     }
     mat.transpose();
     *this = mat;
-    return *this;
+    return true;
 }
 
 template<typename T>
-inline void matrix<T>::multiply(matrix<T>& lhs, matrix<T>& rhs) {
+inline matrix<T>& matrix<T>::multiply(matrix<T>& lhs, matrix<T>& rhs) {
 
     matrix<T>& result = *this;
-    
     if(lhs.COLS != rhs.ROWS) {
         std::cout << "Matrix dimensions do not match!" << std::endl;
-        return;
+        return *this;
     }
     //Matrix multiplication
-    for(int i = 0; i < result.ROWS; i++) {
-        for(int j = 0; j < result.COLS; j++) {
+    for(int i = 0; i < ROWS; i++) {
+        for(int j = 0; j < COLS; j++) {
             for(int k = 0; k < lhs.COLS; k++) {
-                //cout << lhs(i,k) << endl;
                 auto lhsElem = lhs(i, k);
                 auto rhsElem = rhs(k, j);
-                result(i, j) += lhsElem * rhsElem;
+                result(i,j) += (lhsElem * rhsElem);
             }
         }
     }
+    *this = result;
+    return *this;
 }
 
 template<typename T>
@@ -197,6 +282,18 @@ inline Vector3 matrix<T>::multiply(Vector3 inDir) {
     return Vector3(result(0,0), result(1,0), result(2,0));
 }
 
+template<typename T>
+inline matrix<T>& matrix<T>::multiply(double factor) {
+    
+    //Matrix multiplication
+    for(int i = 0; i < ROWS; i++) {
+        for(int j = 0; j < COLS; j++) {
+            (*this)(i,j) *= factor;
+        }
+    }
+    return *this;
+}
+
 template<class T>
 typename matrix_element<T>::type& matrix<T>::operator() (int row, int col) {
     return s.at(row).at(col);
@@ -218,6 +315,7 @@ void matrix<T>::printm()
             cout << this->s.at(i).at(j) <<"\t";
         cout << endl;
     }
+    cout << endl;
 }
 
 

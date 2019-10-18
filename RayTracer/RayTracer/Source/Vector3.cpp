@@ -12,12 +12,12 @@ double Vector3::length() const {
     return sqrt((x*x) + (y*y) + (z*z));
 }
 
-Vector3* Vector3::normalize() {
+Vector3& Vector3::normalize() {
     double lengthVec = length();
     x = x/lengthVec;
     y = y/lengthVec;
     z = z/lengthVec;
-    return this;
+    return *this;
 }
 
 std::ostream& operator<<(std::ostream& out, const Vector3& v1) {

@@ -23,9 +23,9 @@ void Scene::initialize()
     scene.push_back(Triangle(Vertex(10,6,5), Vertex(13,0,5), Vertex(10,6,-5), ColorDbl(0.0, 1.0, 1.0)));
     scene.push_back(Triangle(Vertex(13,0,5), Vertex(13,0,-5), Vertex(10,6,-5), ColorDbl(0.0, 1.0, 1.0)));
     
-    //Wall 4 - red
-    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, 5), Vertex(-3, 0, 5), ColorDbl(1.0, 0.0, 0.0)));
-    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, -5), Vertex(0, -6, 5), ColorDbl(1.0, 0.0, 0.0)));
+    //Wall 4 - orange
+    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, 5), Vertex(-3, 0, 5), ColorDbl(1.0, 1.0, 0.0)));
+    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, -5), Vertex(0, -6, 5), ColorDbl(1.0, 1.0, 0.0)));
 
 	//Wall 5 - blue
     scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,5), Vertex(0,-6,5), ColorDbl(0.0, 0.0, 1.0)));
@@ -74,7 +74,7 @@ void Scene::addTetrahedron(Vertex inV, double scale, ColorDbl incolor, int reflT
     //Front left
     scene.push_back(Triangle(top, corner3, corner1,  incolor, reflType));
 
-    std::cout << "Added a tetrahedron to the scene!" << std::endl;
+    std::cout << "Added a tetrahedron to the scene!" << std::endl << std::endl;
 }
 
 void Scene::addSphere(Vertex inCenter, double radius, ColorDbl inColor, int inReflType) {
@@ -138,38 +138,46 @@ bool Scene::shootShadowRay(Vertex &inV) {
 
 //Whitted ray-tracing & monte carlo
 void Scene::rayTracing(Ray* arg, int iteration) {
-    
+    //cout << "iteration: " << iteration << endl;
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
+        //cout << "null" << endl;
         return;
     }
-    if(iteration > 5) return;
     
     //Add intersections to ray
     findIntersection(*arg);
+    //cout << *arg << endl;
+    
+    if(iteration > 0) {
+        return;
+    }
     
     if(arg->intSectPoint == nullptr) {
+        //cout << "nullptr" << endl;
         return;
     }
     
     if( (arg->start->vec3 - arg->intSectPoint->vec3) < 0.1 ||
        -1*(arg->start->vec3 - arg->intSectPoint->vec3) > 0.1 ) {
+        //cout << "intersects with itself" << endl;
         return;
     }
-    
-    Vector3 normal;
-    
-    //If the ray hits a diffuse triangle, stop the recursion!
+    //If the ray hits a diffuse triangle
     if(arg->endTri && arg->endTri->surf.reflectionType == 0) {
-        arg->monteCarloRay = monteCarloRayTracing(*arg);
+        arg->monteCarloRay = monteCarloRayTracing(arg);
         rayTracing(arg->monteCarloRay, iteration +1);
+
     }
-    //If the ray hits a diffuse sphere, stop the recursion!
+    //If the ray hits a diffuse sphere
     else if(arg->endSphere && arg->endSphere->surf.reflectionType == 0) {
-        arg->monteCarloRay = monteCarloRayTracing(*arg);
+
+        arg->monteCarloRay = monteCarloRayTracing(arg);
         rayTracing(arg->monteCarloRay, iteration +1);
     }
+    //Perfect reflection
     else {
+        Vector3 normal;
         //Get normal
         if(arg->endTri) {
             normal = arg->endTri->calcNormal();
@@ -191,70 +199,118 @@ void Scene::rayTracing(Ray* arg, int iteration) {
     }
 }
 
-matrix<double> Scene::transformToLocalCoordinateSystem(Ray &arg) {
+matrix<double> Scene::transformToLocalCoordinateSystem(Ray *arg) {
 
-    Vector3 I = (*arg.end - *arg.start).vec3;
-    Vector3 z = arg.endTri ? arg.endTri->normal : arg.endSphere ? arg.endSphere->calcNormal(arg) : Vector3(0,0,0);
-    z.normalize();
-    Vector3 x = I - dotProduct(I, z) * z;
-    x.normalize();
-    Vector3 y = crossProduct(-1*x, z);
-    y.normalize();
+    Vector3 I = (*arg->end - *arg->start).vec3;
+
     matrix<double> transform(4,4);
+
+    Vector3 z = (arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg)).normalize();
+    Vector3 x = (I - dotProduct(I, z) * z).normalize();
+    Vector3 y = crossProduct(-1*x, z).normalize();
     
-    if(arg.intSectPoint) {
-        matrix<double> translation(x, y, z);
-        Vector3 col1 = Vector3(1, 0, 0);
-        Vector3 col2 = Vector3(0, 1, 0);
-        Vector3 col3 = Vector3(0, 0, 1);
-        matrix<double> rotation(col1, col2, col3, -1*(arg.intSectPoint->vec3));
-        transform.multiply(translation, rotation);
-    }
+    //Rotation to new coordinate system
+    matrix<double> rotation(x, y, z);
     
+    
+    //Translation to new coordinate system
+    Vector3 col1 = Vector3(1,0,0);
+    Vector3 col2 = Vector3(0,1,0);
+    Vector3 col3 = Vector3(0,0,1);
+    matrix<double> translation(col1, col2, col3, -1*(arg->intSectPoint->vec3));
+    
+    transform.multiply(translation, rotation); // DO NOT CHANGE ORDER
+    
+    //transform.printm();
+
     return transform;
 }
 
-Ray* Scene::monteCarloRayTracing(Ray &arg) {
-    
-    //If the ray doesn't intersect, there can't be a reflected ray
-    if(!arg.intSectPoint) return new Ray(nullptr, nullptr);
+Ray* Scene::monteCarloRayTracing(Ray *arg) {
+    //cout << "MONTE CARLO" << endl;
     //Setting up the estimator by generating 2 random numbers [0,1]
-    double randX = ((double) rand() / (RAND_MAX));
-    double randY = ((double) rand() / (RAND_MAX));
+
+    double randX = (*dis)(*gen);
+    double randY = (*dis)(*gen);
     double PI = 3.14;
     
     //Monte Carlo solution with a cosine estimator
-    double azimuthAngle = 2*PI*randX;
-    double inclinationAngle = asin(sqrt(randY));
+    double azimuth = 2*PI*randX;
+    //azimuth = (azimuth*360)/2*PI;
+    double inclination = asin(sqrt(randY));
+    //inclination = (inclination*360)/(2*PI); //To degrees
     
-    //Inclination rotation
-    Vector3 col1 = Vector3(cos(inclinationAngle), sin(inclinationAngle), 0);
-    Vector3 col2 = Vector3(-sin(inclinationAngle), cos(inclinationAngle), 0);
-    Vector3 col3 = Vector3(0,0,1);
-    matrix<double> inclinationRotation(col1, col2, col3);
+    Vector3 normal = (arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg)).normalize();
+    glm::vec3 normalGLM((float)normal.x, (float)normal.y, (float)normal.z);
+    glm::vec3 helper = normalGLM + glm::vec3(1,1,1);
+    glm::vec3 tangent = glm::normalize(glm::cross(normalGLM, helper));
     
-    //Azimuth rotation
-    col1 = Vector3(1, 0, 0);
-    col2 = Vector3(0, cos(azimuthAngle), sin(azimuthAngle));
-    col3 = Vector3(0, -sin(azimuthAngle), cos(azimuthAngle));
-    matrix<double> azimuthRotation(col1, col2, col3);
+    glm::vec3 random_direction = normalGLM;
+    random_direction = glm::normalize(glm::rotate(random_direction, (float) inclination, tangent));
+    random_direction = glm::normalize(glm::rotate(random_direction, (float) azimuth, normalGLM));
     
-    //Total rotation
-    matrix<double> rotation(4,4);
-    rotation.multiply(azimuthRotation, inclinationRotation);
+    
+    
+    
+    //Inclination rotation, rotation along y-axis
+//    Vector3 col1 = Vector3(cos(inclination), 0, sin(inclination));
+//    Vector3 col2 = Vector3(0 ,1 , 0);
+//    Vector3 col3 = Vector3(-sin(inclination),0, cos(inclination));
+//    matrix<double> inclinationRotation(col1, col2, col3);
+//
+//    glm::mat4x4();
+
+//
+//    //Azimuth rotation, rotation along z-axis
+//    col1 = Vector3(cos(azimuth), -sin(azimuth), 0);
+//    col2 = Vector3(sin(azimuth), cos(azimuth), 0);
+//    col3 = Vector3(0 ,0 ,1 );
+//    matrix<double> azimuthRotation(col1, col2, col3);
+//
+//    //Total rotation. This is the local random outgoing direction transformation
+//    matrix<double> rotation(4,4);
+//    rotation.multiply(azimuthRotation, inclinationRotation).normalize();
+
     
     //Getting outgoing direction by transforming to local coordinate system
-    matrix<double> changeCoords = transformToLocalCoordinateSystem(arg);
-    Vector3 inDir = (*arg.end - *arg.start).vec3;
-    Vector3 inDirLocal = changeCoords.multiply(inDir);
-    Vector3 outDirLocal = rotation.multiply(inDirLocal);
-    Vector3 outDirGlobal;
+    //matrix<double> changeCoords = transformToLocalCoordinateSystem(arg);
+
+    
+    //Check if inverse is not possible, terminate ray
+//    if(changeCoords.determinant(4) <= 0) {
+//        cout << "singular matrix!" << endl;
+//        return nullptr;
+//    }
     
     //Transform to global coordinate system
-    changeCoords.invert();
-    outDirGlobal = changeCoords.multiply(outDirLocal);
-    Vertex* endVertex = new Vertex(arg.intSectPoint->vec3 + outDirGlobal);
+    //changeCoords.normalize();
     
-    Ray *outRay = new Ray(endVertex, arg.start);
+    //Incoming direction
+    Vector3 inDirGlobal = (*arg->end - *arg->start).vec3.normalize();
+    //cout << inDir << endl;
+    
+    //Getting transformation matrix
+//    matrix<double> inGlobal(inDirGlobal);
+//    inGlobal.transpose();
+    
+    
+    //Transform to local coordinate system
+ //   Vector3 inDirLocal = changeCoords.multiply(inDirGlobal).normalize();
+    //cout << inDirLocal << endl;
+    
+    //Apply rotation
+  //  Vector3 outDirLocal = rotation.multiply(inDirLocal).normalize();
+    //cout << outDirLocal << endl;
+    
+    //Transform to global coordinate system
+ //   changeCoords.invert();
+  //  Vector3 outDirGlobal = changeCoords.multiply(outDirLocal).normalize();
+    //cout << "outDIrGlobal: " << outDirGlobal << endl;
+    Vector3 outDirGlobal = Vector3((double)random_direction.x, (double)random_direction.y, (double)random_direction.z );
+    
+    //Add new ray to the tree
+    Vertex* endVertex = new Vertex(arg->intSectPoint->vec3 + outDirGlobal);
+    Ray *outRay = new Ray(arg->intSectPoint, endVertex);
+    //cout << outRay << " END OF MONTE CARLO " << endl;
     return outRay;
 }
