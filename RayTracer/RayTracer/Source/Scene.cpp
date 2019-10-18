@@ -157,37 +157,20 @@ void Scene::traceRay(Ray* arg, int iteration) {
         return;
     }
     
-    //If the ray hits a diffuse triangle
-    if(arg->endTri && arg->endTri->surf.reflectionType == 0) {
+    //Diffuse surface, monte carlo ray tracing
+    if((arg->endTri && arg->endTri->surf.reflectionType == 0) ||
+      (arg->endSphere && arg->endSphere->surf.reflectionType == 0)) {
+        //Monte carlo ray
         arg->monteCarloRay = traceRayMonteCarlo(arg);
-        traceRay(arg->monteCarloRay, iteration +1);
-
-    }
-    //If the ray hits a diffuse sphere
-    else if(arg->endSphere && arg->endSphere->surf.reflectionType == 0) {
-
-        arg->monteCarloRay = traceRayMonteCarlo(arg);
+        //Recurse
         traceRay(arg->monteCarloRay, iteration +1);
     }
-    //Perfect reflection
-    else {
-        Vector3 normal;
-        //Get normal
-        if(arg->endTri) {
-            normal = arg->endTri->calcNormal();
-        }
-        else if(arg->endSphere) {
-            normal = arg->endSphere->calcNormal(*arg);
-        }
-        else {
-            return;
-        }
-            
-        //Perfectly reflected ray
-        Vector3 dir = calcPerfectReflection(*arg, normal);
-        Vertex* endVertex = new Vertex(*arg->intSectPoint + dir);
-        arg->reflectedRay = new Ray(arg->intSectPoint, endVertex);
+    //Perfectly reflective surface
+    else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
+            (arg->endTri && arg->endTri->surf.reflectionType == 1)) {
         
+        //Perfectly reflected ray
+        arg->reflectedRay = traceRayPerfectReflection(*arg);
         //Recurse
         traceRay(arg->reflectedRay, iteration + 1);
     }
@@ -225,5 +208,14 @@ Ray* Scene::traceRayMonteCarlo(Ray *arg) {
     Vertex* endVertex = new Vertex(arg->intSectPoint->vec3 + outDirGlobal);
     Ray *outRay = new Ray(arg->intSectPoint, endVertex);
 
+    return outRay;
+}
+
+Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
+    Vector3 I = (*inRay.end - *inRay.start).vec3.normalize();
+    Vector3 normal = (inRay.endTri ? (inRay.endTri->normal) : (inRay.endSphere->calcNormal(inRay))).normalize();
+    Vector3 outDir = (I - 2*(dotProduct(I,normal)*normal));
+    Ray* outRay = new Ray(inRay.intSectPoint, new Vertex(inRay.intSectPoint->vec3 + outDir));
+    
     return outRay;
 }

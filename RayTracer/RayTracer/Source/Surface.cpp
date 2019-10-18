@@ -21,12 +21,7 @@ double getTransmissCoeff(Vector3 &R, Vector3 &T, double n1, double n2) {
     return (1-getReflectionCoeff(R, T, n1, n2));
 }
 
-Vector3 calcPerfectReflection(Ray &inRay, Vector3 normal) {
-    Vector3 I = (*inRay.end - *inRay.start).vec3;
-    I.normalize();
-    
-    return (I - 2*(dotProduct(I,normal)*normal));
-}
+
 
 //Snell's law of refraction
 Vector3 calcRefraction(Ray &inRay, Vector3 normal, double n1, double n2) {

@@ -51,6 +51,7 @@ public:
     Vertex* findIntersection(Ray &arg);
     void traceRay(Ray* arg, int iteration);
     Ray* traceRayMonteCarlo(Ray *arg);
+    Ray* traceRayPerfectReflection(Ray &inRay) ;
 };
 
 #endif

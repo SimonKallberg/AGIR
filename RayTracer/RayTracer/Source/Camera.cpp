@@ -26,12 +26,8 @@ void Camera::render()
 	{
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
-//    int x = 0;
-//    int y = 0;
             Ray theRay = calcRay(x,y);
-            
-            //Find intersection with ray
-           // theScene->findIntersection(theRay);
+
             //Shoot out ray
             theScene->traceRay(&theRay, 0);
             
@@ -88,100 +84,6 @@ void Camera::render()
             {
                 plane(x, y).color = ColorDbl(1,0,0);
             }
-            
-            
-     
-   //OLD THIS WORKS
-            //If the ray hits a tringle
-//            if(myRay.endTri) {
-//                //Shoot shadow ray
-//                if(myRay.intSectPoint) {
-//                     shadow = theScene->shootShadowRay(*myRay.intSectPoint);
-//                     //Is there a shadow? Set to black
-//                     if(shadow) {
-//                         plane(x, y).color = ColorDbl(0,0,0);
-//                     }
-//                    //Add shading to objects that are hit by light
-//                     else {
-//						 Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
-//						 rayToLight.normalize();
-//						 double alpha = dotProduct(myRay.endTri->normal, rayToLight);
-//                         if ( alpha > 0 ) {
-//                            plane(x, y).color = myRay.endTri->surf.color*alpha;
-//                         }
-//                         else {
-//                             plane(x, y).color = myRay.endTri->surf.color;
-//                         }
-//                     }
-//                }
-//            }
-//            //If the ray hits a sphere
-//            else {
-//                if(myRay.intSectPoint) {
-//
-//                     shadow = theScene->shootShadowRay(*myRay.intSectPoint);
-//                     //Is there a shadow? Set to black
-//                     if(shadow) {
-//                         plane(x, y).color = ColorDbl(0,0,0);
-//                     }
-//                     else {
-//                         Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - myRay.intSectPoint->vec3);
-//                         rayToLight.normalize();
-//                         double alpha = dotProduct(myRay.endSphere->calcNormal(myRay), rayToLight);
-//                         if ( alpha > 0 ) {
-//                            plane(x, y).color = myRay.endSphere->surf.color*alpha;
-//                         }
-//                         else {
-//                             plane(x, y).color = myRay.endSphere->surf.color;
-//                         }
-//                     }
-//                }
-//            }
-//
-            //Perfect refraction
-//            if(myRay.endSphere) {
-//                //Shoot shadow ray if ray hits something
-//                if(myRay.intSectPoint != nullptr) {
-//                    Vector3 dir = calcRefraction(myRay, myRay.endSphere->calcNormal(myRay), 0.2, 0.8);
-//                    Vertex dirVert = *myRay.intSectPoint + dir;
-//                    Ray mirroredRay = Ray(myRay.intSectPoint, &dirVert);
-//                    theScene->findIntersection(mirroredRay);
-//
-//                    if(mirroredRay.intSectPoints.size() >= 2) {
-//                        if (mirroredRay.intSectPoints[1].tri != nullptr){
-//                            plane(x, y).color = mirroredRay.intSectPoints[1].tri->surf.color;
-//                        }
-//                        else if (mirroredRay.intSectPoints[1].sphere != nullptr) {
-//                            plane(x, y).color = mirroredRay.intSectPoints[1].sphere->surf.color;
-//                        }
-//                        else {
-//
-//                        }
-//                    }
-//                }
-//
-
-            //Perfect mirror
-//            if(myRay.endSphere) {
-//                //Shoot shadow ray if ray hits something
-//                if(myRay.intSectPoint != nullptr) {
-//                    Vector3 dir = calcPerfectReflection(myRay, myRay.endSphere->calcNormal(myRay));
-//                    Vertex dirVert = *myRay.intSectPoint + dir;
-//                    Ray mirroredRay = Ray(myRay.intSectPoint, &dirVert);
-//                    theScene->findIntersection(mirroredRay);
-//
-//                    if (mirroredRay.endTri != nullptr){
-//                        plane(x, y).color = mirroredRay.endTri->surf.color;
-//                    }
-//                    else if (mirroredRay.endSphere != nullptr) {
-//                        plane(x, y).color = mirroredRay.endSphere->surf.color;
-//                    }
-//                    else {
-//
-//                    }
-//                }
-
-           // }
             
 		}
 	}
