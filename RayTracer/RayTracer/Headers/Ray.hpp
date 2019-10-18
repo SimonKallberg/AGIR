@@ -43,6 +43,7 @@ public:
     Ray* parent = nullptr;
     Ray* reflectedRay = nullptr;
     Ray* refractedRay = nullptr;
+    Ray* monteCarloRay = nullptr;
 
     //Pointing towards vertexes
 	Vertex* start = nullptr;

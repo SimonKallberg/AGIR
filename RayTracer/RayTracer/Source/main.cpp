@@ -19,22 +19,27 @@ const int SPECULAR = 1;
 #include "Camera.hpp"
 #include <string>
 #include "Sphere.hpp"
+#include "glm.hpp"
+#include "transform.hpp"
+
+using namespace std;
 
 int main()
 {
 	Scene myScene;
     //Setup room
     myScene.initialize();
+    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     
 	//Adding a tetrahedron
-    myScene.addTetrahedron(Vertex(7.0, 3.0, -2.0), 2, ColorDbl(0.9, 0.1, 0.7), DIFFUSE);
-    //myScene.addTetrahedron(Vertex(7.0, 2.0, 0.0), 1, ColorDbl(0.5, 0.5, 0.5));
+    //myScene.addTetrahedron(Vertex(7.0, 3.0, -2.0), 2, ColorDbl(0.9, 0.1, 0.7), DIFFUSE);
+    myScene.addTetrahedron(Vertex(7.0, 2.0, 0.0), 2, ColorDbl(0.5, 0.5, 0.5));
     
     //Adding a sphere
-    myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5), SPECULAR);
+    myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5), DIFFUSE);
     myScene.addPointLight(Vertex(5.0,0.0,4.5));
 	Camera myCamera(&myScene);
-
+    
 	myCamera.render();
 	myCamera.createImage("raytracing.bmp");
 
