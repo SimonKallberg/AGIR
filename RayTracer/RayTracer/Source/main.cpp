@@ -29,14 +29,16 @@ int main()
 	Scene myScene;
     //Setup room
     myScene.initialize();
-    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     
 	//Adding a tetrahedron
-    //myScene.addTetrahedron(Vertex(7.0, 3.0, -2.0), 2, ColorDbl(0.9, 0.1, 0.7), DIFFUSE);
-    myScene.addTetrahedron(Vertex(7.0, 2.0, 0.0), 2, ColorDbl(0.5, 0.5, 0.5));
+    myScene.addTetrahedron(Vertex(7.0, -1.0, 0.0), 2, ColorDbl(0.5, 0.5, 0.5), DIFFUSE);
     
     //Adding a sphere
-    myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5), DIFFUSE);
+    myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5), SPECULAR);
+    //Adding a sphere
+    myScene.addSphere(Vertex(7.0, 2.0, 3.0), 1.0, ColorDbl(0.5, 0.2, 0.2), DIFFUSE);
+    //Adding a sphere
+    myScene.addSphere(Vertex(6.0, 2.0, -3.0), 1.0, ColorDbl(0.5, 0.5, 0.5), SPECULAR);
     myScene.addPointLight(Vertex(5.0,0.0,4.5));
 	Camera myCamera(&myScene);
     

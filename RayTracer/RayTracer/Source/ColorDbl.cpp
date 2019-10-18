@@ -25,3 +25,14 @@ ColorDbl & ColorDbl::operator=(const ColorDbl &temp)
 	b = temp.b;
 	return *this;
 }
+
+ColorDbl operator+(ColorDbl lhs, ColorDbl rhs) {
+    return ColorDbl(lhs.r+rhs.r, lhs.g+rhs.g, lhs.b+rhs.b);
+}
+
+ColorDbl operator-(ColorDbl lhs, ColorDbl rhs) {
+    return ColorDbl(lhs.r-rhs.r, lhs.g-rhs.g, lhs.b-rhs.b);
+}
+ColorDbl operator*(double lhs, ColorDbl rhs) {
+    return ColorDbl(lhs*rhs.r, lhs*rhs.g, lhs*rhs.b);
+}

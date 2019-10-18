@@ -49,9 +49,10 @@ public:
     
     bool shootShadowRay(Vertex &inV);
     Vertex* findIntersection(Ray &arg);
-    void traceRay(Ray* arg, int iteration);
+    ColorDbl traceRay(Ray* arg, int iteration);
     Ray* traceRayMonteCarlo(Ray *arg);
-    Ray* traceRayPerfectReflection(Ray &inRay) ;
+    Ray* traceRayPerfectReflection(Ray &inRay);
+    ColorDbl getLambertianSurfaceColor(Ray &endRay);
 };
 
 #endif

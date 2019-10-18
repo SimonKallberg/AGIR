@@ -15,25 +15,25 @@ void Scene::initialize()
     
     //Setting up a room shaped as a polygon
     
-    //Wall2 - purple
-    scene.push_back(Triangle(Vertex(0,6,5), Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(1.0, 0.0, 1.0)));
-    scene.push_back(Triangle(Vertex(10,6,5), Vertex(10,6,-5), Vertex(0,6,-5), ColorDbl(1.0, 0.0, 1.0)));
+    //Wall2 - matte light pink
+    scene.push_back(Triangle(Vertex(0,6,5),Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(0.94, 0.66, 0.73)));
+    scene.push_back(Triangle(Vertex(10,6,5),Vertex(10,6,-5),Vertex(0,6,-5),ColorDbl(0.94, 0.66, 0.73)));
 	
-    //Wall 3 - turqoise
-    scene.push_back(Triangle(Vertex(10,6,5), Vertex(13,0,5), Vertex(10,6,-5), ColorDbl(0.0, 1.0, 1.0)));
-    scene.push_back(Triangle(Vertex(13,0,5), Vertex(13,0,-5), Vertex(10,6,-5), ColorDbl(0.0, 1.0, 1.0)));
+    //Wall 3 - matte blue
+    scene.push_back(Triangle(Vertex(10,6,5), Vertex(13,0,5), Vertex(10,6,-5), ColorDbl(0.36, 0.45, 0.63)));
+    scene.push_back(Triangle(Vertex(13,0,5), Vertex(13,0,-5), Vertex(10,6,-5), ColorDbl(0.36, 0.45, 0.63)));
     
-    //Wall 4 - orange
-    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, 5), Vertex(-3, 0, 5), ColorDbl(1.0, 1.0, 0.0)));
-    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, -5), Vertex(0, -6, 5), ColorDbl(1.0, 1.0, 0.0)));
+    //Wall 4 - dark matte pink
+    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, 5), Vertex(-3, 0, 5), ColorDbl(0.76, 0.4, 0.5)));
+    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, -5), Vertex(0, -6, 5), ColorDbl(0.76, 0.4, 0.5)));
 
-	//Wall 5 - blue
-    scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,5), Vertex(0,-6,5), ColorDbl(0.0, 0.0, 1.0)));
-    scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,-5), Vertex(10,-6,5), ColorDbl(0.0, 0.0, 1.0)));
+	//Wall 5 - dark green
+    scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,5), Vertex(0,-6,5), ColorDbl(0.23, 0.31, 0.27)));
+    scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,-5), Vertex(10,-6,5), ColorDbl(0.23, 0.31, 0.27)));
 	
     //Wall 6 - green
-    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,5), Vertex(10,-6,5), ColorDbl(0.0, 1.0, 0.0)));
-    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,-5), Vertex(13,0,5), ColorDbl(0.0, 1.0, 0.0)));
+    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,5), Vertex(10,-6,5), ColorDbl(0.92, 0.64, 0.59)));
+    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,-5), Vertex(13,0,5), ColorDbl(0.92, 0.64, 0.59)));
     
     //celing - white
     scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(0,6,5), Vertex(-3, 0, 5), ColorDbl(1, 1, 1)));
@@ -48,8 +48,8 @@ void Scene::initialize()
     scene.push_back(Triangle(Vertex(10,6,-5), Vertex(13,0,-5), Vertex(10,-6,-5), ColorDbl(1, 1, 1)));
     
     // Wall 1 - yellow
-       scene.push_back(Triangle(Vertex(-3, 0, 5), Vertex(0, 6, 5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
-       scene.push_back(Triangle(Vertex(0, 6, 5), Vertex(0, 6, -5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
+    scene.push_back(Triangle(Vertex(-3, 0, 5), Vertex(0, 6, 5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
+    scene.push_back(Triangle(Vertex(0, 6, 5), Vertex(0, 6, -5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
 }
 
 
@@ -137,24 +137,24 @@ bool Scene::shootShadowRay(Vertex &inV) {
 }
 
 //Whitted ray-tracing & monte carlo
-void Scene::traceRay(Ray* arg, int iteration) {
-    //cout << "iteration: " << iteration << endl;
+ColorDbl Scene::traceRay(Ray* arg, int iteration) {
+
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
-        cout << "null" << endl;
-        return;
+        return ColorDbl();
     }
     
     //Add intersections to ray
     findIntersection(*arg);
     
-    if(iteration > 0) {
-        return;
+    if(arg->intSectPoint == nullptr) {
+        return ColorDbl();
     }
     
-    if(arg->intSectPoint == nullptr) {
-        //cout << "nullptr" << endl;
-        return;
+    ColorDbl diffuse = 0.5 * getLambertianSurfaceColor(*arg);
+    
+    if( iteration > 1) {
+        return diffuse;
     }
     
     //Diffuse surface, monte carlo ray tracing
@@ -163,7 +163,7 @@ void Scene::traceRay(Ray* arg, int iteration) {
         //Monte carlo ray
         arg->monteCarloRay = traceRayMonteCarlo(arg);
         //Recurse
-        traceRay(arg->monteCarloRay, iteration +1);
+        diffuse = diffuse + 0.7 * traceRay(arg->monteCarloRay, iteration + 1);
     }
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
@@ -172,8 +172,9 @@ void Scene::traceRay(Ray* arg, int iteration) {
         //Perfectly reflected ray
         arg->reflectedRay = traceRayPerfectReflection(*arg);
         //Recurse
-        traceRay(arg->reflectedRay, iteration + 1);
+        diffuse = traceRay(arg->reflectedRay, iteration + 1);
     }
+    return diffuse;
 }
 
 Ray* Scene::traceRayMonteCarlo(Ray *arg) {
@@ -219,3 +220,53 @@ Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
     
     return outRay;
 }
+
+ColorDbl Scene::getLambertianSurfaceColor(Ray &endRay) {
+    bool shadow = false;
+        //If the ray hits a triangle
+        if(endRay.endTri) {
+            
+             shadow = shootShadowRay(*endRay.intSectPoint);
+             //Is there a shadow? Set to black
+             if(shadow) {
+                 return ColorDbl(0,0,0);
+             }
+            //Add shading to objects that are hit by light
+             else {
+                 Vector3 rayToLight = (pointLights[0].pos.vec3 - endRay.intSectPoint->vec3);
+                 rayToLight.normalize();
+                 double alpha = dotProduct(endRay.endTri->normal, rayToLight);
+                 if ( alpha > 0 ) {
+                    return endRay.endTri->surf.color*alpha;
+                 }
+                 else {
+                     return ColorDbl(0,0,0);
+                 }
+             }
+        }
+        
+        //If the ray its a sphere
+        else if(endRay.endSphere) {
+            shadow = shootShadowRay(*endRay.intSectPoint);
+            //Is there a shadow? Set to black
+            if(shadow) {
+                return ColorDbl(0,0,0);
+            }
+            else {
+                Vector3 rayToLight = (pointLights[0].pos.vec3 - endRay.intSectPoint->vec3);
+                rayToLight.normalize();
+                double alpha = dotProduct(endRay.endSphere->calcNormal(endRay), rayToLight);
+                if ( alpha > 0 ) {
+                   return endRay.endSphere->surf.color*alpha;
+                }
+                else {
+                    return ColorDbl(0,0,0);
+                }
+            }
+        }
+        else
+        {
+            return ColorDbl(1,0,0);
+        }
+}
+

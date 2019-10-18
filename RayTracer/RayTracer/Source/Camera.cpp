@@ -10,8 +10,12 @@
 Ray Camera::calcRay(int x, int y) {
 	double deltaWidth = (double)abs((c1.vec3.y - c3.vec3.y)) / (double)CAMERA_WIDTH;
 	double deltaHeight = -(double)abs((c1.vec3.z - c3.vec3.z)) / (double)CAMERA_HEIGHT;
+    
+    //Make ray shoot from middle of pixel
+    double startWidth = deltaWidth/2;
+    double startHeight = deltaHeight/2;
 
-	Vertex localCoord = Vertex(0.0, (double)x*deltaWidth, (double)y*deltaHeight);
+	Vertex localCoord = Vertex(0.0, ((double)x*deltaWidth)+startWidth , ((double)y*deltaHeight)+startHeight);
     //TODO resolve memory leak
 	Vertex *end = new Vertex(c4 + localCoord);
     Ray theRay = Ray(getActiveEye(), end);
@@ -26,65 +30,16 @@ void Camera::render()
 	{
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
+            //Calculate ray from eye through the pixel
             Ray theRay = calcRay(x,y);
 
-            //Shoot out ray
-            theScene->traceRay(&theRay, 0);
-            
-            //Pointer to loop through the ray
-            Ray* endRay = &theRay;
-            //Access the leaf of the tree
-            while(endRay->monteCarloRay) {
-                endRay = endRay->monteCarloRay;
+            //Shoot out 4 rays per ray to implement anti aliasing
+            ColorDbl colorOfPixel;
+            for(int i = 0; i < 3; i++) {
+                colorOfPixel = colorOfPixel + theScene->traceRay(&theRay, 0);
             }
-            bool shadow = false;
-            //If the ray hits a triangle
-            if(endRay->endTri) {
-                plane(x, y).color = endRay->endTri->surf.color;
-                
-                 shadow = theScene->shootShadowRay(*endRay->intSectPoint);
-                 //Is there a shadow? Set to black
-                 if(shadow) {
-                     plane(x, y).color = ColorDbl(0,0,0);
-                 }
-                //Add shading to objects that are hit by light
-                 else {
-                     Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - endRay->intSectPoint->vec3);
-                     rayToLight.normalize();
-                     double alpha = dotProduct(endRay->endTri->normal, rayToLight);
-                     if ( alpha > 0 ) {
-                        plane(x, y).color = endRay->endTri->surf.color*alpha;
-                     }
-                     else {
-                         plane(x, y).color = ColorDbl(0,0,0);
-                     }
-                 }
-            }
-            
-            //If the ray its a sphere
-            else if(endRay->endSphere) {
-                shadow = theScene->shootShadowRay(*endRay->intSectPoint);
-                //Is there a shadow? Set to black
-                if(shadow) {
-                    plane(x, y).color = ColorDbl(0,0,0);
-                }
-                else {
-                    Vector3 rayToLight = (theScene->pointLights[0].pos.vec3 - endRay->intSectPoint->vec3);
-                    rayToLight.normalize();
-                    double alpha = dotProduct(endRay->endSphere->calcNormal(*endRay), rayToLight);
-                    if ( alpha > 0 ) {
-                       plane(x, y).color = endRay->endSphere->surf.color*alpha;
-                    }
-                    else {
-                        plane(x, y).color = ColorDbl(0,0,0);
-                    }
-                }
-            }
-            else
-            {
-                plane(x, y).color = ColorDbl(1,0,0);
-            }
-            
+            //Take average of the 4 rays and write to pixel plane
+            plane(x, y) = 0.25 * colorOfPixel;
 		}
 	}
 }
