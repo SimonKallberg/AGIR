@@ -18,6 +18,8 @@
 #include "ColorDbl.hpp"
 #include <algorithm>
 #include <iterator>
+#include "matrix.hpp"
+#include <random>
 
 class Scene {
 public:
@@ -32,7 +34,9 @@ public:
     bool shootShadowRay(Vertex &inV);
     
     Vertex* findIntersection(Ray &arg);
-    void rayTracing(Ray* arg, int iteration);
+    void rayTracing(Ray* arg);
+    matrix<double> transformToLocalCoordinateSystem(Ray &arg);
+    Ray monteCarloRayTracing(Ray &arg);
 };
 
 

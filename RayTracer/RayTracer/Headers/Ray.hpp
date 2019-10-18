@@ -42,21 +42,17 @@ public:
     //Tree structure
     Ray* parent = nullptr;
     Ray* reflectedRay = nullptr;
-    //Ray* refractedRay = nullptr;
+    Ray* refractedRay = nullptr;
 
     //Pointing towards vertexes
 	Vertex* start = nullptr;
 	Vertex* end = nullptr;
     Vertex* intSectPoint = nullptr;
-    
     //Intersecting objects
     std::vector<intersection> intSectPoints;
 	Triangle* endTri = nullptr;
     Sphere* endSphere = nullptr;
 	ColorDbl color = ColorDbl(0.0, 0.0, 0.0);
-    
-    //Refraction index
-    double refractionIndex = 1;
 
 	friend std::ostream& operator<<(std::ostream& out, const Ray& v1);
 };

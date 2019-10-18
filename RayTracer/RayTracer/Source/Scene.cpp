@@ -95,26 +95,15 @@ Vertex* Scene::findIntersection(Ray &arg) {
     
     if(arg.intSectPoints.size() > 0) {
         arg.sortIntersections();
-        //Check if start point is the same as end point
         arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
-        int i = 0;
-//        if( (arg.start->vec3 - arg.intSectPoint->vec3).length() < 0.00001 ) {
-//            cout << "Intersection point same as starting point" << endl;
-//            if((int)arg.intSectPoints.size() > 1) {
-//                cout << "Changing intersection point" << endl;
-//                i = 1;
-//            }
-//        }
-        arg.intSectPoint = &arg.intSectPoints[i].interSectPoint;
         
-        if(arg.intSectPoints[i].tri != nullptr ) {
-            arg.endTri = arg.intSectPoints[i].tri;
-            arg.refractionIndex = arg.endTri->refractionIndex;
+        if(arg.intSectPoints[0].tri != nullptr ) {
+            arg.endTri = arg.intSectPoints[0].tri;
         }
         else {
-            arg.endSphere = arg.intSectPoints[i].sphere;
-            arg.refractionIndex = arg.endSphere->refractionIndex;
+            arg.endSphere = arg.intSectPoints[0].sphere;
         }
+        
         
     return arg.intSectPoint;
         
@@ -148,84 +137,122 @@ bool Scene::shootShadowRay(Vertex &inV) {
 }
 
 //Whitted ray-tracing
-void Scene::rayTracing(Ray* arg, int iteration) {
-    
-    if(iteration > 10) {
-        //cout << "breaking" << endl;
-        return;
-    }
+void Scene::rayTracing(Ray* arg) {
     
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
-        //cout << "break 1" << endl;
         return;
     }
     //Add intersections to ray
     findIntersection(*arg);
     
     if(arg->intSectPoint == nullptr) {
-        //cout << "break 2" << endl;
         return;
     }
     
+    if( (arg->start->vec3 - arg->intSectPoint->vec3) < 0.1 ||
+       -1*(arg->start->vec3 - arg->intSectPoint->vec3) > 0.1 ) {
+        return;
+    }
+    
+    Vector3 normal;
+    
+    transformToLocalCoordinateSystem(*arg);
+    
     //If the ray hits a diffuse triangle, stop the recursion!
     if(arg->endTri && arg->endTri->surf.reflectionType == 0) {
-        //cout << "break 4" << endl;
         return;
     }
     //If the ray hits a diffuse sphere, stop the recursion!
     else if(arg->endSphere && arg->endSphere->surf.reflectionType == 0) {
-        //cout << "break 5" << endl;
         return;
     }
     else {
-        //Get normal and refraction index
-        Vector3 normal;
+        //Get normal
         if(arg->endTri) {
             normal = arg->endTri->calcNormal();
         }
         else if(arg->endSphere) {
             normal = arg->endSphere->calcNormal(*arg);
-            //cout << "Sphere: n2" << n2 << endl;
         }
         else {
-            //cout << "break 6" << endl;
             return;
         }
-        
+            
         //Perfectly reflected ray
         Vector3 dir = calcPerfectReflection(*arg, normal);
         Vertex* endVertex = new Vertex(*arg->intSectPoint + dir);
         arg->reflectedRay = new Ray(arg->intSectPoint, endVertex);
-        arg->reflectedRay->parent = arg;
         
-        //Perfectly refracted ray
-//        bool inside = false;
-//        double n1 = 1;
-//        double n2 = arg->refractionIndex;
-//        if(arg->parent != nullptr) {
-//            n1 = arg->parent->refractionIndex;
-//        }
-//
-//        Vector3 dirRefr = calcRefraction(*arg, normal, n1, n2);
-//        //No refraction exists!
-//        if( dirRefr < 0.1) {
-//            return;
-//        }
-        
-//        Vertex* newStartPoint = new Vertex(*arg->intSectPoint + (normal*0.01));
-//        Vertex* endRefrVertex = new Vertex(*arg->intSectPoint + dirRefr);
-//        arg->refractedRay = new Ray(newStartPoint, endRefrVertex);
-//        arg->refractedRay->parent = arg;
-        //cout << *arg->refractedRay->parent << endl;
-        //cout << *arg->intSectPoint << endl;
-        //cout << *arg->refractedRay << endl;
-            
-        //Recurse refraction
-        //rayTracing(arg->refractedRay, iteration + 1);
-        
-        //Recurse reflection
-        rayTracing(arg->reflectedRay, iteration + 1);
+        //Recurse
+        rayTracing(arg->reflectedRay);
     }
 }
 
+matrix<double> Scene::transformToLocalCoordinateSystem(Ray &arg) {
+
+    Vector3 I = (*arg.end - *arg.start).vec3;
+    Vector3 z = arg.endTri ? arg.endTri->normal : arg.endSphere ? arg.endSphere->calcNormal(arg) : Vector3(0,0,0);
+    z.normalize();
+    Vector3 x = I - dotProduct(I, z) * z;
+    x.normalize();
+    Vector3 y = crossProduct(-1*x, z);
+    y.normalize();
+    matrix<double> transform(4,4);
+    
+    if(arg.intSectPoint) {
+        matrix<double> translation(x, y, z);
+        Vector3 col1 = Vector3(1, 0, 0);
+        Vector3 col2 = Vector3(0, 1, 0);
+        Vector3 col3 = Vector3(0, 0, 1);
+        matrix<double> rotation(col1, col2, col3, -1*(arg.intSectPoint->vec3));
+        transform.multiply(translation, rotation);
+    }
+    
+    return transform;
+}
+
+Ray Scene::monteCarloRayTracing(Ray &arg) {
+    
+    //If the ray doesn't intersect, there can't be a reflected ray
+    if(!arg.intSectPoint) return Ray(nullptr, nullptr);
+    //Setting up the estimator by generating 2 random numbers [0,1]
+    double randX = ((double) rand() / (RAND_MAX));
+    double randY = ((double) rand() / (RAND_MAX));
+    double PI = 3.14;
+    
+    //Monte Carlo solution with a cosine estimator
+    double azimuthAngle = 2*PI*randX;
+    double inclinationAngle = asin(sqrt(randY));
+    
+    //Azimuth rotation
+    Vector3 col1 = Vector3(cos(azimuthAngle), sin(azimuthAngle), 0);
+    Vector3 col2 = Vector3(-sin(azimuthAngle), cos(azimuthAngle), 0);
+    Vector3 col3 = Vector3(0,0,1);
+    matrix<double> azimuthRotation(col1, col2, col3);
+    
+    //Inclination rotation
+    col1 = Vector3(1, 0, 0);
+    col2 = Vector3(0, cos(inclinationAngle), sin(inclinationAngle));
+    col3 = Vector3(0, -sin(inclinationAngle), cos(inclinationAngle));
+    matrix<double> inclinationRotation(col1, col2, col3);
+    
+    //Total rotation
+    matrix<double> rotation(4,4);
+    rotation.multiply(azimuthRotation, inclinationRotation);
+    
+    //Getting outgoing direction by transforming to local coordinate system
+    matrix<double> changeCoords = transformToLocalCoordinateSystem(arg);
+    Vector3 inDir = (*arg.end - *arg.start).vec3;
+    Vector3 inDirLocal = changeCoords.multiply(inDir);
+    Vector3 outDirLocal = rotation.multiply(inDirLocal);
+    Vector3 outDirGlobal;
+    
+    //Transform to global coordinate system
+    changeCoords.invert();
+    outDirGlobal = changeCoords.multiply(outDirLocal);
+    Vertex* endVertex = new Vertex(arg.intSectPoint->vec3 + outDirGlobal);
+    
+    Ray outRay = Ray(arg.start, endVertex);
+    return outRay;
+}
