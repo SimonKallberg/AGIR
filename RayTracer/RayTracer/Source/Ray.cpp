@@ -24,13 +24,10 @@ Ray::Ray (const Ray &old_obj) {
 
 Ray::~Ray() {
 
-    Ray* ptr = reflectedRay;
-    //Delete the ray tree
-    while(ptr) {
-        Ray* temp = reflectedRay;
-        ptr = ptr->reflectedRay;
-        delete temp;
-    }
+    delete reflectedRay;
+    delete monteCarloRay;
+
+    monteCarloRay = nullptr;
     reflectedRay = nullptr;
     start = nullptr;
     end = nullptr;

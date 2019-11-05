@@ -20,6 +20,9 @@ public:
 
     //Assignment operator
     ColorDbl& operator=(const ColorDbl &temp);
+    friend ColorDbl operator+(ColorDbl lhs, ColorDbl rhs);
+    friend ColorDbl operator-(ColorDbl lhs, ColorDbl rhs);
+    friend ColorDbl operator*(double lhs, ColorDbl rhs);
     
     //Copy constructor
     ColorDbl (const ColorDbl &old_obj) {

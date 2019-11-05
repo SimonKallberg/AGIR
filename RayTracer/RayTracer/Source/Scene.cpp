@@ -15,25 +15,25 @@ void Scene::initialize()
     
     //Setting up a room shaped as a polygon
     
-    //Wall2 - purple
-    scene.push_back(Triangle(Vertex(0,6,5), Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(1.0, 0.0, 1.0)));
-    scene.push_back(Triangle(Vertex(10,6,5), Vertex(10,6,-5), Vertex(0,6,-5), ColorDbl(1.0, 0.0, 1.0)));
+    //Wall2 - matte light pink
+    scene.push_back(Triangle(Vertex(0,6,5),Vertex(10,6,5), Vertex(0,6,-5), ColorDbl(0.94, 0.66, 0.73)));
+    scene.push_back(Triangle(Vertex(10,6,5),Vertex(10,6,-5),Vertex(0,6,-5),ColorDbl(0.94, 0.66, 0.73)));
 	
-    //Wall 3 - turqoise
-    scene.push_back(Triangle(Vertex(10,6,5), Vertex(13,0,5), Vertex(10,6,-5), ColorDbl(0.0, 1.0, 1.0)));
-    scene.push_back(Triangle(Vertex(13,0,5), Vertex(13,0,-5), Vertex(10,6,-5), ColorDbl(0.0, 1.0, 1.0)));
+    //Wall 3 - matte blue
+    scene.push_back(Triangle(Vertex(10,6,5), Vertex(13,0,5), Vertex(10,6,-5), ColorDbl(0.36, 0.45, 0.63)));
+    scene.push_back(Triangle(Vertex(13,0,5), Vertex(13,0,-5), Vertex(10,6,-5), ColorDbl(0.36, 0.45, 0.63)));
     
-    //Wall 4 - orange
-    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, 5), Vertex(-3, 0, 5), ColorDbl(1.0, 1.0, 0.0)));
-    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, -5), Vertex(0, -6, 5), ColorDbl(1.0, 1.0, 0.0)));
+    //Wall 4 - dark matte pink
+    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, 5), Vertex(-3, 0, 5), ColorDbl(0.76, 0.4, 0.5)));
+    scene.push_back(Triangle(Vertex(-3, 0, -5), Vertex(0, -6, -5), Vertex(0, -6, 5), ColorDbl(0.76, 0.4, 0.5)));
 
-	//Wall 5 - blue
-    scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,5), Vertex(0,-6,5), ColorDbl(0.0, 0.0, 1.0)));
-    scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,-5), Vertex(10,-6,5), ColorDbl(0.0, 0.0, 1.0)));
+	//Wall 5 - dark green
+    scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,5), Vertex(0,-6,5), ColorDbl(0.23, 0.31, 0.27)));
+    scene.push_back(Triangle(Vertex(0,-6,-5), Vertex(10,-6,-5), Vertex(10,-6,5), ColorDbl(0.23, 0.31, 0.27)));
 	
     //Wall 6 - green
-    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,5), Vertex(10,-6,5), ColorDbl(0.0, 1.0, 0.0)));
-    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,-5), Vertex(13,0,5), ColorDbl(0.0, 1.0, 0.0)));
+    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,5), Vertex(10,-6,5), ColorDbl(0.92, 0.64, 0.59)));
+    scene.push_back(Triangle(Vertex(10,-6,-5), Vertex(13,0,-5), Vertex(13,0,5), ColorDbl(0.92, 0.64, 0.59)));
     
     //celing - white
     scene.push_back(Triangle(Vertex(0, -6, 5), Vertex(0,6,5), Vertex(-3, 0, 5), ColorDbl(1, 1, 1)));
@@ -48,8 +48,8 @@ void Scene::initialize()
     scene.push_back(Triangle(Vertex(10,6,-5), Vertex(13,0,-5), Vertex(10,-6,-5), ColorDbl(1, 1, 1)));
     
     // Wall 1 - yellow
-       scene.push_back(Triangle(Vertex(-3, 0, 5), Vertex(0, 6, 5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
-       scene.push_back(Triangle(Vertex(0, 6, 5), Vertex(0, 6, -5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
+    scene.push_back(Triangle(Vertex(-3, 0, 5), Vertex(0, 6, 5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
+    scene.push_back(Triangle(Vertex(0, 6, 5), Vertex(0, 6, -5), Vertex(-3, 0, -5), ColorDbl(1.0, 1.0, 0.0)));
 }
 
 
@@ -137,180 +137,136 @@ bool Scene::shootShadowRay(Vertex &inV) {
 }
 
 //Whitted ray-tracing & monte carlo
-void Scene::rayTracing(Ray* arg, int iteration) {
-    //cout << "iteration: " << iteration << endl;
+ColorDbl Scene::traceRay(Ray* arg, int iteration) {
+
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
-        //cout << "null" << endl;
-        return;
+        return ColorDbl();
     }
     
     //Add intersections to ray
     findIntersection(*arg);
-    //cout << *arg << endl;
-    
-    if(iteration > 0) {
-        return;
-    }
     
     if(arg->intSectPoint == nullptr) {
-        //cout << "nullptr" << endl;
-        return;
+        return ColorDbl();
     }
     
-    if( (arg->start->vec3 - arg->intSectPoint->vec3) < 0.1 ||
-       -1*(arg->start->vec3 - arg->intSectPoint->vec3) > 0.1 ) {
-        //cout << "intersects with itself" << endl;
-        return;
+    ColorDbl diffuse = 0.5 * getLambertianSurfaceColor(*arg);
+    
+    if( iteration > 1) {
+        return diffuse;
     }
-    //If the ray hits a diffuse triangle
-    if(arg->endTri && arg->endTri->surf.reflectionType == 0) {
-        arg->monteCarloRay = monteCarloRayTracing(arg);
-        rayTracing(arg->monteCarloRay, iteration +1);
-
-    }
-    //If the ray hits a diffuse sphere
-    else if(arg->endSphere && arg->endSphere->surf.reflectionType == 0) {
-
-        arg->monteCarloRay = monteCarloRayTracing(arg);
-        rayTracing(arg->monteCarloRay, iteration +1);
-    }
-    //Perfect reflection
-    else {
-        Vector3 normal;
-        //Get normal
-        if(arg->endTri) {
-            normal = arg->endTri->calcNormal();
-        }
-        else if(arg->endSphere) {
-            normal = arg->endSphere->calcNormal(*arg);
-        }
-        else {
-            return;
-        }
-            
-        //Perfectly reflected ray
-        Vector3 dir = calcPerfectReflection(*arg, normal);
-        Vertex* endVertex = new Vertex(*arg->intSectPoint + dir);
-        arg->reflectedRay = new Ray(arg->intSectPoint, endVertex);
-        
+    
+    //Diffuse surface, monte carlo ray tracing
+    if((arg->endTri && arg->endTri->surf.reflectionType == 0) ||
+      (arg->endSphere && arg->endSphere->surf.reflectionType == 0)) {
+        //Monte carlo ray
+        arg->monteCarloRay = traceRayMonteCarlo(arg);
         //Recurse
-        rayTracing(arg->reflectedRay, iteration + 1);
+        diffuse = diffuse + 0.7 * traceRay(arg->monteCarloRay, iteration + 1);
     }
+    //Perfectly reflective surface
+    else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
+            (arg->endTri && arg->endTri->surf.reflectionType == 1)) {
+        
+        //Perfectly reflected ray
+        arg->reflectedRay = traceRayPerfectReflection(*arg);
+        //Recurse
+        diffuse = traceRay(arg->reflectedRay, iteration + 1);
+    }
+    return diffuse;
 }
 
-matrix<double> Scene::transformToLocalCoordinateSystem(Ray *arg) {
+Ray* Scene::traceRayMonteCarlo(Ray *arg) {
 
-    Vector3 I = (*arg->end - *arg->start).vec3;
-
-    matrix<double> transform(4,4);
-
-    Vector3 z = (arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg)).normalize();
-    Vector3 x = (I - dotProduct(I, z) * z).normalize();
-    Vector3 y = crossProduct(-1*x, z).normalize();
-    
-    //Rotation to new coordinate system
-    matrix<double> rotation(x, y, z);
-    
-    
-    //Translation to new coordinate system
-    Vector3 col1 = Vector3(1,0,0);
-    Vector3 col2 = Vector3(0,1,0);
-    Vector3 col3 = Vector3(0,0,1);
-    matrix<double> translation(col1, col2, col3, -1*(arg->intSectPoint->vec3));
-    
-    transform.multiply(translation, rotation); // DO NOT CHANGE ORDER
-    
-    //transform.printm();
-
-    return transform;
-}
-
-Ray* Scene::monteCarloRayTracing(Ray *arg) {
-    //cout << "MONTE CARLO" << endl;
     //Setting up the estimator by generating 2 random numbers [0,1]
-
     double randX = (*dis)(*gen);
     double randY = (*dis)(*gen);
     double PI = 3.14;
     
     //Monte Carlo solution with a cosine estimator
     double azimuth = 2*PI*randX;
-    //azimuth = (azimuth*360)/2*PI;
     double inclination = asin(sqrt(randY));
-    //inclination = (inclination*360)/(2*PI); //To degrees
-    
-    Vector3 normal = (arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg)).normalize();
-    glm::vec3 normalGLM((float)normal.x, (float)normal.y, (float)normal.z);
-    glm::vec3 helper = normalGLM + glm::vec3(1,1,1);
-    glm::vec3 tangent = glm::normalize(glm::cross(normalGLM, helper));
-    
-    glm::vec3 random_direction = normalGLM;
-    random_direction = glm::normalize(glm::rotate(random_direction, (float) inclination, tangent));
-    random_direction = glm::normalize(glm::rotate(random_direction, (float) azimuth, normalGLM));
-    
-    
-    
-    
-    //Inclination rotation, rotation along y-axis
-//    Vector3 col1 = Vector3(cos(inclination), 0, sin(inclination));
-//    Vector3 col2 = Vector3(0 ,1 , 0);
-//    Vector3 col3 = Vector3(-sin(inclination),0, cos(inclination));
-//    matrix<double> inclinationRotation(col1, col2, col3);
-//
-//    glm::mat4x4();
 
-//
-//    //Azimuth rotation, rotation along z-axis
-//    col1 = Vector3(cos(azimuth), -sin(azimuth), 0);
-//    col2 = Vector3(sin(azimuth), cos(azimuth), 0);
-//    col3 = Vector3(0 ,0 ,1 );
-//    matrix<double> azimuthRotation(col1, col2, col3);
-//
-//    //Total rotation. This is the local random outgoing direction transformation
-//    matrix<double> rotation(4,4);
-//    rotation.multiply(azimuthRotation, inclinationRotation).normalize();
-
-    
-    //Getting outgoing direction by transforming to local coordinate system
-    //matrix<double> changeCoords = transformToLocalCoordinateSystem(arg);
-
-    
-    //Check if inverse is not possible, terminate ray
-//    if(changeCoords.determinant(4) <= 0) {
-//        cout << "singular matrix!" << endl;
-//        return nullptr;
-//    }
-    
-    //Transform to global coordinate system
-    //changeCoords.normalize();
-    
-    //Incoming direction
-    Vector3 inDirGlobal = (*arg->end - *arg->start).vec3.normalize();
-    //cout << inDir << endl;
-    
-    //Getting transformation matrix
-//    matrix<double> inGlobal(inDirGlobal);
-//    inGlobal.transpose();
-    
+    Vector3 I = (*arg->end - *arg->start).vec3.normalize();
+    Vector3 z1 = (arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg)).normalize();
+    Vector3 x1 = (I - dotProduct(I, z1) * z1).normalize();
     
     //Transform to local coordinate system
- //   Vector3 inDirLocal = changeCoords.multiply(inDirGlobal).normalize();
-    //cout << inDirLocal << endl;
+    glm::vec3 z((float)z1.x, (float)z1.y, (float)z1.z);
+    glm::vec3 x((float)x1.x, (float)x1.y, (float)x1.z);
+    glm::vec3 y = glm::normalize(glm::cross(z, -x));
+    glm::vec3 random_direction = z;
     
-    //Apply rotation
-  //  Vector3 outDirLocal = rotation.multiply(inDirLocal).normalize();
-    //cout << outDirLocal << endl;
+    //Rotate in random direction
+    random_direction = glm::normalize(glm::rotate(random_direction, (float) inclination, y));
+    random_direction = glm::normalize(glm::rotate(random_direction, (float) azimuth, z));
     
-    //Transform to global coordinate system
- //   changeCoords.invert();
-  //  Vector3 outDirGlobal = changeCoords.multiply(outDirLocal).normalize();
-    //cout << "outDIrGlobal: " << outDirGlobal << endl;
+    //Create outgoing direction
     Vector3 outDirGlobal = Vector3((double)random_direction.x, (double)random_direction.y, (double)random_direction.z );
     
     //Add new ray to the tree
     Vertex* endVertex = new Vertex(arg->intSectPoint->vec3 + outDirGlobal);
     Ray *outRay = new Ray(arg->intSectPoint, endVertex);
-    //cout << outRay << " END OF MONTE CARLO " << endl;
+
     return outRay;
 }
+
+Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
+    Vector3 I = (*inRay.end - *inRay.start).vec3.normalize();
+    Vector3 normal = (inRay.endTri ? (inRay.endTri->normal) : (inRay.endSphere->calcNormal(inRay))).normalize();
+    Vector3 outDir = (I - 2*(dotProduct(I,normal)*normal));
+    Ray* outRay = new Ray(inRay.intSectPoint, new Vertex(inRay.intSectPoint->vec3 + outDir));
+    
+    return outRay;
+}
+
+ColorDbl Scene::getLambertianSurfaceColor(Ray &endRay) {
+    bool shadow = false;
+        //If the ray hits a triangle
+        if(endRay.endTri) {
+            
+             shadow = shootShadowRay(*endRay.intSectPoint);
+             //Is there a shadow? Set to black
+             if(shadow) {
+                 return ColorDbl(0,0,0);
+             }
+            //Add shading to objects that are hit by light
+             else {
+                 Vector3 rayToLight = (pointLights[0].pos.vec3 - endRay.intSectPoint->vec3);
+                 rayToLight.normalize();
+                 double alpha = dotProduct(endRay.endTri->normal, rayToLight);
+                 if ( alpha > 0 ) {
+                    return endRay.endTri->surf.color*alpha;
+                 }
+                 else {
+                     return ColorDbl(0,0,0);
+                 }
+             }
+        }
+        
+        //If the ray its a sphere
+        else if(endRay.endSphere) {
+            shadow = shootShadowRay(*endRay.intSectPoint);
+            //Is there a shadow? Set to black
+            if(shadow) {
+                return ColorDbl(0,0,0);
+            }
+            else {
+                Vector3 rayToLight = (pointLights[0].pos.vec3 - endRay.intSectPoint->vec3);
+                rayToLight.normalize();
+                double alpha = dotProduct(endRay.endSphere->calcNormal(endRay), rayToLight);
+                if ( alpha > 0 ) {
+                   return endRay.endSphere->surf.color*alpha;
+                }
+                else {
+                    return ColorDbl(0,0,0);
+                }
+            }
+        }
+        else
+        {
+            return ColorDbl(1,0,0);
+        }
+}
+

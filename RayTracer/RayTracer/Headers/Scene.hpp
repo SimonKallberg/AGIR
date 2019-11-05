@@ -42,8 +42,6 @@ public:
     std::vector<Sphere> spheres;
     std::vector<PointLight> pointLights;
     
-    
-    
     void initialize();
     void addTetrahedron(Vertex inV, double scale, ColorDbl incolor, int reflType = 0);
     void addSphere(Vertex inCenter, double radius, ColorDbl inColor, int inReflType);
@@ -51,10 +49,10 @@ public:
     
     bool shootShadowRay(Vertex &inV);
     Vertex* findIntersection(Ray &arg);
-    matrix<double> transformToLocalCoordinateSystem(Ray *arg);
-    
-    void rayTracing(Ray* arg, int iteration);
-    Ray* monteCarloRayTracing(Ray *arg);
+    ColorDbl traceRay(Ray* arg, int iteration);
+    Ray* traceRayMonteCarlo(Ray *arg);
+    Ray* traceRayPerfectReflection(Ray &inRay);
+    ColorDbl getLambertianSurfaceColor(Ray &endRay);
 };
 
 
