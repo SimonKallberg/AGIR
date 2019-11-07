@@ -23,7 +23,7 @@ public:
     : color(r, g, b) {}
 
 
-    vec3 color;
+    vec3 color; // = vec3(0.0f, 0.0f, 0.0f);;
     Ray* ray = nullptr;
 
 	Pixel& operator=(vec3 p);

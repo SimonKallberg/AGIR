@@ -18,7 +18,7 @@
 class Sphere {
 public:
     Sphere(vec3 inC = vec3(1.0f, 1.0f, 0.0f), float inR =  1.0f, vec3 inColor = vec3(1.0f, 1.0f, 1.0f), int refType = 0, float inRoughness = 0.0f)
-      : r(inR), centerPos(inC), surf(refType, inColor, inRoughness) { }
+      : r(inR), centerPos(inC), color(inColor), surf(refType, inColor, inRoughness) { }
 
     
     vec3 calcNormal(Ray &p);

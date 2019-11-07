@@ -125,8 +125,8 @@ bool Scene::shootShadowRay(vec3 &inV) {
         //Check if an object is intersecting ray to light
         if(findIntersection(theRay) != nullptr) {
             //Check so distance to light is greater than distance to intersecting object
-            float distToLight = length(*theRay.end - *theRay.start);
-            float distToIntersection = length(*theRay.intSectPoint - *theRay.start);
+            float distToLight = glm::length(*theRay.end - *theRay.start);
+            float distToIntersection = glm::length(*theRay.intSectPoint - *theRay.start);
             
             if( distToIntersection < distToLight ){
                 return true;
@@ -156,23 +156,20 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     //Diffuse surface, monte carlo ray tracing
     if((arg->endTri && arg->endTri->surf.reflectionType == 0) ||
       (arg->endSphere && arg->endSphere->surf.reflectionType == 0)) {
-        diffuse = arg->endTri ? arg->endTri->color : arg->endSphere->color;
-        return diffuse;
         
         //Monte carlo ray
-//        arg->monteCarloRay = traceRayMonteCarlo(arg);
+        arg->monteCarloRay = traceRayMonteCarlo(arg);
         
-//        //If intersection point is not in shadow, set it to BRDF
-//        if(!shootShadowRay(*arg->intSectPoint)) {
-//           diffuse = 0.4f * getLambertianSurfaceColor(*arg);
-//        }
-//        if( iteration > 0) {
-//            return diffuse;
-//        }
-//
-//
-//        //Recurse
-//        diffuse = diffuse + 0.6f * traceRay(arg->monteCarloRay, iteration + 1);
+        //If intersection point is not in shadow, set it to BRDF
+        if(!shootShadowRay(*arg->intSectPoint)) {
+           diffuse = 0.4f * getOrenNayarSurfaceColor(*arg);
+        }
+        if( iteration > 0) {
+            return diffuse;
+        }
+
+        //Recurse
+        diffuse = diffuse + 0.6f * traceRay(arg->monteCarloRay, iteration + 1);
     }
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
@@ -195,26 +192,21 @@ Ray* Scene::traceRayMonteCarlo(Ray *arg) {
     
     //Monte Carlo solution with a cosine estimator
     float azimuth = 2.0f*PI*randX;
-    float inclination = glm::asin(sqrt(randY));
+    float inclination = glm::asin(glm::sqrt(randY));
 
     vec3 I = normalize(*arg->end - *arg->start);
     vec3 z = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
     vec3 x = normalize(I - dot(I, z) * z);
     
     //Transform to local coordinate system
-    //glm::vec3 z((float)z1.x, (float)z1.y, (float)z1.z);
-   // glm::vec3 x((float)x1.x, (float)x1.y, (float)x1.z);
     glm::vec3 y = glm::normalize(glm::cross(z, -x));
+    //Create outgoing direction
     glm::vec3 outDirGlobal = z;
     
     //Rotate in random direction
     outDirGlobal = glm::normalize(glm::rotate(outDirGlobal, inclination, y));
     outDirGlobal = glm::normalize(glm::rotate(outDirGlobal, azimuth, z));
-    
-    //Create outgoing direction
-    //vec3 outDirGlobal = vec3((float)random_direction.x, (float)random_direction.y, (float)random_direction.z );
-    //normalize(outDirGlobal);
-    
+
     //Add new ray to the tree
     vec3* endvec3 = new vec3(*arg->intSectPoint + outDirGlobal);
     Ray *outRay = new Ray(arg->intSectPoint, endvec3);
@@ -234,9 +226,8 @@ Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
 vec3 Scene::getLambertianSurfaceColor(Ray &endRay) {
     
     //If the ray hits a triangle or sphere
-    vec3 normal = endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay);
-    normalize(normal);
-    vec3 albedo = endRay.endTri ? endRay.endTri->surf.color : endRay.endSphere->surf.color;
+    vec3 normal = normalize(endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay));
+    vec3 albedo = endRay.endTri ? endRay.endTri->color : endRay.endSphere->color;
 
     //Add shading to objects that are hit by light
     vec3 rayToLight = normalize(pointLights[0].pos - *endRay.intSectPoint);
@@ -246,7 +237,7 @@ vec3 Scene::getLambertianSurfaceColor(Ray &endRay) {
         return albedo * alpha;
     }
     else {
-        return vec3(1.0f,0.0f,0.0f);
+        return vec3(0.0f,0.0f,0.0f);
     }
 }
 
@@ -282,10 +273,10 @@ vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay) {
     
     float thetaR = glm::acos(cos_thetaR);
     float thetaI = glm::acos(cos_thetaI);
-    float alphaAngle = std::max(thetaR, thetaI);
-    float betaAngle = std::min(thetaR, thetaI);
+    float alphaAngle = glm::max(thetaR, thetaI);
+    float betaAngle = glm::min(thetaR, thetaI);
        
-    vec3 Lr = albedo * ( A + (B * std::max(0.0f, cos_phiI) * glm::sin(alphaAngle) * glm::tan(betaAngle)));
+    vec3 Lr =  albedo * ( A + (B * glm::max(0.0f, cos_phiI) * glm::sin(alphaAngle) * glm::tan(betaAngle)));
 
     return Lr;
    

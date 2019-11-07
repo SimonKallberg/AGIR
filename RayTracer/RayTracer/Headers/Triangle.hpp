@@ -26,13 +26,13 @@ class Scene;
 class Triangle {
 public:
     
-    vec3 color;
-	vec3 v0, v1, v2;
+    vec3 color = vec3(1.0f, 0.0f, 0.0f);
+	vec3 v0, v1, v2 = vec3(0.0f, 0.0f, 0.0f);;
 	vec3 normal = vec3(0.0f, 0.0f, 0.0f);
     Surface surf;
     
 	Triangle(vec3 inV0 = vec3(1.0f, 1.0f, 0.0f), vec3 inV1 = vec3(1.0f, -1.0f, 0.0f), vec3 inV2 = vec3(-1.0f, -1.0f, 0.0f), vec3 inCol = vec3(0.5f, 0.5f, 0.5f), int refType = 0, float inRoughness = 0.5f)
-		: v0(inV0), v1(inV1), v2(inV2), surf(refType, inCol, inRoughness)
+		: v0(inV0), v1(inV1), v2(inV2), surf(refType, inCol, inRoughness), color(inCol)
 	{
 		normal = calcNormal();
 	}

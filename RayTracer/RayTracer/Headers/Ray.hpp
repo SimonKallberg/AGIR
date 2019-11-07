@@ -25,10 +25,10 @@ class ColorDbl;
 class Sphere;
 
 struct intersection {
-    vec3 interSectPoint;
-    float distance = 0.0f;
-    Triangle* tri;
-    Sphere* sphere;
+    vec3 interSectPoint = vec3(0.0f,0.0f,0.0f);
+    float distance = -1.0f;
+    Triangle* tri = nullptr;
+    Sphere* sphere = nullptr;
 };
 
 class Ray {

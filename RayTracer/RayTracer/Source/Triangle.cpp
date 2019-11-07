@@ -17,10 +17,8 @@ vec3 Triangle::calcNormal() {
     vec3 vector1 = vec3(v0-v1);
     vec3 vector2 = vec3(v0-v2);
     //Cross product to get normal
-    vec3 normal = cross(vector2, vector1);
-    //Normalize
-    normalize(normal);
-
+    vec3 normal = normalize(cross(vector2, vector1));
+    
     return normal;
 }
 
@@ -33,35 +31,35 @@ bool Triangle::rayIntersection(Ray &p)
     //Edge 2
     vec3 E2 = (v2-v0);
     //Direction
-    vec3 D = (*p.end - *p.start);
-    normalize(D);
+    vec3 D = normalize(*p.end - *p.start);
     //Edge normal
     vec3 P = cross(D, E2);
     //Determinant
     float determinant = dot(P, E1);
     
-    if(abs(determinant) < 0.001f ) {
+    if(abs(determinant) < 0.00001f ) {
         return false;
     }
+    float invDet = 1.0f/determinant;
     
     vec3 Q = cross(T, E1);
     
-    float t = dot(Q, E2)/determinant;
-    float u = dot(T, P)/determinant;
-    float v = dot(D, Q)/determinant;
+    float t = dot(Q, E2)*invDet;
+    float u = dot(T, P)*invDet;
+    float v = dot(D, Q)*invDet;
     
     //Check if variables are in triangle area -> intersection!
-    if(u < 0.0f || u > 1.0f) {
+    if(u < 0.f || u > 1.f) {
         return false;
     }
     
-    if(v < 0.0f || u + v > 1.0f ) {
+    if(v < 0.f || u + v > 1.f ) {
         return false;
     }
     
-    if(t > 0.00000001f && t < 1000000.0f) {
+    if(t > 0.001f && t < 1000000.0f) {
         vec3 intersection = *p.start + (t*D);
-        float distance = length(intersection - *p.start);
+        float distance = glm::length(intersection - *p.start);
         p.intSectPoints.push_back({intersection, distance, this, nullptr});
         return true;
     }
