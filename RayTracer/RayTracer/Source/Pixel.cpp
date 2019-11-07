@@ -7,10 +7,9 @@
 
 #include "Pixel.hpp"
 
-Pixel & Pixel::operator=(Pixel p)
+Pixel & Pixel::operator=(vec3 p)
 {
-	color.r = p.color.r;
-	color.g = p.color.g;
-	color.b = p.color.b;
+    color = p;
+    
 	return *this;
 }

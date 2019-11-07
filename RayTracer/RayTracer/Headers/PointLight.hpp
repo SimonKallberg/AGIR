@@ -10,14 +10,17 @@
 #define PointLight_hpp
 
 #include <stdio.h>
-#include "Vertex.hpp"
+#include "glm.hpp"
+
+using namespace glm;
+using namespace std;
 
 class PointLight {
 public:
-    PointLight(Vertex inC = Vertex(1.0, 1.0, 0.0))
+    PointLight(vec3 inC = vec3(1.0f, 1.0f, 0.0f))
       : pos(inC) { }
 
-    Vertex pos = Vertex(Vector3(0.0,0.0,0.0));
+    vec3 pos = vec3(0.0f, 0.0f, 0.0f);
 };
 
 

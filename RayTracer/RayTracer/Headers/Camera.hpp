@@ -10,7 +10,7 @@
 
 
 #include <stdio.h>
-#include "Vertex.hpp"
+#include "vec3.hpp"
 #include "Pixel.hpp"
 #include <iostream>
 #include "bitmap_image.hpp"
@@ -19,24 +19,28 @@
 #include "Triangle.hpp"
 #include "Scene.hpp"
 #include "Surface.hpp"
+#include "glm.hpp"
+
+using namespace glm;
+using namespace std;
 
 
 class Camera {
 public:
     bool RIGHT = true;
     bool LEFT = false;
-	Vertex eyeL, eyeR;
+	vec3 eyeL, eyeR;
 	Scene* theScene = nullptr;
 	bool activeEye = LEFT; // if false, left eye. If true, right eye
-	Camera(Scene* inScene, Vertex inL = Vertex(-1.0, 0.0, 0.0), Vertex inR = Vertex(-2.0, 0.0, 0.0),
+	Camera(Scene* inScene, vec3 inL = vec3(-1.0f, 0.0f, 0.0f), vec3 inR = vec3(-2.0f, 0.0f, 0.0f),
            int camWidth = 800, int camHeigth = 800)
 		: theScene(inScene), eyeL(inL), eyeR(inR), plane(camWidth, camHeigth), CAMERA_WIDTH(camWidth),
         CAMERA_HEIGHT(camHeigth) {}
 
-	Vertex c1 = Vertex(0.0, -1.0, -1.0);
-	Vertex c2 = Vertex(0.0, 1.0, -1.0);
-	Vertex c3 = Vertex(0.0, 1.0, 1.0);
-	Vertex c4 = Vertex(0.0, -1.0, 1.0);
+	vec3 c1 = vec3(0.0f, -1.0f, -1.0f);
+	vec3 c2 = vec3(0.0f, 1.0f, -1.0f);
+	vec3 c3 = vec3(0.0f, 1.0f, 1.0f);
+	vec3 c4 = vec3(0.0f, -1.0f, 1.0f);
 
     int CAMERA_WIDTH;
     int CAMERA_HEIGHT;
@@ -46,7 +50,7 @@ public:
 	Ray calcRay(int x, int y);
 	void render();
 	void createImage(std::string fileName);
-    Vertex* getActiveEye();
+    vec3* getActiveEye();
 };
 
 #endif

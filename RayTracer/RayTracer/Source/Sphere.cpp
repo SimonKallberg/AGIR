@@ -9,48 +9,46 @@
 #include "Sphere.hpp"
 #include <cmath>
 
-Vector3 Sphere::calcNormal(Ray &p) {
+vec3 Sphere::calcNormal(Ray &p) {
     
-    Vector3 normal = p.intSectPoint->vec3 - centerPos.vec3;
-    normal.normalize();
+    vec3 normal = normalize(*p.intSectPoint - centerPos);
     return normal;
 }
 
 bool Sphere::rayIntersection(Ray &p)
 {
     //Start point
-    Vector3 o = (*p.start).vec3;
+    vec3 o = *p.start;
     
-    //Normalized Vector3 from starting point
-    Vector3 I = (*p.end-*p.start).vec3;
-    I.normalize();
+    //Normalized vec3 from starting point
+    vec3 I = normalize(*p.end-*p.start);
 
-    double a = 1.0;
-    double b = dotProduct((2*I),o-centerPos.vec3);
-    double c = dotProduct(o-centerPos.vec3, o-centerPos.vec3) - (r*r);
+    float a = 1.0f;
+    float b = dot((2.0f*I),o-centerPos);
+    float c = dot(o-centerPos, o-centerPos) - (r*r);
     
-    double d1 = (-b/2) + sqrt(((b/2)*(b/2))-(a*c));
-    double d2 = (-b/2) - sqrt(((b/2)*(b/2))-(a*c));
+    float d1 = (-b/2.0f) + sqrt(((b/2.0f)*(b/2.0f))-(a*c));
+    float d2 = (-b/2.0f) - sqrt(((b/2.0f)*(b/2.0f))-(a*c));
     
     //Check if root is imaginary - then the ray doesn't intersect
     if(isnan(d1) || isnan(d2)) {
         return false;
     }
     //Check if point is same as starting point - then the ray doesn't intersect
-    if(d1 < 0.1 && d2 < 0.1) {
+    if(d1 < 0.1f && d2 < 0.1f) {
         return false;
     }
     
     if(d1 > d2) {
-        Vector3 x2 = o + d2*I;
-        double distance = (x2-p.start->vec3).length();
-        p.intSectPoints.push_back({Vertex(x2), distance , nullptr, this});
+        vec3 x2 = o + d2*I;
+        float distance = (x2-*p.start).length();
+        p.intSectPoints.push_back({vec3(x2), distance , nullptr, this});
         return true;
     }
     else {
-        Vector3 x1 = o + d1*I;
-        double distance = (x1-p.start->vec3).length();
-        p.intSectPoints.push_back({Vertex(x1), distance , nullptr, this});
+        vec3 x1 = o + d1*I;
+        float distance = length(x1-*p.start);
+        p.intSectPoints.push_back({vec3(x1), distance , nullptr, this});
         return true;
     }
 }

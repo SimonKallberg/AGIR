@@ -10,12 +10,12 @@
 
 #include <stdio.h>
 #include <vector>
-#include "Vertex.hpp"
+#include "vec3.hpp"
 #include "Ray.hpp"
 #include "Triangle.hpp"
 #include "Sphere.hpp"
 #include "PointLight.hpp"
-#include "ColorDbl.hpp"
+#include "vec3.hpp"
 #include <algorithm>
 #include <iterator>
 #include "matrix.hpp"
@@ -24,35 +24,39 @@
 #include "transform.hpp"
 #include "rotate_vector.hpp"
 
+using namespace glm;
+using namespace std;
+
 
 class Scene {
 public:
     //Random generator
-    std::random_device rd;  //Will be used to obtain a seed for the random number engine
-    std::uniform_real_distribution<float>* dis;
-    std::mt19937* gen;
+    random_device rd;  //Will be used to obtain a seed for the random number engine
+    uniform_real_distribution<float>* dis;
+    mt19937* gen;
     
     Scene() {
          //Standard mersenne_twister_engine seeded with rd()
-        gen = new std::mt19937(rd());
-        dis = new std::uniform_real_distribution<float>(0.0, 1.0);
+        gen = new mt19937(rd());
+        dis = new uniform_real_distribution<float>(0.0f, 1.0f);
         
     }
-    std::vector<Triangle> scene;
-    std::vector<Sphere> spheres;
-    std::vector<PointLight> pointLights;
+    vector<Triangle> scene;
+    vector<Sphere> spheres;
+    vector<PointLight> pointLights;
     
     void initialize();
-    void addTetrahedron(Vertex inV, double scale, ColorDbl incolor, int reflType = 0);
-    void addSphere(Vertex inCenter, double radius, ColorDbl inColor, int inReflType);
-    void addPointLight(Vertex inCenter);
+    void addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType = 0, float inRoughness = 0.0f);
+    void addSphere(vec3 inCenter, float radius, vec3 inColor, int inReflType, float inRoughness = 0.0f);
+    void addPointLight(vec3 inCenter);
     
-    bool shootShadowRay(Vertex &inV);
-    Vertex* findIntersection(Ray &arg);
-    ColorDbl traceRay(Ray* arg, int iteration);
+    bool shootShadowRay(vec3 &inV);
+    vec3* findIntersection(Ray &arg);
+    vec3 traceRay(Ray* arg, int iteration);
     Ray* traceRayMonteCarlo(Ray *arg);
     Ray* traceRayPerfectReflection(Ray &inRay);
-    ColorDbl getLambertianSurfaceColor(Ray &endRay);
+    vec3 getLambertianSurfaceColor(Ray &endRay);
+    vec3 getOrenNayarSurfaceColor(Ray &endRay);
 };
 
 #endif
