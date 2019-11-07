@@ -59,4 +59,5 @@ public:
     vec3 getOrenNayarSurfaceColor(Ray &endRay);
 };
 
+
 #endif
