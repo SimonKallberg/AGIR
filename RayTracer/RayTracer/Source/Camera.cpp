@@ -8,16 +8,16 @@
 #include "Camera.hpp"
 
 Ray Camera::calcRay(int x, int y) {
-	double deltaWidth = (double)abs((c1.vec3.y - c3.vec3.y)) / (double)CAMERA_WIDTH;
-	double deltaHeight = -(double)abs((c1.vec3.z - c3.vec3.z)) / (double)CAMERA_HEIGHT;
+	float deltaWidth = (float)abs((c1.y - c3.y)) / (float)CAMERA_WIDTH;
+	float deltaHeight = -(float)abs((c1.z - c3.z)) / (float)CAMERA_HEIGHT;
     
     //Make ray shoot from middle of pixel
-    double startWidth = deltaWidth/2;
-    double startHeight = deltaHeight/2;
+    float startWidth = deltaWidth/2;
+    float startHeight = deltaHeight/2;
 
-	Vertex localCoord = Vertex(0.0, ((double)x*deltaWidth)+startWidth , ((double)y*deltaHeight)+startHeight);
+	vec3 localCoord = vec3(0.0f, ((float)x*deltaWidth)+startWidth , ((float)y*deltaHeight)+startHeight);
     //TODO resolve memory leak
-	Vertex *end = new Vertex(c4 + localCoord);
+	vec3 *end = new vec3(c4 + localCoord);
     Ray theRay = Ray(getActiveEye(), end);
 	return theRay;
 }
@@ -34,12 +34,12 @@ void Camera::render()
             Ray theRay = calcRay(x,y);
 
             //Shoot out 4 rays per ray to implement anti aliasing
-            ColorDbl colorOfPixel;
-            for(int i = 0; i < 3; i++) {
+            vec3 colorOfPixel = vec3(0.0f,0.0f,0.0f);
+            //for(int i = 0; i < 3; i++) {
                 colorOfPixel = colorOfPixel + theScene->traceRay(&theRay, 0);
-            }
+            //}
             //Take average of the 4 rays and write to pixel plane
-            plane(x, y) = 0.25 * colorOfPixel;
+            plane(x, y).color = colorOfPixel; //* 0.25
 		}
 	}
 }
@@ -52,9 +52,14 @@ void Camera::createImage(std::string fileName)
     //Set pixels to the camera plane
     for(int x = 0; x < CAMERA_WIDTH; x++) {
         for(int y = 0; y < CAMERA_HEIGHT; y++) {
-			unsigned int r = (int)(plane(x, y).color.r * 255);
-			unsigned int g = (int)(plane(x, y).color.g * 255);
-			unsigned int b = (int)(plane(x, y).color.b * 255);
+//			unsigned int r = (int)(0.4f * 255.0f);
+//			unsigned int g = (int)(0.4f * 255.0f);
+//			unsigned int b = (int)(0.3f * 255.0f);
+            
+            unsigned int r = (int)(plane(x, y).color.x * 255.0f);
+            unsigned int g = (int)(plane(x, y).color.y * 255.0f);
+            unsigned int b = (int)(plane(x, y).color.z * 255.0f);
+            
             rgb_t color = make_colour(r, g, b);
             image.set_pixel( x,  y, color);
         }
@@ -63,7 +68,7 @@ void Camera::createImage(std::string fileName)
     image.save_image(fileName);
 }
 
-Vertex* Camera::getActiveEye() {
+vec3* Camera::getActiveEye() {
     if(activeEye == RIGHT) {
         return &eyeR;
     }

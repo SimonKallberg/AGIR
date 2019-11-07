@@ -11,27 +11,30 @@
 
 #include <stdio.h>
 #include "Ray.hpp"
-#include "Vector3.hpp"
+#include "glm.hpp"
+
+using namespace glm;
+using namespace std;
 
 
-
-Vector3 calcRefraction(Ray &inRay, Vector3 normal, double n1, double n2);
-double getReflectionCoeff(Vector3 &R, Vector3 &T, double n1, double n2);
+vec3 calcRefraction(Ray &inRay, vec3 normal, float n1, float n2);
+float getReflectionCoeff(vec3 &R, vec3 &T, float n1, float n2);
 
 
 class Surface {
   
 public:
-	Surface(int inReflectionType = 0, ColorDbl col = ColorDbl(1,1,1))
-		: reflectionType(inReflectionType), color(col) 
+	Surface(int inReflectionType = 0, vec3 col = vec3(1.0f, 1.0f, 1.0f), float inRoughness = 0.0f)
+		: reflectionType(inReflectionType), color(col), roughness(inRoughness)
 	{	}
-	ColorDbl diffuseReflection(ColorDbl inC);
-	ColorDbl specularReflection(ColorDbl inC);
+	vec3 diffuseReflection(vec3 inC);
+	vec3 specularReflection(vec3 inC);
     //Diffuse reflection = 0, Perfect refraction = 1
 	int reflectionType = 0;
-	ColorDbl color;
+	vec3 color;
 
-	double reflectionCo = 0.8;
+	float reflectionCo = 0.8f;
+    float roughness = 0.0f;
 
 };
 

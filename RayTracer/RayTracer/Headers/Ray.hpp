@@ -14,22 +14,26 @@
 #include "ColorDbl.hpp"
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include "glm.hpp"
+#include "string_cast.hpp"
+
+using namespace std;
+using namespace glm;
 
 class Triangle;
 class ColorDbl;
 class Sphere;
 
 struct intersection {
-    Vertex interSectPoint;
-    double distance = 0;
+    vec3 interSectPoint;
+    float distance = 0.0f;
     Triangle* tri;
     Sphere* sphere;
 };
 
 class Ray {
 public:
-	Ray(Vertex* s, Vertex* e)
+	Ray(vec3* s, vec3* e)
 		: start(s), end(e)
 	{}
     
@@ -46,16 +50,17 @@ public:
     Ray* monteCarloRay = nullptr;
 
     //Pointing towards vertexes
-	Vertex* start = nullptr;
-	Vertex* end = nullptr;
-    Vertex* intSectPoint = nullptr;
+	vec3* start = nullptr;
+	vec3* end = nullptr;
+    vec3* intSectPoint = nullptr;
+    
     //Intersecting objects
-    std::vector<intersection> intSectPoints;
+    vector<intersection> intSectPoints;
 	Triangle* endTri = nullptr;
     Sphere* endSphere = nullptr;
-	ColorDbl color = ColorDbl(0.0, 0.0, 0.0);
+	vec3 color = vec3(0.0f, 0.0f, 0.0f);
 
-	friend std::ostream& operator<<(std::ostream& out, const Ray& v1);
+	friend ostream& operator<<(ostream& out, const Ray& v1);
 };
 
 #endif

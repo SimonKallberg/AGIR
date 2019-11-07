@@ -13,19 +13,20 @@
 #include "Vertex.hpp"
 #include "Ray.hpp"
 #include <vector>
+#include "glm.hpp"
 
 class Pixel {
 public:
-    Pixel(ColorDbl inCol) 
-		: color(inCol.r, inCol.g, inCol.b) {}
-    Pixel(double r = 0, double g = 0, double b = 0)
+    Pixel(vec3 inCol)
+		: color(inCol) {}
+    Pixel(float r = 0.0f, float g = 0.0f, float b = 0.0f)
     : color(r, g, b) {}
 
 
-    ColorDbl color;
+    vec3 color;
     Ray* ray = nullptr;
 
-	Pixel& operator=(Pixel p);
+	Pixel& operator=(vec3 p);
 };
 
 #endif

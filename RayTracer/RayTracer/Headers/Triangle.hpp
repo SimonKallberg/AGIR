@@ -16,29 +16,32 @@
 #include "ColorDbl.hpp"
 #include "Surface.hpp"
 #include <cmath>
+#include "glm.hpp"
 
 using namespace std;
+using namespace glm;
 
 class Scene;
 
 class Triangle {
 public:
-	Vertex v0, v1, v2;
-	ColorDbl color;
-	Vector3 normal = Vector3(0.0, 0.0, 0.0);
+    
+    vec3 color;
+	vec3 v0, v1, v2;
+	vec3 normal = vec3(0.0f, 0.0f, 0.0f);
     Surface surf;
-
-	Triangle(Vertex inV0 = Vertex(1.0, 1.0, 0.0), Vertex inV1 = Vertex(1.0, -1.0, 0.0), Vertex inV2 = Vertex(-1.0, -1.0, 0.0),ColorDbl inCol = ColorDbl(0.5, 0.5, 0.5), int refType = 0)
-		: v0(inV0), v1(inV1), v2(inV2), surf(refType, inCol)
+    
+	Triangle(vec3 inV0 = vec3(1.0f, 1.0f, 0.0f), vec3 inV1 = vec3(1.0f, -1.0f, 0.0f), vec3 inV2 = vec3(-1.0f, -1.0f, 0.0f), vec3 inCol = vec3(0.5f, 0.5f, 0.5f), int refType = 0, float inRoughness = 0.5f)
+		: v0(inV0), v1(inV1), v2(inV2), surf(refType, inCol, inRoughness)
 	{
 		normal = calcNormal();
 	}
 
 	bool rayIntersection(Ray &arg1);
-	Vector3 calcNormal();
+	vec3 calcNormal();
     void flipNormal();
 
-	friend std::ostream& operator<<(std::ostream& out, const Triangle& v1);
+	friend ostream& operator<<(ostream& out, const Triangle& v);
     
 };
 

@@ -12,7 +12,10 @@
 #include <stdio.h>
 #include <iostream>
 #include "Vector3.hpp"
+#include "glm.hpp"
 
+using namespace glm;
+using namespace std;
 
 class Vertex {
 public:
@@ -22,7 +25,7 @@ public:
     Vertex(double inX, double inY, double inZ, double inW = 1.0)
         : vec3(inX, inY, inZ), w(inW) {}
 	Vertex(Vector3 inVec, double inW = 1.0)
-		: vec3(inVec), w(inW) {}
+		: vec3(inVec) {}
     //Copy constructor
     Vertex (const Vertex &old_obj) {
         vec3 = old_obj.vec3;

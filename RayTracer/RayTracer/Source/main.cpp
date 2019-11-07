@@ -7,6 +7,7 @@
 
 const int DIFFUSE = 0;
 const int SPECULAR = 1;
+const int ROUGH = 1;
 
 #include <iostream>
 #include <vector>
@@ -21,8 +22,11 @@ const int SPECULAR = 1;
 #include "Sphere.hpp"
 #include "glm.hpp"
 #include "transform.hpp"
+#include "ext.hpp"
 
 using namespace std;
+
+
 
 int main()
 {
@@ -31,15 +35,15 @@ int main()
     myScene.initialize();
     
 	//Adding a tetrahedron
-    myScene.addTetrahedron(Vertex(7.0, -1.0, 0.0), 2, ColorDbl(0.5, 0.5, 0.5), DIFFUSE);
+    myScene.addTetrahedron(vec3(7.0f, -1.0f, 0.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), DIFFUSE, ROUGH);
     
     //Adding a sphere
-    myScene.addSphere(Vertex(5.0, -2.0, -3.0), 2.0, ColorDbl(0.5, 0.5, 0.5), SPECULAR);
+    myScene.addSphere(vec3(5.0f, -2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), SPECULAR);
     //Adding a sphere
-    myScene.addSphere(Vertex(7.0, 2.0, 3.0), 1.0, ColorDbl(0.5, 0.2, 0.2), DIFFUSE);
+    myScene.addSphere(vec3(7.0f, 2.0f, 3.0f), 1.0f, vec3(0.5f, 0.2f, 0.2f), DIFFUSE, ROUGH);
     //Adding a sphere
-    myScene.addSphere(Vertex(6.0, 2.0, -3.0), 1.0, ColorDbl(0.5, 0.5, 0.5), SPECULAR);
-    myScene.addPointLight(Vertex(5.0,0.0,4.5));
+    myScene.addSphere(vec3(6.0f, 2.0f, -3.0f), 1.0f, vec3(0.5f, 0.5f, 0.5f), SPECULAR);
+    myScene.addPointLight(vec3(5.0f,0.0f,4.5f));
 	Camera myCamera(&myScene);
     
 	myCamera.render();
