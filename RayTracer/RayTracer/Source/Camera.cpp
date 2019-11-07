@@ -52,10 +52,6 @@ void Camera::createImage(std::string fileName)
     //Set pixels to the camera plane
     for(int x = 0; x < CAMERA_WIDTH; x++) {
         for(int y = 0; y < CAMERA_HEIGHT; y++) {
-//			unsigned int r = (int)(0.4f * 255.0f);
-//			unsigned int g = (int)(0.4f * 255.0f);
-//			unsigned int b = (int)(0.3f * 255.0f);
-            
             unsigned int r = (int)(plane(x, y).color.x * 255.0f);
             unsigned int g = (int)(plane(x, y).color.y * 255.0f);
             unsigned int b = (int)(plane(x, y).color.z * 255.0f);

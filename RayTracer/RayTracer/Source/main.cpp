@@ -7,7 +7,8 @@
 
 const int DIFFUSE = 0;
 const int SPECULAR = 1;
-const int ROUGH = 1;
+const int TRANSPARENT = 2;
+const float ROUGH = 3.0f;
 
 #include <iostream>
 #include <vector>
@@ -35,10 +36,10 @@ int main()
     myScene.initialize();
     
 	//Adding a tetrahedron
-    myScene.addTetrahedron(vec3(7.0f, -1.0f, 0.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), DIFFUSE, ROUGH);
+    myScene.addTetrahedron(vec3(7.0f, -1.0f, 0.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), DIFFUSE, 0.0f);
     
     //Adding a sphere
-    myScene.addSphere(vec3(5.0f, -2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), SPECULAR);
+    myScene.addSphere(vec3(5.0f, -2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT, 0.0f);
     //Adding a sphere
     myScene.addSphere(vec3(7.0f, 2.0f, 3.0f), 1.0f, vec3(0.5f, 0.2f, 0.2f), DIFFUSE, ROUGH);
     //Adding a sphere

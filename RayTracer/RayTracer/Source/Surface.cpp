@@ -38,9 +38,9 @@ vec3 calcRefraction(Ray &inRay, vec3 normal, float n1, float n2) {
     }
     else {
         //Angle between incoming ray and normal
-        float alpha = acos(dot(I,normal)/(length(I)*length(normal)));
+        float alpha = glm::acos(dot(I,normal)/(length(I)*length(normal)));
         //Brewster angle
-        float alpham = acos(n2/n1);
+        float alpham = glm::acos(n2/n1);
         
         //No refraction exists!
         if(alpha > alpham) {

@@ -55,6 +55,7 @@ public:
     vec3 traceRay(Ray* arg, int iteration);
     Ray* traceRayMonteCarlo(Ray *arg);
     Ray* traceRayPerfectReflection(Ray &inRay);
+    Ray* traceRayRefraction(Ray *arg, bool inside);
     vec3 getLambertianSurfaceColor(Ray &endRay);
     vec3 getOrenNayarSurfaceColor(Ray &endRay);
 };

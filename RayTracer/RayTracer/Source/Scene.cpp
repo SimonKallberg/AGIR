@@ -141,7 +141,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
 
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
-        return vec3();
+        return vec3(0.0f);
     }
     
     //Add intersections to ray
@@ -162,12 +162,11 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         
         //If intersection point is not in shadow, set it to BRDF
         if(!shootShadowRay(*arg->intSectPoint)) {
-           diffuse = 0.4f * getOrenNayarSurfaceColor(*arg);
+           diffuse = 1.0f * getOrenNayarSurfaceColor(*arg);
         }
         if( iteration > 0) {
             return diffuse;
         }
-
         //Recurse
         diffuse = diffuse + 0.6f * traceRay(arg->monteCarloRay, iteration + 1);
     }
@@ -180,7 +179,64 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         //Recurse
         diffuse = traceRay(arg->reflectedRay, iteration + 1);
     }
+    else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
+    (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
+        
+        if( iteration > 3) {
+            return diffuse;
+        }
+
+        //Recurse
+        traceRayRefraction(arg, false);
+        diffuse = traceRay(arg->refractedRay, iteration + 1) + traceRay(arg->reflectedRay, iteration + 1);
+        
+    }
+    
     return diffuse;
+}
+
+Ray* Scene::traceRayRefraction(Ray *arg, bool inside){
+    
+    vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+    vec3 dir = normalize(vec3 (arg->end - arg->start));
+    
+    //Inside an object
+    if(dot(normal, dir) > 0.0f) {
+        inside = true;
+        normal = -1.0f*normal;
+    }
+    float n2 = arg->endTri ? arg->endTri->surf.refractionIndex : arg->endSphere->surf.refractionIndex;
+    float n1 = 1.0f;
+    
+    if(arg->parent) {
+       n1 = arg->parent->endTri ? arg->parent->endTri->surf.refractionIndex : arg->parent->endSphere->surf.refractionIndex;
+    }
+    
+    vec3 refractionGLM = glm::refract(dir, normal, n1/n2);
+    
+    //Check for brewster angle
+    if(refractionGLM != vec3(0.0f)) {
+        vec3 *refractionRay = new vec3(refractionGLM);//new vec3(calcRefraction(*arg, normal, n1, n2));
+
+        arg->refractedRay = new Ray(arg->intSectPoint, refractionRay);
+        arg->reflectedRay = traceRayPerfectReflection(*arg);
+    }
+    else {
+        //Perfectly reflected ray
+        arg->refractedRay = traceRayPerfectReflection(*arg);
+        //Add offset
+        if(inside) {
+            *arg->refractedRay->start = *arg->refractedRay->start - 0.001f *normal;
+            //cout << "inside"<<endl;
+            
+        }
+        else {
+            *arg->refractedRay->start = *arg->refractedRay->start + 0.001f *normal;
+           // cout << "outside" <<endl;
+        }
+    
+    }
+    return arg->refractedRay;
 }
 
 Ray* Scene::traceRayMonteCarlo(Ray *arg) {
@@ -250,12 +306,30 @@ vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay) {
     //Get surface color of triangle or sphere
     float roughness = endRay.endTri ? endRay.endTri->surf.roughness : endRay.endSphere->surf.roughness;
     
-    float sigma2 = roughness * roughness;
+   float sigma2 = roughness * roughness;
         
     vec3 inDir = normalize(*endRay.start - *endRay.intSectPoint);
     vec3 lightDir = normalize(pointLights[0].pos - *endRay.intSectPoint);
     vec3 outDir = normalize(*endRay.monteCarloRay->end - *endRay.intSectPoint);
+   
     
+    
+   
+    float A = 1 - 0.5 * sigma2 / (sigma2 + 0.57);
+    float B = 0.45 * sigma2 / (sigma2 + 0.09);
+    float cos_theta_d1 = glm::dot(inDir, normal);
+    float cos_theta_d2 = glm::dot(lightDir, normal);
+    float theta = glm::acos(cos_theta_d2);
+    float theta_d1 = glm::acos(cos_theta_d1);
+    float alpha = glm::max(theta, theta_d1);
+    float beta = glm::min(theta, theta_d1);
+    float cos_d1_d2 = glm::dot(inDir, lightDir);
+
+    return albedo / 3.14f * cos_theta_d2 * 
+    (A + (B * glm::max(0.0f, cos_d1_d2)) * glm::sin(alpha) * glm::tan(beta));
+    
+    
+   /*
     float A = 1.0f - (0.5f * sigma2/2.0f*(sigma2 + 0.33f));
     float B = 0.45f * sigma2/(sigma2+ 0.09f);
     
@@ -273,12 +347,12 @@ vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay) {
     
     float thetaR = glm::acos(cos_thetaR);
     float thetaI = glm::acos(cos_thetaI);
-    float alphaAngle = glm::max(thetaR, thetaI);
-    float betaAngle = glm::min(thetaR, thetaI);
+    float alphaAngle = std::max(thetaR, thetaI);
+    float betaAngle = std::min(thetaR, thetaI);
        
     vec3 Lr =  albedo * ( A + (B * glm::max(0.0f, cos_phiI) * glm::sin(alphaAngle) * glm::tan(betaAngle)));
 
-    return Lr;
+    return Lr;*/
    
 }
 
