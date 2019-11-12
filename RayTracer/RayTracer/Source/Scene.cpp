@@ -179,16 +179,17 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         //Recurse
         diffuse = traceRay(arg->reflectedRay, iteration + 1);
     }
+    //Perfectly transparent surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
     (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
         
-        if( iteration > 3) {
+        if( iteration > 5) {
             return diffuse;
         }
 
         //Recurse
         traceRayRefraction(arg, false);
-        diffuse = traceRay(arg->refractedRay, iteration + 1) + traceRay(arg->reflectedRay, iteration + 1);
+        diffuse = traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
         
     }
     
@@ -203,20 +204,20 @@ Ray* Scene::traceRayRefraction(Ray *arg, bool inside){
     //Inside an object
     if(dot(normal, dir) > 0.0f) {
         inside = true;
-        normal = -1.0f*normal;
+        //normal = -1.0f*normal;
     }
-    float n2 = arg->endTri ? arg->endTri->surf.refractionIndex : arg->endSphere->surf.refractionIndex;
+    float n2 = 1.0f; //arg->endTri ? arg->endTri->surf.refractionIndex : arg->endSphere->surf.refractionIndex;
     float n1 = 1.0f;
     
-    if(arg->parent) {
-       n1 = arg->parent->endTri ? arg->parent->endTri->surf.refractionIndex : arg->parent->endSphere->surf.refractionIndex;
-    }
+//    if(arg->parent) {
+//       n1 = arg->parent->endTri ? arg->parent->endTri->surf.refractionIndex : arg->parent->endSphere->surf.refractionIndex;
+//    }
     
-    vec3 refractionGLM = glm::refract(dir, normal, n1/n2);
+    vec3 refractionGLM = glm::refract(dir, normal, 1.0f);
     
     //Check for brewster angle
     if(refractionGLM != vec3(0.0f)) {
-        vec3 *refractionRay = new vec3(refractionGLM);//new vec3(calcRefraction(*arg, normal, n1, n2));
+        vec3 *refractionRay = new vec3(normalize(refractionGLM));//new vec3(calcRefraction(*arg, normal, n1, n2));
 
         arg->refractedRay = new Ray(arg->intSectPoint, refractionRay);
         arg->reflectedRay = traceRayPerfectReflection(*arg);
