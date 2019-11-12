@@ -141,19 +141,20 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
 
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
-        return vec3(1.0f);
+        return vec3(0.0f, 1.0f, 0.0f);
     }
     
     //Add intersections to ray
     findIntersection(*arg);
     
+    //No intersections found
     if(arg->intSectPoint == nullptr) {
-        return vec3(1.0f);
+        return vec3(0.0f,0.0f,1.0f);
     }
     
     
     vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
-    vec3 dir = normalize(vec3 (arg->end - arg->start));
+    vec3 dir = normalize(vec3(*arg->end - *arg->start));
     //Inside an object
     if(dot(normal, dir) < 0.0f) {
         arg->inside = true;
@@ -194,25 +195,35 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
     (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
         
-        if( iteration > 3) {
+        if( iteration > 5) {
             return vec3(1.0f,0.0f,0.0f);
         }
         //Recurse
         //traceRayRefraction(arg);
-        vec3 dir = normalize(vec3(*arg->end - *arg->start));
-       
-//        vec3 offset = -0.01f*normal;
-//        if(!arg->inside) {
-//            //cout << "inside" << endl;
-//            offset = -1.0f*offset;
+        if(arg->inside) {
+            normal = -1.0f*normal;
+        }
+        
+        //vec3 refractionGLM = glm::refract(dir, normal, 1.0f);
+        
+//        float eta = 2.0f - 1.0f;
+//        vec3 refractionGLM = vec3(0.0f);
+//        //If eta is not 1
+//        if(1.0f - abs(eta) > 0.001) {
+//            float cosi = dot(normal, dir);
+//            refractionGLM = normalize(dir * eta - normal * (-cosi + eta * cosi));
 //        }
+//        else {
+//            refractionGLM = dir;
+//        }
+        
         vec3* endRefr = new vec3(*arg->intSectPoint + dir);
         vec3* startRefr = new vec3(*arg->intSectPoint);
         
         arg->refractedRay = new Ray(startRefr, endRefr);
         //cout << *arg << endl;
         //cout << "Refracted ray: " << *arg->refractedRay << endl;
-        diffuse = 0.8f * traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
+        diffuse = 0.95f * traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
     }
     
     return diffuse;
@@ -247,7 +258,6 @@ Ray* Scene::traceRayRefraction(Ray *arg){
     if(1.0f - abs(eta) > 0.001) {
         float cosi = dot(normal, dir);
         o = normalize(dir * eta - normal * (-cosi + eta * cosi));
-        cout << "hej" << endl;
     }
     else {
         o = dir;
