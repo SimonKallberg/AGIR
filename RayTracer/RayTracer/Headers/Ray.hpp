@@ -48,6 +48,10 @@ public:
     Ray* reflectedRay = nullptr;
     Ray* refractedRay = nullptr;
     Ray* monteCarloRay = nullptr;
+    
+    //Travelling inside objects
+    bool inside = false;
+    float refractionIndex = 1.0f; //Air
 
     //Pointing towards vertexes
 	vec3* start = nullptr;

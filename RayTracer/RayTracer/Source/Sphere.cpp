@@ -9,9 +9,14 @@
 #include "Sphere.hpp"
 #include <cmath>
 
+void Sphere::flipNormal() {
+    normal = -1.0f*normal;
+}
+
+
 vec3 Sphere::calcNormal(Ray &p) {
     
-    vec3 normal = normalize(*p.intSectPoint - centerPos);
+    normal = normalize(*p.intSectPoint - centerPos);
     return normal;
 }
 
