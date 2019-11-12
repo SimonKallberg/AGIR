@@ -16,6 +16,7 @@
 #include <vector>
 #include "glm.hpp"
 #include "string_cast.hpp"
+#include <algorithm>	
 
 using namespace std;
 using namespace glm;
