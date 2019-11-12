@@ -175,7 +175,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         if(!shootShadowRay(*arg->intSectPoint)) {
            diffuse = 1.0f * getOrenNayarSurfaceColor(*arg);
         }
-        if( iteration > 0) {
+        if( iteration > 2) {
             return diffuse;
         }
         //Recurse
@@ -194,25 +194,25 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
     (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
         
-        if( iteration > 5) {
+        if( iteration > 3) {
             return vec3(1.0f,0.0f,0.0f);
         }
         //Recurse
         //traceRayRefraction(arg);
         vec3 dir = normalize(vec3(*arg->end - *arg->start));
-        vec3* endRefr = new vec3(*arg->intSectPoint + dir + dir*0.5f);
-        vec3* startRefr = new vec3(*arg->intSectPoint + dir*0.5f);;
-        
-//        if(arg->inside) {
-//           startRefr = new vec3(*arg->intSectPoint + dir*0.2f);
+       
+//        vec3 offset = -0.01f*normal;
+//        if(!arg->inside) {
+//            //cout << "inside" << endl;
+//            offset = -1.0f*offset;
 //        }
-//        else {
-//            startRefr = new vec3(*arg->intSectPoint - dir*0.2f);
-//        }
-        
+        vec3* endRefr = new vec3(normalize(*arg->intSectPoint + dir));
+        vec3* startRefr = new vec3(*arg->intSectPoint);
         
         arg->refractedRay = new Ray(startRefr, endRefr);
-        diffuse = 0.9f * traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
+        //cout << "Ray: " << *arg << endl;
+        //cout << "Refracted ray: " << *arg->refractedRay << endl;
+        diffuse = 0.8f * traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
     }
     
     return diffuse;

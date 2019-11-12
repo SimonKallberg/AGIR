@@ -40,13 +40,13 @@ bool Sphere::rayIntersection(Ray &p)
         return false;
     }
     //Check if point is same as starting point - then the ray doesn't intersect
-    if(d1 < 0.1f && d2 < 0.1f) {
+    if(d1 < 0.01f && d2 < 0.01f) {
         return false;
     }
     
     if(d1 > d2) {
         vec3 x2 = o + d2*I;
-        float distance = (x2-*p.start).length();
+        float distance = length(x2-*p.start);
         p.intSectPoints.push_back({vec3(x2), distance , nullptr, this});
         return true;
     }
@@ -55,5 +55,7 @@ bool Sphere::rayIntersection(Ray &p)
         float distance = length(x1-*p.start);
         p.intSectPoints.push_back({vec3(x1), distance , nullptr, this});
         return true;
+
     }
+    return false;
 }

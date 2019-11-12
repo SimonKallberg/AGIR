@@ -26,24 +26,25 @@ Ray Camera::calcRay(int x, int y) {
 void Camera::render()
 {
     cout << "Rendering image..." << endl;
-//	for (int x = 0; x < CAMERA_WIDTH; x++)
-//	{
-//		for (int y = 0; y < CAMERA_HEIGHT; y++)
-//		{
-//            //Calculate ray from eye through the pixel
-//            Ray theRay = calcRay(x,y);
-//
-//            //Shoot out 4 rays per ray to implement anti aliasing
-//            vec3 colorOfPixel = vec3(0.0f,0.0f,0.0f);
-//            //for(int i = 0; i < 3; i++) {
-//                colorOfPixel = colorOfPixel + theScene->traceRay(&theRay, 0);
-//            //}
-//            //Take average of the 4 rays and write to pixel plane
-//            plane(x, y).color = colorOfPixel; //* 0.25
-//		}
-//	}
-    Ray theRay = calcRay(200,600);
-    plane(200, 600).color = theScene->traceRay(&theRay, 0);
+	for (int x = 0; x < CAMERA_WIDTH; x++)
+	{
+		for (int y = 0; y < CAMERA_HEIGHT; y++)
+		{
+            //Calculate ray from eye through the pixel
+            Ray theRay = calcRay(x,y);
+
+            //Shoot out 4 rays per ray to implement anti aliasing
+            vec3 colorOfPixel = vec3(0.0f,0.0f,0.0f);
+            //for(int i = 0; i < 3; i++) {
+                colorOfPixel = colorOfPixel + theScene->traceRay(&theRay, 0);
+            //}
+            //Take average of the 4 rays and write to pixel plane
+            plane(x, y).color = colorOfPixel; //* 0.25
+		}
+	}
+    //Debugging
+//    Ray theRay = calcRay(200,600);
+//    plane(200, 600).color = theScene->traceRay(&theRay, 0);
 }
 
 void Camera::createImage(std::string fileName)
