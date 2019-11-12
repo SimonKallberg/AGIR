@@ -212,7 +212,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         
         
         arg->refractedRay = new Ray(startRefr, endRefr);
-        diffuse = 0.5f * traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
+        diffuse = 0.9f * traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
     }
     
     return diffuse;
