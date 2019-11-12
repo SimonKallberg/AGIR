@@ -155,7 +155,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
     vec3 dir = normalize(vec3 (arg->end - arg->start));
     //Inside an object
-    if(dot(normal, dir) > 0.0f) {
+    if(dot(normal, dir) < 0.0f) {
         arg->inside = true;
     }
     else {
@@ -206,11 +206,11 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
 //            //cout << "inside" << endl;
 //            offset = -1.0f*offset;
 //        }
-        vec3* endRefr = new vec3(normalize(*arg->intSectPoint + dir));
+        vec3* endRefr = new vec3(*arg->intSectPoint + dir);
         vec3* startRefr = new vec3(*arg->intSectPoint);
         
         arg->refractedRay = new Ray(startRefr, endRefr);
-        //cout << "Ray: " << *arg << endl;
+        //cout << *arg << endl;
         //cout << "Refracted ray: " << *arg->refractedRay << endl;
         diffuse = 0.8f * traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
     }
@@ -318,7 +318,9 @@ Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
     vec3 I = normalize(*inRay.end - *inRay.start);
     vec3 normal = normalize(inRay.endTri ? (inRay.endTri->normal) : (inRay.endSphere->calcNormal(inRay)));
     vec3 outDir = (I - 2.0f*(dot(I,normal)*normal));
-    Ray* outRay = new Ray(inRay.intSectPoint, new vec3(*inRay.intSectPoint + outDir));
+    //Offset
+    vec3 *start = new vec3(*inRay.intSectPoint + normal*0.01f);
+    Ray* outRay = new Ray(start, new vec3(*inRay.intSectPoint + outDir));
     
     return outRay;
 }
