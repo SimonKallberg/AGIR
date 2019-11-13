@@ -96,7 +96,7 @@ vec3* Scene::findIntersection(Ray &arg) {
     
     for(int i = 0; i < arg.intSectPoints.size(); ++i) {
         //Check if intersection is same as start point, if it is then take the next intersection
-        if(abs(length(arg.intSectPoints[i].interSectPoint - *arg.start)) > FLT_EPSILON) {
+        if(abs(length(arg.intSectPoints[i].interSectPoint - *arg.start)) > 0.01f) {
             arg.intSectPoint = &arg.intSectPoints[i].interSectPoint;
             if(arg.intSectPoints[i].tri != nullptr ) {
                 arg.endTri = arg.intSectPoints[i].tri;
@@ -199,7 +199,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
 //        if(n1 > 1.5f && n2 > 1.5f) {
 //            n2 = 1.0f;
 //        }
-        float n = 1.3f;
+        float n = 1.53f;
         float eta = 1.0f/n;
         
         //inside
@@ -208,7 +208,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
             eta = n;
             //cout << "flippin de normal" << endl;
         }
-        vec3 refractionGLM = glm::refract(dir, normal, 1.0f);
+        vec3 refractionGLM = glm::refract(dir, normal, eta);
         
         //Check for brewster angle
         if (refractionGLM != vec3(0.0f)) {
