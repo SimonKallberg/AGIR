@@ -86,11 +86,11 @@ bool Sphere::rayIntersection(Ray &ray)
         float d0 = - (b/2) - sqrt(discriminant);
         float d1 = - (b/2) + sqrt(discriminant);
         
-        float d = d0 > 0 ? d0 : d1;
+        float d = d0 > 0.01 ? d0 : d1;
         
         //if (d > ray.t) return false;
         
-        if (d > 0)
+        if (d > 0.01)
         {
             //ray.t = d;
             vec3 intersection = o + l * d;
