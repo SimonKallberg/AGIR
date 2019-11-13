@@ -27,12 +27,13 @@ public:
 	Surface(int inReflectionType = 0, vec3 col = vec3(1.0f, 1.0f, 1.0f), float inRoughness = 0.0f)
 		: reflectionType(inReflectionType), color(col), roughness(inRoughness)
 	{
-        if(inReflectionType == 2) { refractionIndex = 1.33f; }
+        if(inReflectionType == 2) { refractionIndex = 1.53f; }
         
     }
 	vec3 diffuseReflection(vec3 inC);
 	vec3 specularReflection(vec3 inC);
-    //Diffuse reflection = 0, Perfect refraction = 1
+    
+    //Diffuse reflection = 0, Perfect reflection = 1, perfect refraction = 2
 	int reflectionType = 0;
 	vec3 color;
 

@@ -92,23 +92,22 @@ vec3* Scene::findIntersection(Ray &arg) {
     for(int i = 0; i < (int)spheres.size(); i++) {
         spheres[i].rayIntersection(arg);
     }
+    arg.sortIntersections();
     
-    if(arg.intSectPoints.size() > 0) {
-        arg.sortIntersections();
-        arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
-        
-        if(arg.intSectPoints[0].tri != nullptr ) {
-            arg.endTri = arg.intSectPoints[0].tri;
+    for(int i = 0; i < arg.intSectPoints.size(); ++i) {
+        //Check if intersection is same as start point, if it is then take the next intersection
+        if(abs(length(arg.intSectPoints[i].interSectPoint - *arg.start)) > FLT_EPSILON) {
+            arg.intSectPoint = &arg.intSectPoints[i].interSectPoint;
+            if(arg.intSectPoints[i].tri != nullptr ) {
+                arg.endTri = arg.intSectPoints[i].tri;
+            }
+            else {
+                arg.endSphere = arg.intSectPoints[i].sphere;
+            }
+            break;
         }
-        else {
-            arg.endSphere = arg.intSectPoints[0].sphere;
-        }
-        
-        
-    return arg.intSectPoint;
-        
     }
-    return nullptr;
+    return arg.intSectPoint;
 }
 
 void Scene::addPointLight(vec3 inCenter) {
@@ -121,12 +120,13 @@ bool Scene::shootShadowRay(vec3 &inV) {
     
     for(int i = 0; i < (int)pointLights.size(); i++) {
         Ray theRay = Ray(&inV, &pointLights[i].pos);
+        findIntersection(theRay);
         
         //Check if an object is intersecting ray to light
-        if(findIntersection(theRay) != nullptr) {
+        if(theRay.intSectPoints.size() > 0) {
             //Check so distance to light is greater than distance to intersecting object
             float distToLight = glm::length(*theRay.end - *theRay.start);
-            float distToIntersection = glm::length(*theRay.intSectPoint - *theRay.start);
+            float distToIntersection = glm::length(theRay.intSectPoints[0].interSectPoint - *theRay.start); //Ugly solution
             
             if( distToIntersection < distToLight ){
                 return true;
@@ -153,16 +153,6 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     }
     
     
-    vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
-    vec3 dir = normalize(vec3(*arg->end - *arg->start));
-    //Inside an object
-    if(dot(normal, dir) < 0.0f) {
-        arg->inside = true;
-    }
-    else {
-        arg->inside = false;
-    }
-    
     vec3 diffuse = vec3(0.0f);
     
     //Diffuse surface, monte carlo ray tracing
@@ -176,7 +166,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         if(!shootShadowRay(*arg->intSectPoint)) {
            diffuse = 1.0f * getOrenNayarSurfaceColor(*arg);
         }
-        if( iteration > 2) {
+        if( iteration > 6) {
             return diffuse;
         }
         //Recurse
@@ -195,35 +185,46 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
     (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
         
-        if( iteration > 5) {
+        if( iteration > 20) {
             return vec3(1.0f,0.0f,0.0f);
         }
+        vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+        vec3 dir = normalize(vec3(*arg->end - *arg->start));
+        
         //Recurse
         //traceRayRefraction(arg);
-        if(arg->inside) {
+//        float n1 = arg->refractionIndex;
+//        float n2 = arg->endSphere ? arg->endSphere->surf.refractionIndex : arg->endTri->surf.refractionIndex;
+//
+//        if(n1 > 1.5f && n2 > 1.5f) {
+//            n2 = 1.0f;
+//        }
+        float n = 1.3f;
+        float eta = 1.0f/n;
+        
+        //inside
+        if(dot(normal, dir) > 0.0f) {
             normal = -1.0f*normal;
+            eta = n;
+            //cout << "flippin de normal" << endl;
         }
+        vec3 refractionGLM = glm::refract(dir, normal, 1.0f);
         
-        //vec3 refractionGLM = glm::refract(dir, normal, 1.0f);
-        
-//        float eta = 2.0f - 1.0f;
-//        vec3 refractionGLM = vec3(0.0f);
-//        //If eta is not 1
-//        if(1.0f - abs(eta) > 0.001) {
-//            float cosi = dot(normal, dir);
-//            refractionGLM = normalize(dir * eta - normal * (-cosi + eta * cosi));
-//        }
-//        else {
-//            refractionGLM = dir;
-//        }
-        
-        vec3* endRefr = new vec3(*arg->intSectPoint + dir);
-        vec3* startRefr = new vec3(*arg->intSectPoint);
-        
-        arg->refractedRay = new Ray(startRefr, endRefr);
-        //cout << *arg << endl;
-        //cout << "Refracted ray: " << *arg->refractedRay << endl;
-        diffuse = 0.95f * traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
+        //Check for brewster angle
+        if (refractionGLM != vec3(0.0f)) {
+            vec3* endRefr = new vec3(*arg->intSectPoint + refractionGLM);
+            vec3* startRefr = new vec3(*arg->intSectPoint);
+            
+            arg->refractedRay = new Ray(startRefr, endRefr);
+            //arg->refractedRay->refractionIndex = n2;
+            //cout << *arg << endl;
+            //cout << "Refracted ray: " << *arg->refractedRay << endl;
+            diffuse = traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
+        }
+        else {
+            arg->refractedRay =  traceRayPerfectReflection(*arg);
+            diffuse = traceRay(arg->refractedRay, iteration + 1);
+        }
     }
     
     return diffuse;
