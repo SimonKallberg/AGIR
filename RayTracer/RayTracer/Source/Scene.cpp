@@ -138,7 +138,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
 
     //Check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
-        return vec3(0.0f, 1.0f, 0.0f);
+        return vec3(0.0f, 0.0f, 0.0f);
     }
     
     //Add intersections to ray
@@ -147,6 +147,10 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     //No intersections found
     if(arg->intSectPoint == nullptr) {
         return vec3(0.0f,0.0f,1.0f);
+    }
+    
+    if( iteration > 20) {
+        return vec3(1.0f,0.0f,0.0f);
     }
     
     
@@ -182,104 +186,71 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
     (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
         
-        if( iteration > 20) {
-            return vec3(1.0f,0.0f,0.0f);
+
+
+        float fresnelCoeff = traceRayRefraction(arg);
+        arg->reflectedRay = traceRayPerfectReflection(*arg);
+
+        //Brewster angle - reflection is total
+        if(!arg->refractedRay) {
+            fresnelCoeff = 1.0f;
         }
-        vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
-        //Incoming ray
-        vec3 dir = normalize(vec3(*arg->end - *arg->start));
         
+        diffuse = (1.0f-fresnelCoeff)*traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff*traceRay(arg->reflectedRay, iteration + 1);
         //Recurse
-        //traceRayRefraction(arg);
-        float n = 1.53f;
-        float eta = 1.0f/n;
+//        if(traceRayRefraction(arg)) {
+//            diffuse = traceRay(arg->refractedRay, iteration + 1);
+//        }
+//        else {
+//            arg->reflectedRay = traceRayPerfectReflection(*arg);
+//            diffuse = traceRay(arg->reflectedRay, iteration + 1);
+//        }
         
-        //If the ray is inside an object
-        if(dot(normal, dir) > 0.0f) {
-            normal = -1.0f*normal;
-            eta = n;
-        }
-        vec3 refractionGLM = glm::refract(dir, normal, eta);
-        
-        //Check for brewster angle
-        if (refractionGLM != vec3(0.0f)) {
-            vec3* endRefr = new vec3(*arg->intSectPoint + refractionGLM);
-            vec3* startRefr = new vec3(*arg->intSectPoint);
-            
-            arg->refractedRay = new Ray(startRefr, endRefr);
-            diffuse = traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
-        }
-        else {
-            arg->refractedRay =  traceRayPerfectReflection(*arg);
-            diffuse = traceRay(arg->refractedRay, iteration + 1);
-        }
+//        else {
+//            arg->refractedRay =  traceRayPerfectReflection(*arg);
+//            diffuse = traceRay(arg->refractedRay, iteration + 1);
+//        }
     }
     
     return diffuse;
 }
 
-Ray* Scene::traceRayRefraction(Ray *arg){
+float Scene::traceRayRefraction(Ray *arg){
     
-    vec3 dir = normalize(vec3(arg->intSectPoint - arg->start));
-    vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->normal);
+    vec3 N = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+    //Incoming ray
+    vec3 I = normalize(vec3(*arg->end - *arg->start));
+    vec3 R = vec3(0.0f);
     
-//    if(arg->inside) {
-//        if(arg->endTri) {
-//            normal = -1.0f*normal;
-//        } else {
-//            normal = -1.0f*normal;
-//        }
-//    }
-
-    
-    
-    float n2 = 1.0f; //arg->endTri ? arg->endTri->surf.refractionIndex : arg->endSphere->surf.refractionIndex;
     float n1 = 1.0f;
+    float n2 = 1.53f;
     
-//    if(arg->parent) {
-//       n1 = arg->parent->endTri ? arg->parent->endTri->surf.refractionIndex : arg->parent->endSphere->surf.refractionIndex;
-//    }
+    //If the ray is inside an object
+    if(dot(N, I) > 0.0f) {
+        N = -1.0f*N;
+        n1 = 1.53f;
+        n2 = 1.0f;
+    }
+    float eta = n1/n2;
+    
+    //Fresnels approximation to schlicks equation
+    float R_0 = pow((n1 - n2)/(n1 + n2), 2);
+    float fresnelCoeff = R_0 + (1 - R_0) * pow(1 - glm::dot(N, -1.0f*I),5);
+    
+    //vec3 refractionGLM = glm::refract(dir, normal, eta);
+    float k = 1.0f - eta * eta * (1.0f - dot(N, I) * dot(N, I));
+    if (k > 0.0)
+        R = eta * I - (eta * dot(N, I) + sqrt(k)) * N;
 
-    //vec3 refractionGLM = normalize(glm::refract(dir, normal, 1.0f));
-    float eta = 2.0f - 1.0f;
-    vec3 o = vec3(0.0f);
-    //If eta is not 1
-    if(1.0f - abs(eta) > 0.001) {
-        float cosi = dot(normal, dir);
-        o = normalize(dir * eta - normal * (-cosi + eta * cosi));
-    }
-    else {
-        o = dir;
-        
-    }
-    
     //Check for brewster angle
-    if(o != vec3(0.0f)) {
+    if (R != vec3(0.0f)) {
+        vec3* endRefr = new vec3(*arg->intSectPoint + R);
+        vec3* startRefr = new vec3(*arg->intSectPoint);
         
-        vec3 *startRefrRay = new vec3(*arg->intSectPoint);
-        vec3 *refractionRay = new vec3(o + *startRefrRay);//new vec3(calcRefraction(*arg, normal, n1, n2));
-        arg->refractedRay = new Ray(startRefrRay, refractionRay);
-
-        //arg->reflectedRay = traceRayPerfectReflection(*arg);
-        //cout << "Not brew" << endl;
+        arg->refractedRay = new Ray(startRefr, endRefr);
     }
-    else {
-        //Perfectly reflected ray
-        arg->refractedRay = traceRayPerfectReflection(*arg);
-        cout << "Brewster angle" << endl;
-        //Add offset
-        if(arg->inside) {
-            *arg->refractedRay->start = *arg->refractedRay->start - 0.001f *normal;
-            //cout << "inside"<<endl;
 
-        }
-        else {
-            *arg->refractedRay->start = *arg->refractedRay->start + 0.001f *normal;
-           // cout << "outside" <<endl;
-        }
-
-    }
-    return arg->refractedRay;
+    return fresnelCoeff;
 }
 
 Ray* Scene::traceRayMonteCarlo(Ray *arg) {
