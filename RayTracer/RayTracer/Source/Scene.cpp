@@ -16,23 +16,23 @@ void Scene::initialize()
     //Setting up a room shaped as a polygon
     
     //Wall2 - matte light pink
-    scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f ,-5.0f), vec3(0.94f, 0.66f, 0.73f)));
+    scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f ,-5.0f), vec3(0.23f, 0.31f, 0.27f)));
     scene.push_back(Triangle(vec3(10.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f , -5.0f),vec3(0.0f, 6.0f ,-5.0f),vec3(0.94f, 0.66f, 0.73f)));
 	
     //Wall 3 - matte blue
-    scene.push_back(Triangle(vec3(10.0f, 6.0f, 5.0f), vec3(13.0f, 0.0f, 5.0f), vec3(10.0f, 6.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
+    scene.push_back(Triangle(vec3(10.0f, 6.0f, 5.0f), vec3(13.0f, 0.0f, 5.0f), vec3(10.0f, 6.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
     scene.push_back(Triangle(vec3(13.0f, 0.0f, 5.0f), vec3(13.0f, 0.0f, -5.0f), vec3(10.0f, 6.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
     
     //Wall 4 - dark matte pink
-    scene.push_back(Triangle(vec3(-3.0f, 0.0f, -5.0f), vec3(0.0f, -6.0f, 5.0f), vec3(-3.0f, 0.0f, 5.0f), vec3(0.76f, 0.4f, 0.5f)));
+    scene.push_back(Triangle(vec3(-3.0f, 0.0f, -5.0f), vec3(0.0f, -6.0f, 5.0f), vec3(-3.0f, 0.0f, 5.0f), vec3(0.92f, 0.64f, 0.59f)));
     scene.push_back(Triangle(vec3(-3.0f, 0.0f, -5.0f), vec3(0.0f, -6.0f, -5.0f), vec3(0.0f, -6.0f, 5.0f), vec3(0.76f, 0.4f, 0.5f)));
 
 	//Wall 5 - dark green
-    scene.push_back(Triangle(vec3(0.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.0f,-6.0f,5.0f), vec3(0.23f, 0.31f, 0.27f)));
+    scene.push_back(Triangle(vec3(0.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.0f,-6.0f,5.0f), vec3(0.94f, 0.66f, 0.73f)));
     scene.push_back(Triangle(vec3(0.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.23f, 0.31f, 0.27f)));
 	
     //Wall 6 - green
-    scene.push_back(Triangle(vec3(10.0f,-6.0f,-5.0f), vec3(13.0f,0.0f,5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.92f, 0.64f, 0.59f)));
+    scene.push_back(Triangle(vec3(10.0f,-6.0f,-5.0f), vec3(13.0f,0.0f,5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.76f, 0.4f, 0.5f)));
     scene.push_back(Triangle(vec3(10.0f,-6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(13.0f,0.0f,5.0f), vec3(0.92f, 0.64f, 0.59f)));
     
     //celing - white
@@ -48,7 +48,7 @@ void Scene::initialize()
     scene.push_back(Triangle(vec3(10.0f,6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
     
     // Wall 1 - yellow
-    scene.push_back(Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
+    scene.push_back(Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
     scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f, -5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
 }
 
@@ -94,17 +94,14 @@ vec3* Scene::findIntersection(Ray &arg) {
     }
     arg.sortIntersections();
     
-    for(int i = 0; i < arg.intSectPoints.size(); ++i) {
-        //Check if intersection is same as start point, if it is then take the next intersection
-        if(abs(length(arg.intSectPoints[i].interSectPoint - *arg.start)) > 0.01f) {
-            arg.intSectPoint = &arg.intSectPoints[i].interSectPoint;
-            if(arg.intSectPoints[i].tri != nullptr ) {
-                arg.endTri = arg.intSectPoints[i].tri;
-            }
-            else {
-                arg.endSphere = arg.intSectPoints[i].sphere;
-            }
-            break;
+    //Choose closest intersection
+    if(arg.intSectPoints.size() > 0) {
+        arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
+        if(arg.intSectPoints[0].tri != nullptr ) {
+            arg.endTri = arg.intSectPoints[0].tri;
+        }
+        else {
+            arg.endSphere = arg.intSectPoints[0].sphere;
         }
     }
     return arg.intSectPoint;
@@ -189,24 +186,18 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
             return vec3(1.0f,0.0f,0.0f);
         }
         vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+        //Incoming ray
         vec3 dir = normalize(vec3(*arg->end - *arg->start));
         
         //Recurse
         //traceRayRefraction(arg);
-//        float n1 = arg->refractionIndex;
-//        float n2 = arg->endSphere ? arg->endSphere->surf.refractionIndex : arg->endTri->surf.refractionIndex;
-//
-//        if(n1 > 1.5f && n2 > 1.5f) {
-//            n2 = 1.0f;
-//        }
         float n = 1.53f;
         float eta = 1.0f/n;
         
-        //inside
+        //If the ray is inside an object
         if(dot(normal, dir) > 0.0f) {
             normal = -1.0f*normal;
             eta = n;
-            //cout << "flippin de normal" << endl;
         }
         vec3 refractionGLM = glm::refract(dir, normal, eta);
         
@@ -216,9 +207,6 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
             vec3* startRefr = new vec3(*arg->intSectPoint);
             
             arg->refractedRay = new Ray(startRefr, endRefr);
-            //arg->refractedRay->refractionIndex = n2;
-            //cout << *arg << endl;
-            //cout << "Refracted ray: " << *arg->refractedRay << endl;
             diffuse = traceRay(arg->refractedRay, iteration + 1); // + traceRay(arg->reflectedRay, iteration + 1);
         }
         else {

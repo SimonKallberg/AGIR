@@ -36,12 +36,12 @@ int main()
     myScene.initialize();
     
 	//Adding a tetrahedron
-    //myScene.addTetrahedron(vec3(7.0f, -1.0f, 0.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT, 0.0f);
+    myScene.addTetrahedron(vec3(7.0f, -1.0f, 0.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT, 0.0f);
     
     //Adding a sphere
     myScene.addSphere(vec3(6.0f, -2.0f, -2.5f), 0.5f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT, 0.0f);
     //Adding a sphere
-    myScene.addSphere(vec3(7.0f, 1.0f, 1.0f), 1.0f, vec3(0.5f, 0.2f, 0.2f), TRANSPARENT,  0.0f);
+    myScene.addSphere(vec3(5.0f, 1.0f, 1.0f), 1.0f, vec3(0.5f, 0.2f, 0.2f), TRANSPARENT,  0.0f);
     //Adding a sphere
     myScene.addSphere(vec3(9.0f, 2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), SPECULAR);
     myScene.addPointLight(vec3(5.0f,0.0f,4.5f));
