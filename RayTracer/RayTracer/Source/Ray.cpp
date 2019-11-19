@@ -45,7 +45,6 @@ void Ray::sortIntersections() {
     
 }
 
-
 std::ostream& operator<<(std::ostream& out, const Ray& v1) {
     out << "Ray: starting point: ";
     if (v1.start != nullptr) {
