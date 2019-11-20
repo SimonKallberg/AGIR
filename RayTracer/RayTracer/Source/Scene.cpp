@@ -183,11 +183,19 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         //Monte carlo ray
         arg->monteCarloRay = traceRayMonteCarlo(arg);
         
+        vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+        vec3 rayToLight = normalize(pointLights[0].pos - *arg->intSectPoint);
+        float cos_theta = dot(normal, rayToLight);
+        
+        if ( cos_theta < 0.0f ) {
+            cos_theta = 0.0f;
+        }
+        
         //If intersection point is not in shadow, set it to BRDF
         if(!shootShadowRay(*arg->intSectPoint)) {
-           diffuse = getLambertianSurfaceColor(*arg);
+           diffuse = cos_theta * getLambertianSurfaceColor(*arg);
         }
-         // Russian roulette, random termination of rays
+        // Russian roulette, random termination of rays
         float random = (*dis)(*gen);
         float absorpionProbability = 1.0f;
         float nonTerminationProbability = 1.0f - absorpionProbability;
@@ -210,8 +218,6 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
     (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
         
-
-
         float fresnelCoeff = traceRayRefraction(arg);
         arg->reflectedRay = traceRayPerfectReflection(*arg);
 
@@ -310,10 +316,11 @@ Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
 vec3 Scene::getLambertianSurfaceColor(Ray &endRay) {
     
     //If the ray hits a triangle or sphere
-    vec3 normal = normalize(endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay));
+    //vec3 normal = normalize(endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay));
     vec3 albedo = endRay.endTri ? endRay.endTri->color : endRay.endSphere->color;
-
+    return albedo/((float)M_PI);
     //Add shading to objects that are hit by light
+    /*
     vec3 rayToLight = normalize(pointLights[0].pos - *endRay.intSectPoint);
     float alpha = dot(normal, rayToLight);
     
@@ -322,7 +329,7 @@ vec3 Scene::getLambertianSurfaceColor(Ray &endRay) {
     }
     else {
         return vec3(0.0f,0.0f,0.0f);
-    }
+    }*/
 }
 
 //vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay) {
