@@ -196,20 +196,8 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
             fresnelCoeff = 1.0f;
         }
         
-        diffuse = (1.0f-fresnelCoeff)*traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff*traceRay(arg->reflectedRay, iteration + 1);
         //Recurse
-//        if(traceRayRefraction(arg)) {
-//            diffuse = traceRay(arg->refractedRay, iteration + 1);
-//        }
-//        else {
-//            arg->reflectedRay = traceRayPerfectReflection(*arg);
-//            diffuse = traceRay(arg->reflectedRay, iteration + 1);
-//        }
-        
-//        else {
-//            arg->refractedRay =  traceRayPerfectReflection(*arg);
-//            diffuse = traceRay(arg->refractedRay, iteration + 1);
-//        }
+        diffuse = (1.0f-fresnelCoeff)*traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff*traceRay(arg->reflectedRay, iteration + 1);
     }
     
     return diffuse;
