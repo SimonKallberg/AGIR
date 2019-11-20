@@ -315,21 +315,9 @@ Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
 
 vec3 Scene::getLambertianSurfaceColor(Ray &endRay) {
     
-    //If the ray hits a triangle or sphere
-    //vec3 normal = normalize(endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay));
+    //Get color of the surface the ray hits
     vec3 albedo = endRay.endTri ? endRay.endTri->color : endRay.endSphere->color;
     return albedo/((float)M_PI);
-    //Add shading to objects that are hit by light
-    /*
-    vec3 rayToLight = normalize(pointLights[0].pos - *endRay.intSectPoint);
-    float alpha = dot(normal, rayToLight);
-    
-    if ( alpha > 0.0f ) {
-        return albedo * alpha;
-    }
-    else {
-        return vec3(0.0f,0.0f,0.0f);
-    }*/
 }
 
 //vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay) {
