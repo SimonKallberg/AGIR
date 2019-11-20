@@ -15,6 +15,7 @@
 #include "Triangle.hpp"
 #include "Sphere.hpp"
 #include "PointLight.hpp"
+#include "Geometry.hpp"
 #include "vec3.hpp"
 #include <algorithm>
 #include <iterator>

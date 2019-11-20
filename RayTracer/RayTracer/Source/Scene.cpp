@@ -150,11 +150,10 @@ bool Scene::isInShadow(Ray &theRay) {
 //Whitted ray-tracing & monte carlo
 vec3 Scene::traceRay(Ray* arg, int iteration) {
 
-    //Check for when rays go inbetween triangles
+    //Error handling, check for when rays go inbetween triangles
     if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
         return vec3(0.0f, 0.0f, 0.0f);
     }
-    
     //Add intersections to ray
     findIntersection(*arg);
     
@@ -162,21 +161,88 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     if(arg->intSectPoint == nullptr) {
         return vec3(0.0f,0.0f,1.0f);
     }
-    if(iteration > 20) {
+    if(iteration > 10) {
         return vec3(1.0f,0.0f,0.0f);
     }
     
     vec3 diffuse = vec3(0.0f);
+//    int mat = arg->endTri ? arg->endTri->surf.reflectionType : arg->endSphere ? arg->endSphere->surf.reflectionType : -1;
+//
+//    switch (mat) {
+//        case 0:
+//        {
+//            //Monte carlo ray
+//            arg->monteCarloRay = traceRayMonteCarlo(arg);
+//
+//            vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+//
+//            float u = 0.0f;
+//            float v = 0.0f;
+//            int N_samples = 16;
+//            //If intersection point is not in shadow, set it to BRDF
+//            for(int i = 0; i < N_samples; i++) {
+//                //Get random point on area light
+//                u = (*dis)(*gen);
+//                v = (*dis)(*gen);
+//                //Cast shadow ray
+//                Ray shadowRay = Ray(arg->intSectPoint, new vec3(getPointOnAreaLight(u, v)));
+//                vec3 direction = normalize(*shadowRay.end - *shadowRay.start);
+//
+//                float cos_theta = glm::dot(direction, normal);
+//                float cos_light_angle = glm::dot(normal, -1.0f*normalize(*shadowRay.end - *shadowRay.start));
+//                float light_solid_angle = 4.0f / N_samples * glm::clamp(cos_light_angle, 0.0f, 1.0f) / glm::pow(glm::length(direction), 2) / (M_PI * 2);
+//                //Cast shadow ray
+//                if(!isInShadow(shadowRay)) {
+//                    diffuse += cos_theta * getLambertianBRDF(*arg) * cos_light_angle * light_solid_angle;
+//                }
+//            }
+//            // Russian roulette, random termination of rays
+//            float random = (*dis)(*gen); //[0,1]
+//            float absorpionProbability = 0.15f;
+//            float nonTerminationProbability = iteration == 0 ? 1.0 : 1.0f - absorpionProbability;
+//            if (random > nonTerminationProbability || iteration > 20)
+//                return diffuse;
+//
+//            //Recurse
+//            diffuse += traceRay(arg->monteCarloRay, iteration + 1);
+//            break;
+//        }
+//        case 1:
+//        {
+//            //Perfectly reflected ray
+//            arg->reflectedRay = traceRayPerfectReflection(*arg);
+//            //Recurse
+//            diffuse = traceRay(arg->reflectedRay, iteration + 1);
+//            break;
+//        }
+//        case 2:
+//        {
+//            float fresnelCoeff = traceRayRefraction(arg);
+//            arg->reflectedRay = traceRayPerfectReflection(*arg);
+//
+//            //Brewster angle - reflection is total
+//            if(!arg->refractedRay) {
+//                fresnelCoeff = 1.0f;
+//            }
+//            diffuse = (1.0f-fresnelCoeff)*traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff * traceRay(arg->reflectedRay, iteration + 1);
+//            break;
+//        }
+//        case 3:
+//        {
+//            diffuse = vec3(1.0f);
+//            break;
+//        }
+//    }
     
     //Diffuse surface, monte carlo ray tracing
     if((arg->endTri && arg->endTri->surf.reflectionType == 0) ||
       (arg->endSphere && arg->endSphere->surf.reflectionType == 0)) {
-        
+
         //Monte carlo ray
         arg->monteCarloRay = traceRayMonteCarlo(arg);
-        
+
         vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
-        
+
         float u = 0.0f;
         float v = 0.0f;
         int N_samples = 16;
@@ -184,19 +250,19 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         for(int i = 0; i < N_samples; i++) {
             u = (*dis)(*gen);
             v = (*dis)(*gen);
-            
+
             Ray shadowRay = Ray(arg->intSectPoint, new vec3(getPointOnAreaLight(u, v)));
             vec3 direction = normalize(*shadowRay.end - *shadowRay.start);
-            
+
             float cos_theta = glm::dot(direction, normal);
             float cos_light_angle = glm::dot(normal, -1.0f*normalize(*shadowRay.end - *shadowRay.start));
-           float light_solid_angle = 4.0f / N_samples * glm::clamp(cos_light_angle, 0.0f, 1.0f) / glm::pow(glm::length(direction), 2) / (M_PI * 2);
+            float light_solid_angle = 4.0f / N_samples * glm::clamp(cos_light_angle, 0.0f, 1.0f) / glm::pow(glm::length(direction), 2) / (M_PI * 2);
 
             if(!isInShadow(shadowRay)) {
                 diffuse += cos_theta * getLambertianBRDF(*arg) * cos_light_angle * light_solid_angle;
             }
         }
-        // Russian roulette, random termination of rays
+//         Russian roulette, random termination of rays
 //        float random = (*dis)(*gen);
 //        float absorpionProbability = 0.15f;
 //        float nonTerminationProbability = iteration == 0 ? 1.0 : 1.0f - absorpionProbability;
@@ -209,7 +275,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
             (arg->endTri && arg->endTri->surf.reflectionType == 1)) {
-        
+
         //Perfectly reflected ray
         arg->reflectedRay = traceRayPerfectReflection(*arg);
         //Recurse
@@ -218,7 +284,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     //Perfectly transparent surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
     (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
-        
+
         float fresnelCoeff = traceRayRefraction(arg);
         arg->reflectedRay = traceRayPerfectReflection(*arg);
 

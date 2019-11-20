@@ -5,25 +5,29 @@
 //  Created by Ylva Selling & Simon Källberg on 2019-09-20.
 //  Copyright © 2019 Ylva Bajsing. All rights reserved.
 
-const int DIFFUSE = 0;
-const int SPECULAR = 1;
-const int TRANSPARENT = 2;
-const float ROUGH = 3.0f;
+//const int DIFFUSE = 0;
+//const int SPECULAR = 1;
+//const int TRANSPARENT = 2;
+//const float ROUGH = 3.0f;
 
+//STD
+#include <string>
 #include <iostream>
 #include <vector>
 #include <cstdio>
+//Libraries
 #include "bitmap_image.hpp"
-#include "Triangle.hpp"
-#include "Ray.hpp"
 #include "matrix.hpp"
-#include "Scene.hpp"
-#include "Camera.hpp"
-#include <string>
-#include "Sphere.hpp"
 #include "glm.hpp"
 #include "transform.hpp"
 #include "ext.hpp"
+//Classes
+#include "Triangle.hpp"
+#include "Ray.hpp"
+#include "Scene.hpp"
+#include "Camera.hpp"
+#include "Sphere.hpp"
+#include "Geometry.hpp"
 
 using namespace std;
 
@@ -36,13 +40,13 @@ int main()
     myScene.initialize();
     
 	//Adding a tetrahedron
-    myScene.addTetrahedron(vec3(6.0f, -1.0f, 0.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), DIFFUSE, 0.0f);
+    myScene.addTetrahedron(vec3(6.0f, -1.0f, 0.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), 0, 0.0f);
     //Adding a sphere
-    myScene.addSphere(vec3(6.0f, -2.0f, -2.5f), 0.5f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT, 0.0f);
+    myScene.addSphere(vec3(6.0f, -2.0f, -2.5f), 0.5f, vec3(0.5f, 0.5f, 0.5f), 2, 0.0f);
     //Adding a sphere
-    myScene.addSphere(vec3(5.0f, 2.0f, 2.0f), 1.0f, vec3(0.5f, 0.2f, 0.2f), DIFFUSE,  0.0f);
+    myScene.addSphere(vec3(5.0f, 2.0f, 2.0f), 1.0f, vec3(0.5f, 0.2f, 0.2f), 0,  0.0f);
     //Adding a sphere
-    myScene.addSphere(vec3(9.0f, 2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), SPECULAR);
+    myScene.addSphere(vec3(9.0f, 2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), 1);
     myScene.addAreaLight(vec3(5.0f, -2.0f, 4.5f), vec3(5.0f, 2.0f, 4.5f), vec3(7.0f, 2.0f, 4.5f), vec3(7.0f, -2.0f, 4.5f));
 	Camera myCamera(&myScene);
     
