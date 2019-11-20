@@ -122,9 +122,9 @@ void Scene::addAreaLight(vec3 v0, vec3 v1, vec3 v2, vec3 v3) {
 //u & v is between 0 and 1
 glm::vec3 Scene::getPointOnAreaLight(float u, float v)
 {
-    glm::vec3 v1 = lights[0].v0 - lights[0].v1;
-    glm::vec3 v2 = lights[1].v2 - lights[0].v1;
-    return lights[0].v1 + u * v1 + v * v2;
+    glm::vec3 v1 = lights[0].v2 - lights[0].v0;
+    glm::vec3 v2 = lights[1].v1 - lights[1].v0; //OK
+    return lights[0].v0 + u * v1 + v * v2;
 }
 
 bool Scene::shootShadowRay(vec3 &inV) {
@@ -198,7 +198,6 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         return vec3(1.0f,0.0f,0.0f);
     }
     
-    
     vec3 diffuse = vec3(0.0f);
     
     //Diffuse surface, monte carlo ray tracing
@@ -209,26 +208,39 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         arg->monteCarloRay = traceRayMonteCarlo(arg);
         
         vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
-        vec3 rayToLight = normalize(pointLights[0].pos - *arg->intSectPoint);
-        float cos_theta = dot(normal, rayToLight);
-        
-        if ( cos_theta < 0.0f ) {
-            cos_theta = 0.0f;
+        int samples = 16; //Samples of area light
+       
+        for(int i = 0; i < samples; i++) {
+            
+           float u = (*dis)(*gen);
+           float v = (*dis)(*gen);
+           
+           vec3 light = getPointOnAreaLight(u, v);
+            // If point is illuminated, add BRDF
+           if (!pointInShadow(*arg->intSectPoint, light)) {
+               vec3 rayToLight = normalize(light - *arg->intSectPoint);
+               float cos_theta = dot(normal, rayToLight);
+               
+               if ( cos_theta < 0.0f ) {
+                   cos_theta = 0.0f;
+               }
+               diffuse += cos_theta * getLambertianSurfaceColor(*arg);
+           }
         }
-        
+
         //If intersection point is not in shadow, set it to BRDF
-        if(!shootShadowRay(*arg->intSectPoint)) {
-           diffuse = cos_theta * getLambertianSurfaceColor(*arg);
-        }
+//        if(!shootShadowRay(*arg->intSectPoint)) {
+//           diffuse = cos_theta * getLambertianSurfaceColor(*arg);
+//        }
         // Russian roulette, random termination of rays
         float random = (*dis)(*gen);
         float absorpionProbability = 1.0f;
         float nonTerminationProbability = 1.0f - absorpionProbability;
         if (random > nonTerminationProbability || iteration > 20) {
-            return diffuse;
+            return diffuse/(float)samples;
         }
-        //Recurse
-        diffuse += 0.6f * traceRay(arg->monteCarloRay, iteration + 1);
+        //Recurse and average on no of samples of area light
+        diffuse += traceRay(arg->monteCarloRay, iteration + 1) / (float)samples;
     }
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
