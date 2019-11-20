@@ -32,6 +32,16 @@ void Camera::render()
 		{
             //Calculate ray from eye through the pixel
             Ray theRay = calcRay(x,y);
+            
+            if( x == 200 && y == 400) {
+                cout << "25% done..." << endl;
+            }
+            else if(x == 400 && y == 400) {
+                cout << "50% done..." << endl;
+            }
+            else if(x == 600 && y == 400) {
+                cout << "75% done..." << endl;
+            }
 
             //Shoot out 4 rays per ray to implement anti aliasing
             vec3 colorOfPixel = vec3(0.0f,0.0f,0.0f);

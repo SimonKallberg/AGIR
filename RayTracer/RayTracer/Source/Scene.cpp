@@ -167,7 +167,11 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         if(!shootShadowRay(*arg->intSectPoint)) {
            diffuse = 1.0f * getOrenNayarSurfaceColor(*arg);
         }
-        if( iteration > 6) {
+         // Russian roulette, random termination of rays
+        float random = (*dis)(*gen);
+        float absorpionProbability = 0.25f;
+        float nonTerminationProbability = 1.0f - absorpionProbability;
+        if (random > nonTerminationProbability || iteration > 20) {
             return diffuse;
         }
         //Recurse
