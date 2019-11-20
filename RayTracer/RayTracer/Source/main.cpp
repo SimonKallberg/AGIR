@@ -45,6 +45,9 @@ int main()
     //Adding a sphere
     myScene.addSphere(vec3(9.0f, 2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), SPECULAR);
     myScene.addPointLight(vec3(5.0f,0.0f,4.5f));
+//    myScene.addPointLight(vec3(6.0f,0.0f,4.5f));
+//    myScene.addPointLight(vec3(4.0f,0.0f,4.5f));
+    myScene.addAreaLight(vec3(5.0f, -2.0f, 4.5f), vec3(5.0f, 2.0f, 4.5f), vec3(7.0f, 2.0f, 4.5f), vec3(7.0f, -2.0f, 4.5f));
 	Camera myCamera(&myScene);
     
 	myCamera.render();

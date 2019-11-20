@@ -113,10 +113,28 @@ void Scene::addPointLight(vec3 inCenter) {
     std::cout << "Added a pointlight with center: " << glm::to_string(inCenter) << "to the scene!" << std::endl << std::endl;
 }
 
+void Scene::addAreaLight(vec3 v0, vec3 v1, vec3 v2, vec3 v3) {
+    lights.push_back(Triangle(v0, v2, v1, vec3(1.0f), 3));
+    lights.push_back(Triangle(v0, v3, v2, vec3(1.0f), 3));
+    std::cout << "Added an area light! " << endl;
+}
+
+//u & v is between 0 and 1
+glm::vec3 Scene::getPointOnAreaLight(float u, float v)
+{
+    glm::vec3 v1 = lights[0].v0 - lights[0].v1;
+    glm::vec3 v2 = lights[1].v2 - lights[0].v1;
+    return lights[0].v1 + u * v1 + v * v2;
+}
+
 bool Scene::shootShadowRay(vec3 &inV) {
     
-    for(int i = 0; i < (int)pointLights.size(); i++) {
-        Ray theRay = Ray(&inV, &pointLights[i].pos);
+    float u = (*dis)(*gen);
+    float v = (*dis)(*gen);
+    int samples = 16;
+    
+    for(int i = 0; i < samples; i++) {
+        Ray theRay = Ray(&inV, new vec3(getPointOnAreaLight(u, v)));
         findIntersection(theRay);
         
         //Check if an object is intersecting ray to light
@@ -124,8 +142,10 @@ bool Scene::shootShadowRay(vec3 &inV) {
             //Check so distance to light is greater than distance to intersecting object
             float distToLight = glm::length(*theRay.end - *theRay.start);
             float distToIntersection = glm::length(theRay.intSectPoints[0].interSectPoint - *theRay.start); //Ugly solution
+            int material = theRay.endTri ? theRay.endTri->surf.reflectionType : theRay.endSphere->surf.reflectionType;
             
-            if( distToIntersection < distToLight ){
+            //No shadow for transparent objects
+            if(material != 2 && distToIntersection < distToLight ){
                 return true;
             }
         }
@@ -165,11 +185,11 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         
         //If intersection point is not in shadow, set it to BRDF
         if(!shootShadowRay(*arg->intSectPoint)) {
-           diffuse = 1.0f * getOrenNayarSurfaceColor(*arg);
+           diffuse = getLambertianSurfaceColor(*arg);
         }
          // Russian roulette, random termination of rays
         float random = (*dis)(*gen);
-        float absorpionProbability = 0.25f;
+        float absorpionProbability = 1.0f;
         float nonTerminationProbability = 1.0f - absorpionProbability;
         if (random > nonTerminationProbability || iteration > 20) {
             return diffuse;
@@ -305,62 +325,62 @@ vec3 Scene::getLambertianSurfaceColor(Ray &endRay) {
     }
 }
 
-vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay) {
+//vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay) {
     
     //Get normal of triangle or sphere
-    vec3 normal = endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay);
-    //Get surface color of triangle or sphere
-    vec3 albedo = endRay.endTri ? endRay.endTri->surf.color : endRay.endSphere->surf.color;
-    //Get surface color of triangle or sphere
-    float roughness = endRay.endTri ? endRay.endTri->surf.roughness : endRay.endSphere->surf.roughness;
-    
-   float sigma2 = roughness * roughness;
-        
-    vec3 inDir = normalize(*endRay.start - *endRay.intSectPoint);
-    vec3 lightDir = normalize(pointLights[0].pos - *endRay.intSectPoint);
-    vec3 outDir = normalize(*endRay.monteCarloRay->end - *endRay.intSectPoint);
+//    vec3 normal = endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay);
+//    //Get surface color of triangle or sphere
+//    vec3 albedo = endRay.endTri ? endRay.endTri->surf.color : endRay.endSphere->surf.color;
+//    //Get surface color of triangle or sphere
+//    float roughness = endRay.endTri ? endRay.endTri->surf.roughness : endRay.endSphere->surf.roughness;
+//
+//   float sigma2 = roughness * roughness;
+//
+//    vec3 inDir = normalize(*endRay.start - *endRay.intSectPoint);
+//    vec3 lightDir = normalize(pointLights[0].pos - *endRay.intSectPoint);
+//    vec3 outDir = normalize(*endRay.monteCarloRay->end - *endRay.intSectPoint);
+//
+//
+//
+//
+//    float A = 1 - 0.5 * sigma2 / (sigma2 + 0.57);
+//    float B = 0.45 * sigma2 / (sigma2 + 0.09);
+//    float cos_theta_d1 = glm::dot(inDir, normal);
+//    float cos_theta_d2 = glm::dot(lightDir, normal);
+//    float theta = glm::acos(cos_theta_d2);
+//    float theta_d1 = glm::acos(cos_theta_d1);
+//    float alpha = glm::max(theta, theta_d1);
+//    float beta = glm::min(theta, theta_d1);
+//    float cos_d1_d2 = glm::dot(inDir, lightDir);
+//
+//    return albedo / 3.14f * cos_theta_d2 *
+//    (A + (B * glm::max(0.0f, cos_d1_d2)) * glm::sin(alpha) * glm::tan(beta));
+//
+//
+//   /*
+//    float A = 1.0f - (0.5f * sigma2/2.0f*(sigma2 + 0.33f));
+//    float B = 0.45f * sigma2/(sigma2+ 0.09f);
+//
+//    //float L = max(0.0, dotProduct(normal, lightDir));
+//    //float V = max(0.0, dotProduct(normal, inDir));
+//    //float P = max(0.0, dotProduct(lightDir-normal*L, inDir-normal*V));
+//
+//    //vec3 Lr = albedo  * ( A + B * P * sqrt((1-L*L)*(1-V*V))/max(L,V));
+//
+//
+//    float cos_thetaR = dot(inDir, normal);
+//    float cos_thetaI = dot(lightDir, normal);
+//
+//    float cos_phiI = dot(normalize(lightDir - normal), normalize(inDir - normal));
+//
+//    float thetaR = glm::acos(cos_thetaR);
+//    float thetaI = glm::acos(cos_thetaI);
+//    float alphaAngle = std::max(thetaR, thetaI);
+//    float betaAngle = std::min(thetaR, thetaI);
+//
+//    vec3 Lr =  albedo * ( A + (B * glm::max(0.0f, cos_phiI) * glm::sin(alphaAngle) * glm::tan(betaAngle)));
+//
+//    return Lr;*/
    
-    
-    
-   
-    float A = 1 - 0.5 * sigma2 / (sigma2 + 0.57);
-    float B = 0.45 * sigma2 / (sigma2 + 0.09);
-    float cos_theta_d1 = glm::dot(inDir, normal);
-    float cos_theta_d2 = glm::dot(lightDir, normal);
-    float theta = glm::acos(cos_theta_d2);
-    float theta_d1 = glm::acos(cos_theta_d1);
-    float alpha = glm::max(theta, theta_d1);
-    float beta = glm::min(theta, theta_d1);
-    float cos_d1_d2 = glm::dot(inDir, lightDir);
-
-    return albedo / 3.14f * cos_theta_d2 * 
-    (A + (B * glm::max(0.0f, cos_d1_d2)) * glm::sin(alpha) * glm::tan(beta));
-    
-    
-   /*
-    float A = 1.0f - (0.5f * sigma2/2.0f*(sigma2 + 0.33f));
-    float B = 0.45f * sigma2/(sigma2+ 0.09f);
-    
-    //float L = max(0.0, dotProduct(normal, lightDir));
-    //float V = max(0.0, dotProduct(normal, inDir));
-    //float P = max(0.0, dotProduct(lightDir-normal*L, inDir-normal*V));
-    
-    //vec3 Lr = albedo  * ( A + B * P * sqrt((1-L*L)*(1-V*V))/max(L,V));
-    
-    
-    float cos_thetaR = dot(inDir, normal);
-    float cos_thetaI = dot(lightDir, normal);
-    
-    float cos_phiI = dot(normalize(lightDir - normal), normalize(inDir - normal));
-    
-    float thetaR = glm::acos(cos_thetaR);
-    float thetaI = glm::acos(cos_thetaI);
-    float alphaAngle = std::max(thetaR, thetaI);
-    float betaAngle = std::min(thetaR, thetaI);
-       
-    vec3 Lr =  albedo * ( A + (B * glm::max(0.0f, cos_phiI) * glm::sin(alphaAngle) * glm::tan(betaAngle)));
-
-    return Lr;*/
-   
-}
+//}
 
