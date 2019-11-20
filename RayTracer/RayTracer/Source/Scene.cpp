@@ -134,20 +134,45 @@ bool Scene::shootShadowRay(vec3 &inV) {
     int samples = 16;
     
     for(int i = 0; i < samples; i++) {
-        Ray theRay = Ray(&inV, new vec3(getPointOnAreaLight(u, v)));
-        findIntersection(theRay);
         
-        //Check if an object is intersecting ray to light
-        if(theRay.intSectPoints.size() > 0) {
-            //Check so distance to light is greater than distance to intersecting object
-            float distToLight = glm::length(*theRay.end - *theRay.start);
-            float distToIntersection = glm::length(theRay.intSectPoints[0].interSectPoint - *theRay.start); //Ugly solution
-            int material = theRay.endTri ? theRay.endTri->surf.reflectionType : theRay.endSphere->surf.reflectionType;
-            
-            //No shadow for transparent objects
-            if(material != 2 && distToIntersection < distToLight ){
-                return true;
-            }
+        vec3 light = getPointOnAreaLight(u, v);
+        if (pointInShadow(inV, light)) {
+            return true;
+        }
+//        Ray theRay = Ray(&inV, new vec3(getPointOnAreaLight(u, v)));
+//        findIntersection(theRay);
+        
+//        //Check if an object is intersecting ray to light
+//        if(theRay.intSectPoints.size() > 0) {
+//            //Check so distance to light is greater than distance to intersecting object
+//            float distToLight = glm::length(*theRay.end - *theRay.start);
+//            float distToIntersection = glm::length(theRay.intSectPoints[0].interSectPoint - *theRay.start); //Ugly solution
+//            int material = theRay.endTri ? theRay.endTri->surf.reflectionType : theRay.endSphere->surf.reflectionType;
+//
+//            //No shadow for transparent objects
+//            if(material != 2 && distToIntersection < distToLight ){
+//                return true;
+//            }
+ //       }
+    }
+    return false;
+}
+
+bool Scene::pointInShadow(vec3 &surfPoint, vec3 &lightPoint) {
+    
+    Ray rayToLight = Ray(&surfPoint, &lightPoint);
+    findIntersection(rayToLight);
+    
+    //Check if an object is intersecting ray to light
+    if(rayToLight.intSectPoints.size() > 0) {
+        //Check so distance to light is greater than distance to intersecting object
+        float distToLight = glm::length(*rayToLight.end - *rayToLight.start);
+        float distToIntersection = glm::length(rayToLight.intSectPoints[0].interSectPoint - *rayToLight.start); //Ugly solution
+        int material = rayToLight.endTri ? rayToLight.endTri->surf.reflectionType : rayToLight.endSphere->surf.reflectionType;
+        
+        //No shadow for transparent objects
+        if(material != 2 && distToIntersection < distToLight ){
+            return true;
         }
     }
     return false;
@@ -203,7 +228,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
             return diffuse;
         }
         //Recurse
-        diffuse = diffuse + 0.6f * traceRay(arg->monteCarloRay, iteration + 1);
+        diffuse += 0.6f * traceRay(arg->monteCarloRay, iteration + 1);
     }
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||

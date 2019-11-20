@@ -54,6 +54,7 @@ public:
     glm::vec3 getPointOnAreaLight(float u, float v);
     
     bool shootShadowRay(vec3 &inV);
+    bool pointInShadow(vec3 &surfPoint, vec3 &lightPoint);
     vec3* findIntersection(Ray &arg);
     vec3 traceRay(Ray* arg, int iteration);
     Ray* traceRayMonteCarlo(Ray *arg);
