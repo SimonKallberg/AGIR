@@ -7,13 +7,14 @@
 
 #include "Scene.hpp"
 
-
-
 void Scene::initialize()
 {
     std::cout << "Setting up triangles...." << std::endl;
     
     //Setting up a room shaped as a polygon
+    // Wall 1 - yellow
+    scene.push_back(Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
+    scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f, -5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
     
     //Wall2 - matte light pink
     scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f ,-5.0f), vec3(0.23f, 0.31f, 0.27f)));
@@ -46,13 +47,8 @@ void Scene::initialize()
     scene.push_back(Triangle(vec3(0.0f,6.0f,-5.0f), vec3(10.0f,6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
     scene.push_back(Triangle(vec3(10.0f,6.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
     scene.push_back(Triangle(vec3(10.0f,6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
-    
-    // Wall 1 - yellow
-    scene.push_back(Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
-    scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f, -5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
+   
 }
-
-
 
 void Scene::addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType, float inRoughness) {
 	
@@ -83,30 +79,6 @@ void Scene::addSphere(vec3 inCenter, float radius, vec3 inColor, int inReflType,
     std::cout << "Added a sphere with center: " << glm::to_string(inCenter) << "color: " << glm::to_string(inColor) << "radius: " << radius << " to the scene!" << std::endl << std::endl;
 }
 
-vec3* Scene::findIntersection(Ray &arg) {
-        
-    for(int i = 0; i < (int)scene.size(); i++) {
-        scene[i].rayIntersection(arg);
-    }
-    
-    for(int i = 0; i < (int)spheres.size(); i++) {
-        spheres[i].rayIntersection(arg);
-    }
-    arg.sortIntersections();
-    
-    //Choose closest intersection
-    if(arg.intSectPoints.size() > 0) {
-        arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
-        if(arg.intSectPoints[0].tri != nullptr ) {
-            arg.endTri = arg.intSectPoints[0].tri;
-        }
-        else {
-            arg.endSphere = arg.intSectPoints[0].sphere;
-        }
-    }
-    return arg.intSectPoint;
-}
-
 void Scene::addPointLight(vec3 inCenter) {
     pointLights.push_back(PointLight(inCenter));
     
@@ -127,35 +99,28 @@ glm::vec3 Scene::getPointOnAreaLight(float u, float v)
     return lights[0].v0 + u * v1 + v * v2;
 }
 
-bool Scene::shootShadowRay(vec3 &inV) {
-    
-    float u = (*dis)(*gen);
-    float v = (*dis)(*gen);
-    int samples = 16;
-    
-    for(int i = 0; i < samples; i++) {
+vec3* Scene::findIntersection(Ray &arg) {
         
-        vec3 light = getPointOnAreaLight(u, v);
-        if (pointInShadow(inV, light)) {
-            return true;
-        }
-//        Ray theRay = Ray(&inV, new vec3(getPointOnAreaLight(u, v)));
-//        findIntersection(theRay);
-        
-//        //Check if an object is intersecting ray to light
-//        if(theRay.intSectPoints.size() > 0) {
-//            //Check so distance to light is greater than distance to intersecting object
-//            float distToLight = glm::length(*theRay.end - *theRay.start);
-//            float distToIntersection = glm::length(theRay.intSectPoints[0].interSectPoint - *theRay.start); //Ugly solution
-//            int material = theRay.endTri ? theRay.endTri->surf.reflectionType : theRay.endSphere->surf.reflectionType;
-//
-//            //No shadow for transparent objects
-//            if(material != 2 && distToIntersection < distToLight ){
-//                return true;
-//            }
- //       }
+    for(int i = 0; i < (int)scene.size(); i++) {
+        scene[i].rayIntersection(arg);
     }
-    return false;
+    
+    for(int i = 0; i < (int)spheres.size(); i++) {
+        spheres[i].rayIntersection(arg);
+    }
+    arg.sortIntersections();
+    
+    //Choose closest intersection by sorting vector of intersections
+    if(arg.intSectPoints.size() > 0) {
+        arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
+        if(arg.intSectPoints[0].tri != nullptr ) {
+            arg.endTri = arg.intSectPoints[0].tri;
+        }
+        else {
+            arg.endSphere = arg.intSectPoints[0].sphere;
+        }
+    }
+    return arg.intSectPoint;
 }
 
 bool Scene::pointInShadow(vec3 &surfPoint, vec3 &lightPoint) {
@@ -210,37 +175,35 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
         int samples = 16; //Samples of area light
        
+        //Sample area light w "samples" no of random points on area light
         for(int i = 0; i < samples; i++) {
             
            float u = (*dis)(*gen);
            float v = (*dis)(*gen);
            
            vec3 light = getPointOnAreaLight(u, v);
-            // If point is illuminated, add BRDF
+           //If point is illuminated, add BRDF
            if (!pointInShadow(*arg->intSectPoint, light)) {
                vec3 rayToLight = normalize(light - *arg->intSectPoint);
                float cos_theta = dot(normal, rayToLight);
+               cos_theta = std::max(cos_theta, 0.0f);
                
-               if ( cos_theta < 0.0f ) {
-                   cos_theta = 0.0f;
-               }
                diffuse += cos_theta * getLambertianSurfaceColor(*arg);
            }
         }
-
-        //If intersection point is not in shadow, set it to BRDF
-//        if(!shootShadowRay(*arg->intSectPoint)) {
-//           diffuse = cos_theta * getLambertianSurfaceColor(*arg);
-//        }
+        
+        //Average color on no of samples of area light
+        diffuse = diffuse /(float)samples;
+        
         // Russian roulette, random termination of rays
         float random = (*dis)(*gen);
-        float absorpionProbability = 1.0f;
+        float absorpionProbability = 0.2f;
         float nonTerminationProbability = 1.0f - absorpionProbability;
-        if (random > nonTerminationProbability || iteration > 20) {
-            return diffuse/(float)samples;
+        if (random > nonTerminationProbability || iteration > 10) {
+            return diffuse;
         }
-        //Recurse and average on no of samples of area light
-        diffuse += traceRay(arg->monteCarloRay, iteration + 1) / (float)samples;
+        //Recurse
+        diffuse += normalize(traceRay(arg->monteCarloRay, iteration + 1));
     }
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
@@ -264,7 +227,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         }
         
         //Recurse
-        diffuse = (1.0f-fresnelCoeff)*traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff*traceRay(arg->reflectedRay, iteration + 1);
+        diffuse = (1.0f-fresnelCoeff) * traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff * traceRay(arg->reflectedRay, iteration + 1);
     }
     
     return diffuse;
@@ -272,15 +235,18 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
 
 float Scene::traceRayRefraction(Ray *arg){
     
+    //Normal
     vec3 N = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
     //Incoming ray
     vec3 I = normalize(vec3(*arg->end - *arg->start));
+    //Refracted ray
     vec3 R = vec3(0.0f);
     
+    //Refraction indexes: n1 is first medium, n2 is second
     float n1 = 1.0f;
     float n2 = 1.53f;
     
-    //If the ray is inside an object
+    //Check the ray is inside an object
     if(dot(N, I) > 0.0f) {
         N = -1.0f*N;
         n1 = 1.53f;
@@ -292,7 +258,6 @@ float Scene::traceRayRefraction(Ray *arg){
     float R_0 = pow((n1 - n2)/(n1 + n2), 2);
     float fresnelCoeff = R_0 + (1 - R_0) * pow(1 - glm::dot(N, -1.0f*I),5);
     
-    //vec3 refractionGLM = glm::refract(dir, normal, eta);
     float k = 1.0f - eta * eta * (1.0f - dot(N, I) * dot(N, I));
     if (k > 0.0)
         R = eta * I - (eta * dot(N, I) + sqrt(k)) * N;

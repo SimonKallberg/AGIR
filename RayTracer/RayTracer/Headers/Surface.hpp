@@ -30,8 +30,6 @@ public:
         if(inReflectionType == 2) { refractionIndex = 1.53f; }
         
     }
-	vec3 diffuseReflection(vec3 inC);
-	vec3 specularReflection(vec3 inC);
     
     //Diffuse reflection = 0, Perfect reflection = 1, perfect refraction = 2
 	int reflectionType = 0;

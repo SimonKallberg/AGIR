@@ -51,12 +51,12 @@ vec3 calcRefraction(Ray &inRay, vec3 normal, float n1, float n2) {
     return normal;
 }
 
-vec3 Surface::diffuseReflection(vec3 inC)
-{
-	return (inC * (reflectionCo/3.1415f));
-}
+//vec3 Surface::diffuseReflection(vec3 inC)
+//{
+//	return (inC * (reflectionCo/3.1415f));
+//}
 
-vec3 Surface::specularReflection(vec3 inC)
-{
-	return inC;
-}
+//vec3 Surface::specularReflection(vec3 inC)
+//{
+//	return inC;
+//}

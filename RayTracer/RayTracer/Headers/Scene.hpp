@@ -53,7 +53,6 @@ public:
     void addAreaLight(vec3 v0, vec3 v1, vec3 v2, vec3 v3);
     glm::vec3 getPointOnAreaLight(float u, float v);
     
-    bool shootShadowRay(vec3 &inV);
     bool pointInShadow(vec3 &surfPoint, vec3 &lightPoint);
     vec3* findIntersection(Ray &arg);
     vec3 traceRay(Ray* arg, int iteration);

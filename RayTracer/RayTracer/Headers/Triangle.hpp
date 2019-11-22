@@ -10,12 +10,12 @@
 #define Triangle_hpp
 
 #include <stdio.h>
+#include <cmath>
 #include "Vertex.hpp"
 #include "Ray.hpp"
 #include "Vector3.hpp"
 #include "ColorDbl.hpp"
 #include "Surface.hpp"
-#include <cmath>
 #include "glm.hpp"
 
 using namespace std;

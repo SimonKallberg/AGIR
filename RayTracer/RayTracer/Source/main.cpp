@@ -10,46 +10,45 @@ const int SPECULAR = 1;
 const int TRANSPARENT = 2;
 const float ROUGH = 3.0f;
 
+//STD libraries
 #include <iostream>
 #include <vector>
+#include <string>
 #include <cstdio>
-#include "bitmap_image.hpp"
+
+//Classes
 #include "Triangle.hpp"
 #include "Ray.hpp"
-#include "matrix.hpp"
 #include "Scene.hpp"
 #include "Camera.hpp"
-#include <string>
 #include "Sphere.hpp"
+
+//External libraries
+#include "matrix.hpp"
+#include "bitmap_image.hpp"
 #include "glm.hpp"
 #include "transform.hpp"
 #include "ext.hpp"
 
 using namespace std;
 
-
-
 int main()
 {
+    //Create scene & setup room
 	Scene myScene;
-    //Setup room
     myScene.initialize();
     
-	//Adding a tetrahedron
-    myScene.addTetrahedron(vec3(7.0f, -1.0f, 0.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT, 0.0f);
+	//Add objects
+    myScene.addTetrahedron(vec3(7.0f, -2.0f, 0.0f), 2.5f, vec3(1.0f, 0.8f, 0.8f), DIFFUSE, 0.0f);
+    myScene.addSphere(vec3(6.0f, 2.0f, 2.5f), 0.5f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT, 0.0f);
+    myScene.addSphere(vec3(4.0f, -2.0f, 1.0f), 1.0f, vec3(0.3f, 0.2f, 0.2f), TRANSPARENT,  0.0f);
+    myScene.addSphere(vec3(7.0f, 2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), SPECULAR);
     
-    //Adding a sphere
-    myScene.addSphere(vec3(6.0f, -2.0f, -2.5f), 0.5f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT, 0.0f);
-    //Adding a sphere
-    myScene.addSphere(vec3(5.0f, 1.0f, 1.0f), 1.0f, vec3(0.5f, 0.2f, 0.2f), TRANSPARENT,  0.0f);
-    //Adding a sphere
-    myScene.addSphere(vec3(9.0f, 2.0f, -3.0f), 2.0f, vec3(0.5f, 0.5f, 0.5f), SPECULAR);
-    myScene.addPointLight(vec3(5.0f,0.0f,4.5f));
-//    myScene.addPointLight(vec3(6.0f,0.0f,4.5f));
-//    myScene.addPointLight(vec3(4.0f,0.0f,4.5f));
+    //Add an area light
     myScene.addAreaLight(vec3(5.0f, -2.0f, 4.5f), vec3(5.0f, 2.0f, 4.5f), vec3(7.0f, 2.0f, 4.5f), vec3(7.0f, -2.0f, 4.5f));
-	Camera myCamera(&myScene);
     
+    //Render & save image
+	Camera myCamera(&myScene);
 	myCamera.render();
 	myCamera.createImage("raytracing.bmp");
 
