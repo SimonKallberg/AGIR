@@ -188,7 +188,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
                float cos_theta = dot(normal, rayToLight);
                cos_theta = std::max(cos_theta, 0.0f);
                
-               diffuse += cos_theta * getLambertianSurfaceColor(*arg);
+               diffuse += cos_theta * getOrenNayarSurfaceColor(*arg, light);
            }
         }
         
@@ -197,7 +197,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         
         // Russian roulette, random termination of rays
         float random = (*dis)(*gen);
-        float absorpionProbability = 0.2f;
+        float absorpionProbability = 1.0f;
         float nonTerminationProbability = 1.0f - absorpionProbability;
         if (random > nonTerminationProbability || iteration > 10) {
             return diffuse;
@@ -284,12 +284,14 @@ Ray* Scene::traceRayMonteCarlo(Ray *arg) {
     float azimuth = 2.0f*PI*randX;
     float inclination = glm::asin(glm::sqrt(randY));
 
+    //Incoming ray
     vec3 I = normalize(*arg->end - *arg->start);
+    
+    //Create local coordinate system from incoming ray and surface normal
     vec3 z = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
     vec3 x = normalize(I - dot(I, z) * z);
-    
-    //Transform to local coordinate system
     glm::vec3 y = glm::normalize(glm::cross(z, -x));
+    
     //Create outgoing direction
     glm::vec3 outDirGlobal = z;
     
@@ -297,9 +299,9 @@ Ray* Scene::traceRayMonteCarlo(Ray *arg) {
     outDirGlobal = glm::normalize(glm::rotate(outDirGlobal, inclination, y));
     outDirGlobal = glm::normalize(glm::rotate(outDirGlobal, azimuth, z));
 
-    //Add new ray to the tree
-    vec3* endvec3 = new vec3(*arg->intSectPoint + outDirGlobal);
-    Ray *outRay = new Ray(arg->intSectPoint, endvec3);
+    //Outgoing ray
+    vec3* end = new vec3(*arg->intSectPoint + outDirGlobal);
+    Ray *outRay = new Ray(arg->intSectPoint, end);
 
     return outRay;
 }
@@ -322,62 +324,33 @@ vec3 Scene::getLambertianSurfaceColor(Ray &endRay) {
     return albedo/((float)M_PI);
 }
 
-//vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay) {
+vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay, vec3 &lightPoint) {
     
     //Get normal of triangle or sphere
-//    vec3 normal = endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay);
-//    //Get surface color of triangle or sphere
-//    vec3 albedo = endRay.endTri ? endRay.endTri->surf.color : endRay.endSphere->surf.color;
-//    //Get surface color of triangle or sphere
-//    float roughness = endRay.endTri ? endRay.endTri->surf.roughness : endRay.endSphere->surf.roughness;
-//
-//   float sigma2 = roughness * roughness;
-//
-//    vec3 inDir = normalize(*endRay.start - *endRay.intSectPoint);
-//    vec3 lightDir = normalize(pointLights[0].pos - *endRay.intSectPoint);
-//    vec3 outDir = normalize(*endRay.monteCarloRay->end - *endRay.intSectPoint);
-//
-//
-//
-//
-//    float A = 1 - 0.5 * sigma2 / (sigma2 + 0.57);
-//    float B = 0.45 * sigma2 / (sigma2 + 0.09);
-//    float cos_theta_d1 = glm::dot(inDir, normal);
-//    float cos_theta_d2 = glm::dot(lightDir, normal);
-//    float theta = glm::acos(cos_theta_d2);
-//    float theta_d1 = glm::acos(cos_theta_d1);
-//    float alpha = glm::max(theta, theta_d1);
-//    float beta = glm::min(theta, theta_d1);
-//    float cos_d1_d2 = glm::dot(inDir, lightDir);
-//
-//    return albedo / 3.14f * cos_theta_d2 *
-//    (A + (B * glm::max(0.0f, cos_d1_d2)) * glm::sin(alpha) * glm::tan(beta));
-//
-//
-//   /*
-//    float A = 1.0f - (0.5f * sigma2/2.0f*(sigma2 + 0.33f));
-//    float B = 0.45f * sigma2/(sigma2+ 0.09f);
-//
-//    //float L = max(0.0, dotProduct(normal, lightDir));
-//    //float V = max(0.0, dotProduct(normal, inDir));
-//    //float P = max(0.0, dotProduct(lightDir-normal*L, inDir-normal*V));
-//
-//    //vec3 Lr = albedo  * ( A + B * P * sqrt((1-L*L)*(1-V*V))/max(L,V));
-//
-//
-//    float cos_thetaR = dot(inDir, normal);
-//    float cos_thetaI = dot(lightDir, normal);
-//
-//    float cos_phiI = dot(normalize(lightDir - normal), normalize(inDir - normal));
-//
-//    float thetaR = glm::acos(cos_thetaR);
-//    float thetaI = glm::acos(cos_thetaI);
-//    float alphaAngle = std::max(thetaR, thetaI);
-//    float betaAngle = std::min(thetaR, thetaI);
-//
-//    vec3 Lr =  albedo * ( A + (B * glm::max(0.0f, cos_phiI) * glm::sin(alphaAngle) * glm::tan(betaAngle)));
-//
-//    return Lr;*/
-   
-//}
+    vec3 normal = endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay);
+    //Get surface color of triangle or sphere
+    vec3 albedo = endRay.endTri ? endRay.endTri->surf.color : endRay.endSphere->surf.color;
+    //Get surface roughness of triangle or sphere
+    float roughness = endRay.endTri ? endRay.endTri->surf.roughness : endRay.endSphere->surf.roughness;
+    float sigma2 = roughness * roughness;
+
+    vec3 inDir = normalize(*endRay.start - *endRay.intSectPoint);
+    vec3 lightDir = normalize(lightPoint - *endRay.intSectPoint);
+    
+    //Calculate angles
+    float theta_view =  acos(dot(inDir, normal));
+    float theta_light = acos(dot(lightDir, normal));
+    vec3 ortogonalToNormal = normalize(inDir - dot(inDir, normal) * normal);
+    float phi_view = acos(dot(inDir, ortogonalToNormal));
+    float phi_light = acos(dot(lightDir, ortogonalToNormal));
+
+    //Variables used in Oren Nayar formula
+    float A = 1 - 0.5 * sigma2 / (sigma2 + 0.33); //kbladin 0.57
+    float B = 0.45 * sigma2 / (sigma2 + 0.09);
+    float alpha = glm::max(theta_light, theta_view);
+    float beta = glm::min(theta_light, theta_view);
+
+    //Oren Nayar equation
+    return albedo / (float)M_PI * (A + (B * glm::max(0.0f, cos(phi_light - phi_view))) * glm::sin(alpha) * glm::tan(beta));
+}
 

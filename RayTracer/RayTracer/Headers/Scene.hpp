@@ -60,7 +60,7 @@ public:
     Ray* traceRayPerfectReflection(Ray &inRay);
     float traceRayRefraction(Ray *arg);
     vec3 getLambertianSurfaceColor(Ray &endRay);
-    vec3 getOrenNayarSurfaceColor(Ray &endRay);
+    vec3 getOrenNayarSurfaceColor(Ray &endRay, vec3 &lightPoint);
 };
 
 
