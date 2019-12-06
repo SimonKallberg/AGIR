@@ -197,13 +197,13 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         
         // Russian roulette, random termination of rays
         float random = (*dis)(*gen);
-        float absorpionProbability = 1.0f;
+        float absorpionProbability = 0.25f;
         float nonTerminationProbability = 1.0f - absorpionProbability;
         if (random > nonTerminationProbability || iteration > 10) {
             return diffuse;
         }
         //Recurse
-        diffuse += normalize(traceRay(arg->monteCarloRay, iteration + 1));
+        diffuse += 0.8f*traceRay(arg->monteCarloRay, iteration + 1);
     }
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||

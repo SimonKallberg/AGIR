@@ -47,7 +47,7 @@ public:
 
 	matrix<Pixel> plane;
 
-	Ray calcRay(int x, int y);
+    Ray calcRay(int x, int y, float deltaWidth_, float deltaHeight_);
 	void render();
 	void createImage(std::string fileName);
     vec3* getActiveEye();

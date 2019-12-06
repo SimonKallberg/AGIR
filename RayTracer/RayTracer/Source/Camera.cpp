@@ -7,16 +7,20 @@
 
 #include "Camera.hpp"
 
-Ray Camera::calcRay(int x, int y) {
+Ray Camera::calcRay(int x, int y, float deltaWidth_, float deltaHeight_) {
 	float deltaWidth = (float)abs((c1.y - c3.y)) / (float)CAMERA_WIDTH;
 	float deltaHeight = -(float)abs((c1.z - c3.z)) / (float)CAMERA_HEIGHT;
     
     //Make ray shoot from middle of pixel
     float startWidth = deltaWidth/2;
     float startHeight = deltaHeight/2;
+    
+    //Move ray from middle to random place
+    startWidth += deltaWidth_;
+    startHeight += deltaHeight_;
 
 	vec3 localCoord = vec3(0.0f, ((float)x*deltaWidth)+startWidth , ((float)y*deltaHeight)+startHeight);
-    //TODO resolve memory leak
+
 	vec3 *end = new vec3(c4 + localCoord);
     Ray theRay = Ray(getActiveEye(), end);
 	return theRay;
@@ -30,26 +34,44 @@ void Camera::render()
 	{
 		for (int y = 0; y < CAMERA_HEIGHT; y++)
 		{
-            //Calculate ray from eye through the pixel
-            Ray theRay = calcRay(x,y);
+            int samplesPerPixel = 4;
+            //Supersampling & anti-aliasing
+            float widthOfCameraPlane = length(c1-c2);
+            float heigthOfCameraPlane = length(c3-c4);
+            float widthOfPixel = widthOfCameraPlane/(float)CAMERA_WIDTH;
+            float heightOfPixel = heigthOfCameraPlane/(float)CAMERA_HEIGHT;
             
-            if( x == 200 && y == 400) {
+            //Get step distance for each pixel sample
+            float deltaWidth = widthOfPixel/2.0f;
+            float deltaHeight = heightOfPixel/2.0f;
+            
+            if(x == CAMERA_WIDTH/4 && y == CAMERA_HEIGHT/4) {
                 cout << "25% done..." << endl;
             }
-            else if(x == 400 && y == 400) {
+            else if(x == CAMERA_WIDTH/2 && y == CAMERA_HEIGHT/2) {
                 cout << "50% done..." << endl;
             }
-            else if(x == 600 && y == 400) {
+            else if(x == CAMERA_WIDTH*3/4 && y == CAMERA_HEIGHT*3/4) {
                 cout << "75% done..." << endl;
             }
 
-            //Shoot out 4 rays per ray to implement anti aliasing
+            //Shoot out 4 rays per ray to implement supersampling
             vec3 colorOfPixel = vec3(0.0f,0.0f,0.0f);
-            //for(int i = 0; i < 3; i++) {
+            for(int i = 0; i < samplesPerPixel; i++) {
+                
+                //Anti-aliasing - move ray randomly
+                uniform_real_distribution<float> randStepSizeWidth(-deltaWidth, deltaWidth);
+                uniform_real_distribution<float> randStepSizeHeight(-deltaHeight, deltaHeight);
+                
+                float randHeight = randStepSizeWidth(*theScene->gen);
+                float randWidth = randStepSizeWidth(*theScene->gen);
+                
+                //Calculate ray from eye through the pixel
+                Ray theRay = calcRay(x,y, randHeight, randWidth);
                 colorOfPixel = colorOfPixel + theScene->traceRay(&theRay, 0);
-            //}
+            }
             //Take average of the 4 rays and write to pixel plane
-            plane(x, y).color = colorOfPixel; //* 0.25
+            plane(x, y).color = colorOfPixel/(float)samplesPerPixel;
 		}
 	}
 //    //Debugging
