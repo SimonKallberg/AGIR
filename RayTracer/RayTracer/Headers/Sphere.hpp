@@ -9,11 +9,14 @@
 #ifndef Sphere_hpp
 #define Sphere_hpp
 
-#include <stdio.h>
+//Classes
+#include "Geometry.hpp"
 #include "vec3.hpp"
 #include "Ray.hpp"
+//Libraries
 #include <cmath>
-#include "Geometry.hpp"
+#include <stdio.h>
+
 
 class Sphere : public Geometry {
 public:

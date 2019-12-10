@@ -24,6 +24,7 @@ Ray::~Ray() {
 
     delete reflectedRay;
     delete diffuseRay;
+    delete refractedRay;
 
     diffuseRay = nullptr;
     reflectedRay = nullptr;

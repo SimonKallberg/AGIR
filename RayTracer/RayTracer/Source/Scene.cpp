@@ -13,6 +13,21 @@ void Scene::initialize()
     
     //Polymorphism
     //Setting up a room shaped as a polygon
+    /*
+         
+        /\
+    2  /  \ 1
+      /    \
+     |      |
+     |      |
+   4 |      | 3
+     |      |
+     |      |
+      \    /
+     6 \  / 5
+        \/
+    
+    */
     // Wall 1 - yellow
     geometry.push_back(new Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
     geometry.push_back(new Triangle(vec3(0.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f, -5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
