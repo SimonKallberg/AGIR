@@ -24,9 +24,9 @@ Ray::Ray (const Ray &old_obj) {
 Ray::~Ray() {
 
     delete reflectedRay;
-    delete monteCarloRay;
+    delete diffuseRay;
 
-    monteCarloRay = nullptr;
+    diffuseRay = nullptr;
     reflectedRay = nullptr;
     start = nullptr;
     end = nullptr;

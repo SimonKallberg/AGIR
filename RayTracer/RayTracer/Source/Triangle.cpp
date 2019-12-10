@@ -60,13 +60,26 @@ bool Triangle::rayIntersection(Ray &ray)
     if(t > 0.001f && t < 1000000.0f) {
         vec3 intersection = *ray.start + (t*D);
         float distance = glm::length(intersection - *ray.start);
-        ray.intSectPoints.push_back({intersection, distance, this, nullptr, this});
+        ray.intSectPoints.push_back({intersection, distance, this, nullptr, this, normal});
         return true;
     }
     return false;
 }
 
+Material Triangle::material(){
+    return objectMaterial;
+}
+
+glm::vec3 Triangle::color() {
+    return objectColor;
+}
+float Triangle::roughness() {
+    return objectRoughness;
+}
+
 void Triangle::flipNormal() {
     normal = -1.0f*normal;
 }
+
+
 

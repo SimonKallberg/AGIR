@@ -57,8 +57,8 @@ public:
     vector<Triangle> lights;
     
     void initialize();
-    void addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType = 0, float inRoughness = 0.0f);
-    void addSphere(vec3 inCenter, float radius, vec3 inColor, int inReflType, float inRoughness = 0.0f);
+    void addTetrahedron(vec3 inV, float scale, vec3 incolor, Material reflType, float inRoughness = 0.0f);
+    void addSphere(vec3 inCenter, float radius, vec3 inColor, Material inReflType, float inRoughness = 0.0f);
     void addPointLight(vec3 inCenter);
     void addAreaLight(vec3 v0, vec3 v1, vec3 v2, vec3 v3);
     glm::vec3 getPointOnAreaLight(float u, float v);

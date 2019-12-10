@@ -10,16 +10,12 @@
 #define Surface_hpp
 
 #include <stdio.h>
-#include "Ray.hpp"
 #include "glm.hpp"
 
 using namespace glm;
 using namespace std;
 
-
-vec3 calcRefraction(Ray &inRay, vec3 normal, float n1, float n2);
-float getReflectionCoeff(vec3 &R, vec3 &T, float n1, float n2);
-
+class Ray;
 
 class Surface {
   

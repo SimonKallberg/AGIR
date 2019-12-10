@@ -14,7 +14,7 @@
 #include "Surface.hpp"
 
 class Ray;
-/*
+
 enum Material{
     LAMBERTIAN,
     OREN_NAYAR,
@@ -22,12 +22,13 @@ enum Material{
     TRANSPARENT,
     EMISSIVE
 };
-*/
+//Class interface for all geometry in the scene
 class Geometry {
 public:
-    
     virtual ~Geometry() = 0;
- //   virtual Material material() = 0;
+    virtual Material material() = 0;
+    virtual glm::vec3 color() = 0;
+    virtual float roughness() = 0;
     virtual bool rayIntersection(Ray &ray) = 0;
 };
 

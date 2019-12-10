@@ -27,11 +27,12 @@ class ColorDbl;
 class Sphere;
 
 struct intersection {
-    vec3 interSectPoint = vec3(0.0f,0.0f,0.0f);
+    vec3 interSectPoint = vec3(0.0f);
     float distance = -1.0f;
     Triangle* tri = nullptr;
     Sphere* sphere = nullptr;
-    Geometry* object = nullptr; 
+    Geometry* object = nullptr;
+    vec3 normal = vec3(0.0f);
 };
 
 class Ray {
@@ -47,10 +48,10 @@ public:
     void sortIntersections();
     
     //Tree structure
-    Ray* parent = nullptr;
+   // Ray* parent = nullptr;
     Ray* reflectedRay = nullptr;
     Ray* refractedRay = nullptr;
-    Ray* monteCarloRay = nullptr;
+    Ray* diffuseRay = nullptr;
     
     //Travelling inside objects
     bool inside = false;
@@ -67,6 +68,7 @@ public:
     Sphere* endSphere = nullptr;
     Geometry* endObject = nullptr;
 	vec3 color = vec3(0.0f, 0.0f, 0.0f);
+    vec3 objectNormal = vec3(0.0f);
 
 	friend ostream& operator<<(ostream& out, const Ray& v1);
 };

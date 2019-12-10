@@ -50,7 +50,7 @@ void Scene::initialize()
     geometry.push_back(new Triangle(vec3(10.0f,6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
 }
 
-void Scene::addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType, float inRoughness) {
+void Scene::addTetrahedron(vec3 inV, float scale, vec3 incolor, Material reflType, float inRoughness) {
 	
     //Closest to camera
 	vec3 corner1 = inV + scale*vec3(-sqrt(8.0f/9.0f), 0.0, -(1.0f/3.0f));
@@ -74,7 +74,7 @@ void Scene::addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType, fl
     std::cout << "Added a tetrahedron to the scene!" << std::endl << std::endl;
 }
 
-void Scene::addSphere(vec3 inCenter, float radius, vec3 inColor, int inReflType, float inRoughness) {
+void Scene::addSphere(vec3 inCenter, float radius, vec3 inColor, Material inReflType, float inRoughness) {
     
     //Polymorphism
     geometry.push_back(new Sphere(inCenter, radius, inColor, inReflType, inRoughness));
@@ -89,8 +89,8 @@ void Scene::addPointLight(vec3 inCenter) {
 }
 
 void Scene::addAreaLight(vec3 v0, vec3 v1, vec3 v2, vec3 v3) {
-    lights.push_back(Triangle(v0, v2, v1, vec3(1.0f), 3));
-    lights.push_back(Triangle(v0, v3, v2, vec3(1.0f), 3));
+    lights.push_back(Triangle(v0, v2, v1, vec3(1.0f), EMISSIVE));
+    lights.push_back(Triangle(v0, v3, v2, vec3(1.0f), EMISSIVE));
     std::cout << "Added an area light! " << endl;
 }
 
@@ -112,13 +112,8 @@ vec3* Scene::findIntersection(Ray &ray) {
     //Choose closest intersection by sorting vector of intersections
     if(ray.intSectPoints.size() > 0) {
         ray.intSectPoint = &ray.intSectPoints[0].interSectPoint;
-        if(ray.intSectPoints[0].tri != nullptr ) {
-            ray.endTri = ray.intSectPoints[0].tri;
-        }
-        else {
-            ray.endSphere = ray.intSectPoints[0].sphere;
-        }
         ray.endObject = ray.intSectPoints[0].object;
+        ray.objectNormal = ray.intSectPoints[0].normal;
     }
     return ray.intSectPoint;
 }
@@ -133,10 +128,10 @@ bool Scene::pointInShadow(vec3 &surfPoint, vec3 &lightPoint) {
         //Check so distance to light is greater than distance to intersecting object
         float distToLight = glm::length(*rayToLight.end - *rayToLight.start);
         float distToIntersection = glm::length(rayToLight.intSectPoints[0].interSectPoint - *rayToLight.start); //Ugly solution
-        int material = rayToLight.endTri ? rayToLight.endTri->surf.reflectionType : rayToLight.endSphere->surf.reflectionType;
+        Material material = rayToLight.endObject->material();
         
         //No shadow for transparent objects
-        if(material != 2 && distToIntersection < distToLight ){
+        if(material != TRANSPARENT && distToIntersection < distToLight ){
             return true;
         }
     }
@@ -154,8 +149,8 @@ vec3 Scene::traceRay(Ray* ray, int iteration) {
     //Add intersections to ray
     findIntersection(*ray);
     
-    //No intersections found, ray goes between triangles. Return black
-    if(ray->intSectPoint == nullptr || ray->endObject) {
+    //No intersections found, ray goes between triangles. Return black.
+    if(ray->intSectPoint == nullptr || ray->endObject == nullptr) {
         return vec3(0.0f,0.0f,0.0f);
     }
     
@@ -165,59 +160,60 @@ vec3 Scene::traceRay(Ray* ray, int iteration) {
     
     vec3 diffuse = vec3(0.0f);
     
+    switch(ray->endObject->material()) {
     //Diffuse surface, monte carlo ray tracing
-    if((ray->endTri && ray->endTri->surf.reflectionType == 0) ||
-      (ray->endSphere && ray->endSphere->surf.reflectionType == 0)) {
-        
-        //Monte carlo ray
-        ray->monteCarloRay = traceRayMonteCarlo(ray);
-        
-        vec3 normal = normalize(ray->endTri ? ray->endTri->normal : ray->endSphere->calcNormal(*ray));
-        int samples = 16; //Samples of area light
-       
-        //Sample area light w "samples" no of random points on area light
-        for(int i = 0; i < samples; i++) {
+        case LAMBERTIAN:
+        case OREN_NAYAR: {
+
+            //Monte carlo ray
+            ray->diffuseRay = traceRayMonteCarlo(ray);
             
-           float u = (*dis)(*gen);
-           float v = (*dis)(*gen);
+            vec3 normal = ray->objectNormal;
+            int samples = 16; //Samples of area light
            
-           vec3 light = getPointOnAreaLight(u, v);
-           //If point is illuminated, add BRDF
-           if (!pointInShadow(*ray->intSectPoint, light)) {
-               vec3 rayToLight = normalize(light - *ray->intSectPoint);
-               float cos_theta = dot(normal, rayToLight);
-               cos_theta = std::max(cos_theta, 0.0f);
+            //Sample area light w "samples" no of random points on area light
+            for(int i = 0; i < samples; i++) {
+                
+               float u = (*dis)(*gen);
+               float v = (*dis)(*gen);
                
-               diffuse += cos_theta * getOrenNayarSurfaceColor(*ray, light);
-           }
+               vec3 light = getPointOnAreaLight(u, v);
+                
+               //If point is illuminated, add BRDF, else color is black
+               if (!pointInShadow(*ray->intSectPoint, light)) {
+                   vec3 rayToLight = normalize(light - *ray->intSectPoint);
+                   float cos_theta = dot(normal, rayToLight);
+                   cos_theta = std::max(cos_theta, 0.0f);
+                   
+                   diffuse += cos_theta * getOrenNayarSurfaceColor(*ray, light);
+               }
+            }
+            
+            //Average color on no of samples of area light
+            diffuse = diffuse /(float)samples;
+            
+            // Russian roulette, random termination of rays
+            float random = (*dis)(*gen);
+            float absorpionProbability = 1.0f;
+            float nonTerminationProbability = 1.0f - absorpionProbability;
+            if (random > nonTerminationProbability || iteration > 10) {
+                return diffuse;
+            }
+            //Recurse
+            diffuse += 0.8f*traceRay(ray->diffuseRay, iteration + 1);
+            break;
         }
-        
-        //Average color on no of samples of area light
-        diffuse = diffuse /(float)samples;
-        
-        // Russian roulette, random termination of rays
-        float random = (*dis)(*gen);
-        float absorpionProbability = 1.0f;
-        float nonTerminationProbability = 1.0f - absorpionProbability;
-        if (random > nonTerminationProbability || iteration > 10) {
-            return diffuse;
+        //Perfectly reflective surface
+        case REFLECTIVE: {
+            //Perfectly reflected ray
+            ray->reflectedRay = traceRayPerfectReflection(*ray);
+            //Recurse
+            diffuse = traceRay(ray->reflectedRay, iteration + 1);
+            break;
         }
-        //Recurse
-        diffuse += 0.8f*traceRay(ray->monteCarloRay, iteration + 1);
-    }
-    //Perfectly reflective surface
-    else if((ray->endSphere && ray->endSphere->surf.reflectionType == 1) ||
-            (ray->endTri && ray->endTri->surf.reflectionType == 1)) {
-        
-        //Perfectly reflected ray
-        ray->reflectedRay = traceRayPerfectReflection(*ray);
-        //Recurse
-        diffuse = traceRay(ray->reflectedRay, iteration + 1);
-    }
     //Perfectly transparent surface
-    else if((ray->endSphere && ray->endSphere->surf.reflectionType == 2) ||
-    (ray->endTri && ray->endTri->surf.reflectionType == 2)) {
-        
+    case TRANSPARENT: {
+    
         float fresnelCoeff = traceRayRefraction(ray);
         ray->reflectedRay = traceRayPerfectReflection(*ray);
 
@@ -227,15 +223,20 @@ vec3 Scene::traceRay(Ray* ray, int iteration) {
         }
         //Recurse
         diffuse = (1.0f-fresnelCoeff) * traceRay(ray->refractedRay, iteration + 1) + fresnelCoeff * traceRay(ray->reflectedRay, iteration + 1);
+        break;
     }
-    
+    case EMISSIVE: {
+        return vec3(1.0f);
+        break;
+        }
+    }
     return diffuse;
 }
 
 float Scene::traceRayRefraction(Ray *ray){
     
     //Normal
-    vec3 N = normalize(ray->endTri ? ray->endTri->normal : ray->endSphere->calcNormal(*ray));
+    vec3 N = ray->objectNormal;
     //Incoming ray
     vec3 I = normalize(vec3(*ray->end - *ray->start));
     //Refracted ray
@@ -286,7 +287,7 @@ Ray* Scene::traceRayMonteCarlo(Ray *ray) {
     vec3 I = normalize(*ray->end - *ray->start);
     
     //Create local coordinate system from incoming ray and surface normal
-    vec3 z = normalize(ray->endTri ? ray->endTri->normal : ray->endSphere->calcNormal(*ray));
+    vec3 z = ray->objectNormal;
     vec3 x = normalize(I - dot(I, z) * z);
     glm::vec3 y = glm::normalize(glm::cross(z, -x));
     
@@ -304,36 +305,36 @@ Ray* Scene::traceRayMonteCarlo(Ray *ray) {
     return outRay;
 }
 
-Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
-    vec3 I = normalize(*inRay.end - *inRay.start);
-    vec3 normal = normalize(inRay.endTri ? (inRay.endTri->normal) : (inRay.endSphere->calcNormal(inRay)));
+Ray* Scene::traceRayPerfectReflection(Ray &ray) {
+    vec3 I = normalize(*ray.end - *ray.start);
+    vec3 normal = ray.objectNormal;
     vec3 outDir = (I - 2.0f*(dot(I,normal)*normal));
     //Offset
-    vec3 *start = new vec3(*inRay.intSectPoint + normal*0.01f);
-    Ray* outRay = new Ray(start, new vec3(*inRay.intSectPoint + outDir));
+    vec3 *start = new vec3(*ray.intSectPoint + normal*0.01f);
+    Ray* outRay = new Ray(start, new vec3(*ray.intSectPoint + outDir));
     
     return outRay;
 }
 
-vec3 Scene::getLambertianSurfaceColor(Ray &endRay) {
+vec3 Scene::getLambertianSurfaceColor(Ray &ray) {
     
     //Get color of the surface the ray hits
-    vec3 albedo = endRay.endTri ? endRay.endTri->color : endRay.endSphere->color;
+    vec3 albedo = ray.endObject->color();
     return albedo/((float)M_PI);
 }
 
-vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay, vec3 &lightPoint) {
+vec3 Scene::getOrenNayarSurfaceColor(Ray &ray, vec3 &lightPoint) {
     
-    //Get normal of triangle or sphere
-    vec3 normal = endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay);
-    //Get surface color of triangle or sphere
-    vec3 albedo = endRay.endTri ? endRay.endTri->surf.color : endRay.endSphere->surf.color;
+    //Get normal of intersecting object
+    vec3 normal = ray.objectNormal;
+    //Get surface color intersecting object
+    vec3 albedo = ray.endObject->color();
     //Get surface roughness of triangle or sphere
-    float roughness = endRay.endTri ? endRay.endTri->surf.roughness : endRay.endSphere->surf.roughness;
+    float roughness = ray.endObject->roughness();
     float sigma2 = roughness * roughness;
 
-    vec3 inDir = normalize(*endRay.start - *endRay.intSectPoint);
-    vec3 lightDir = normalize(lightPoint - *endRay.intSectPoint);
+    vec3 inDir = normalize(*ray.start - *ray.intSectPoint);
+    vec3 lightDir = normalize(lightPoint - *ray.intSectPoint);
     
     //Calculate angles
     float theta_view =  acos(dot(inDir, normal));
