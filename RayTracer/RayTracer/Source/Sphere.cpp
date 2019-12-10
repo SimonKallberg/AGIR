@@ -45,7 +45,8 @@ bool Sphere::rayIntersection(Ray &ray)
             //ray.intersection = ray.intersection + ray.objectNormal * 0.0001;
             vec3 normal = normalize(intersection - centerPos);
             float distance = length(intersection-*ray.start);
-            ray.intSectPoints.push_back({vec3(intersection), distance , nullptr, this, this, normal});
+            Geometry* ptrToSphere = this;
+            ray.intSectPoints.push_back({vec3(intersection), distance, ptrToSphere, normal});
 
             return true;
         }

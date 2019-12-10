@@ -19,7 +19,6 @@
 #include "Ray.hpp"
 #include "Triangle.hpp"
 #include "Scene.hpp"
-#include "Surface.hpp"
 #include "glm.hpp"
 
 using namespace glm;

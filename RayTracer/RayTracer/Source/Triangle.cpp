@@ -60,7 +60,8 @@ bool Triangle::rayIntersection(Ray &ray)
     if(t > 0.001f && t < 1000000.0f) {
         vec3 intersection = *ray.start + (t*D);
         float distance = glm::length(intersection - *ray.start);
-        ray.intSectPoints.push_back({intersection, distance, this, nullptr, this, normal});
+        Geometry* ptrToTri = this;
+        ray.intSectPoints.push_back({intersection, distance, ptrToTri, normal});
         return true;
     }
     return false;

@@ -23,14 +23,11 @@ using namespace std;
 using namespace glm;
 
 class Triangle;
-class ColorDbl;
 class Sphere;
 
 struct intersection {
     vec3 interSectPoint = vec3(0.0f);
     float distance = -1.0f;
-    Triangle* tri = nullptr;
-    Sphere* sphere = nullptr;
     Geometry* object = nullptr;
     vec3 normal = vec3(0.0f);
 };
@@ -48,27 +45,20 @@ public:
     void sortIntersections();
     
     //Tree structure
-   // Ray* parent = nullptr;
     Ray* reflectedRay = nullptr;
     Ray* refractedRay = nullptr;
     Ray* diffuseRay = nullptr;
-    
-    //Travelling inside objects
-    bool inside = false;
-    float refractionIndex = 1.0f; //Air
 
-    //Pointing towards vertexes
+    //Pointing towards verticees
 	vec3* start = nullptr;
 	vec3* end = nullptr;
     vec3* intSectPoint = nullptr;
     
     //Intersecting objects
     vector<intersection> intSectPoints;
-	Triangle* endTri = nullptr;
-    Sphere* endSphere = nullptr;
     Geometry* endObject = nullptr;
-	vec3 color = vec3(0.0f, 0.0f, 0.0f);
     vec3 objectNormal = vec3(0.0f);
+    float length = -1.0f;
 
 	friend ostream& operator<<(ostream& out, const Ray& v1);
 };

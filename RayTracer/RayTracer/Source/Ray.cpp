@@ -16,9 +16,8 @@ Ray::Ray (const Ray &old_obj) {
     intSectPoint = (old_obj.intSectPoint != nullptr) ? new vec3(*old_obj.intSectPoint) : nullptr;
 
     //TODO fix dangling pointers
-    endTri = old_obj.endTri;
-    endSphere = old_obj.endSphere;
-    color = old_obj.color;
+    endObject = old_obj.endObject;
+    objectNormal = old_obj.objectNormal;
 }
 
 Ray::~Ray() {
@@ -30,8 +29,6 @@ Ray::~Ray() {
     reflectedRay = nullptr;
     start = nullptr;
     end = nullptr;
-    endTri = nullptr;
-    endSphere = nullptr;
     endObject = nullptr;
 }
 
