@@ -72,8 +72,8 @@ void Camera::render()
             plane(x, y).color = colorOfPixel/(float)samplesPerPixel;
 		}
 	}
-//    //Debugging
-//    Ray theRay = calcRay(200,600);
+    //Debugging
+//    Ray theRay = calcRay(800,400, 0.0f, 0.0f);
 //    plane(200, 600).color = theScene->traceRay(&theRay, 0);
 }
 

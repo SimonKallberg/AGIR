@@ -13,12 +13,11 @@
 #include "vec3.hpp"
 #include "Ray.hpp"
 #include <cmath>
-#include "Surface.hpp"
 #include "Geometry.hpp"
 
 class Sphere : public Geometry {
 public:
-    Sphere(vec3 inC = vec3(1.0f, 1.0f, 0.0f), float inR =  1.0f, vec3 inColor = vec3(1.0f, 1.0f, 1.0f), Material refType = LAMBERTIAN, float inRoughness = 0.0f)
+    Sphere(vec3 inC = vec3(1.0f, 1.0f, 0.0f), float inR =  1.0f, vec3 inColor = vec3(1.0f, 1.0f, 1.0f), Material refType = OREN_NAYAR, float inRoughness = 1.0f)
       : r(inR), centerPos(inC), objectColor(inColor), objectMaterial(refType) { }
 
     void flipNormal();
