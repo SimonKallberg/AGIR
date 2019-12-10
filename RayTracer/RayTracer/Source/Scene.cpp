@@ -11,43 +11,43 @@ void Scene::initialize()
 {
     std::cout << "Setting up triangles...." << std::endl;
     
+    //Polymorphism
     //Setting up a room shaped as a polygon
     // Wall 1 - yellow
-    scene.push_back(Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
-    scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f, -5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
+    geometry.push_back(new Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
+    geometry.push_back(new Triangle(vec3(0.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f, -5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
     
     //Wall2 - matte light pink
-    scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f ,-5.0f), vec3(0.23f, 0.31f, 0.27f)));
-    scene.push_back(Triangle(vec3(10.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f , -5.0f),vec3(0.0f, 6.0f ,-5.0f),vec3(0.94f, 0.66f, 0.73f)));
-	
+    geometry.push_back(new Triangle(vec3(0.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f ,-5.0f), vec3(0.23f, 0.31f, 0.27f)));
+    geometry.push_back(new Triangle(vec3(10.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f , -5.0f),vec3(0.0f, 6.0f ,-5.0f),vec3(0.94f, 0.66f, 0.73f)));
+    
     //Wall 3 - matte blue
-    scene.push_back(Triangle(vec3(10.0f, 6.0f, 5.0f), vec3(13.0f, 0.0f, 5.0f), vec3(10.0f, 6.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
-    scene.push_back(Triangle(vec3(13.0f, 0.0f, 5.0f), vec3(13.0f, 0.0f, -5.0f), vec3(10.0f, 6.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
+    geometry.push_back(new Triangle(vec3(10.0f, 6.0f, 5.0f), vec3(13.0f, 0.0f, 5.0f), vec3(10.0f, 6.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
+    geometry.push_back(new Triangle(vec3(13.0f, 0.0f, 5.0f), vec3(13.0f, 0.0f, -5.0f), vec3(10.0f, 6.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
     
     //Wall 4 - dark matte pink
-    scene.push_back(Triangle(vec3(-3.0f, 0.0f, -5.0f), vec3(0.0f, -6.0f, 5.0f), vec3(-3.0f, 0.0f, 5.0f), vec3(0.92f, 0.64f, 0.59f)));
-    scene.push_back(Triangle(vec3(-3.0f, 0.0f, -5.0f), vec3(0.0f, -6.0f, -5.0f), vec3(0.0f, -6.0f, 5.0f), vec3(0.76f, 0.4f, 0.5f)));
+    geometry.push_back(new Triangle(vec3(-3.0f, 0.0f, -5.0f), vec3(0.0f, -6.0f, 5.0f), vec3(-3.0f, 0.0f, 5.0f), vec3(0.92f, 0.64f, 0.59f)));
+    geometry.push_back(new Triangle(vec3(-3.0f, 0.0f, -5.0f), vec3(0.0f, -6.0f, -5.0f), vec3(0.0f, -6.0f, 5.0f), vec3(0.76f, 0.4f, 0.5f)));
 
-	//Wall 5 - dark green
-    scene.push_back(Triangle(vec3(0.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.0f,-6.0f,5.0f), vec3(0.94f, 0.66f, 0.73f)));
-    scene.push_back(Triangle(vec3(0.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.23f, 0.31f, 0.27f)));
-	
+    //Wall 5 - dark green
+    geometry.push_back(new Triangle(vec3(0.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.0f,-6.0f,5.0f), vec3(0.94f, 0.66f, 0.73f)));
+    geometry.push_back(new Triangle(vec3(0.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.23f, 0.31f, 0.27f)));
+    
     //Wall 6 - green
-    scene.push_back(Triangle(vec3(10.0f,-6.0f,-5.0f), vec3(13.0f,0.0f,5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.76f, 0.4f, 0.5f)));
-    scene.push_back(Triangle(vec3(10.0f,-6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(13.0f,0.0f,5.0f), vec3(0.92f, 0.64f, 0.59f)));
+    geometry.push_back(new Triangle(vec3(10.0f,-6.0f,-5.0f), vec3(13.0f,0.0f,5.0f), vec3(10.0f,-6.0f,5.0f), vec3(0.76f, 0.4f, 0.5f)));
+    geometry.push_back(new Triangle(vec3(10.0f,-6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(13.0f,0.0f,5.0f), vec3(0.92f, 0.64f, 0.59f)));
     
     //celing - white
-    scene.push_back(Triangle(vec3(0.0f, -6.0f, 5.0f), vec3(0.0f,6.0f,5.0f), vec3(-3.0f, 0.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f)));
-    scene.push_back(Triangle(vec3(0.0f,-6.0f,5.0f), vec3(10.0f,6.0f,5.0f), vec3(0.0f,6.0f,5.0f), vec3(1.0f, 1.0f, 1.0f)));
-    scene.push_back(Triangle(vec3(0.0f, -6.0f, 5.0f), vec3(10.0f,-6.0f,5.0f), vec3(10.0f, 6.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f)));
-    scene.push_back(Triangle(vec3(10.0f,-6.0f,5.0f), vec3(13.0f,0.0f,5.0f), vec3(10.0f,6.0f,5.0f), vec3(1.0f, 1.0f, 1.0f)));
+    geometry.push_back(new Triangle(vec3(0.0f, -6.0f, 5.0f), vec3(0.0f,6.0f,5.0f), vec3(-3.0f, 0.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f)));
+    geometry.push_back(new Triangle(vec3(0.0f,-6.0f,5.0f), vec3(10.0f,6.0f,5.0f), vec3(0.0f,6.0f,5.0f), vec3(1.0f, 1.0f, 1.0f)));
+    geometry.push_back(new Triangle(vec3(0.0f, -6.0f, 5.0f), vec3(10.0f,-6.0f,5.0f), vec3(10.0f, 6.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f)));
+    geometry.push_back(new Triangle(vec3(10.0f,-6.0f,5.0f), vec3(13.0f,0.0f,5.0f), vec3(10.0f,6.0f,5.0f), vec3(1.0f, 1.0f, 1.0f)));
     
     //floor - white
-    scene.push_back(Triangle(vec3(-3.0f,0.0f,-5.0f), vec3(0.0f,6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
-    scene.push_back(Triangle(vec3(0.0f,6.0f,-5.0f), vec3(10.0f,6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
-    scene.push_back(Triangle(vec3(10.0f,6.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
-    scene.push_back(Triangle(vec3(10.0f,6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
-   
+    geometry.push_back(new Triangle(vec3(-3.0f,0.0f,-5.0f), vec3(0.0f,6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
+    geometry.push_back(new Triangle(vec3(0.0f,6.0f,-5.0f), vec3(10.0f,6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
+    geometry.push_back(new Triangle(vec3(10.0f,6.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
+    geometry.push_back(new Triangle(vec3(10.0f,6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
 }
 
 void Scene::addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType, float inRoughness) {
@@ -60,23 +60,26 @@ void Scene::addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType, fl
 	vec3 corner3 = inV + scale*vec3(sqrt(2.0f / 9.0f), -1.0* sqrt(2.0f / 3.0f), -(1.0f/3.0f));
     vec3 top = inV + scale*vec3(0.0f, 0.0f, 1.0f);
 
+    //Polymorphism
     //Adding triangles to scene
     //Back
-    scene.push_back(Triangle(top, corner2, corner3, incolor, reflType));
+    geometry.push_back(new Triangle(top, corner2, corner3, incolor, reflType));
     //Bottom
-    scene.push_back(Triangle(corner1, corner3, corner2, incolor, reflType));
+    geometry.push_back(new Triangle(corner1, corner3, corner2, incolor, reflType));
     //Front right
-    scene.push_back(Triangle(top, corner1, corner2, incolor, reflType));
+    geometry.push_back(new Triangle(top, corner1, corner2, incolor, reflType));
     //Front left
-    scene.push_back(Triangle(top, corner3, corner1,  incolor, reflType));
+    geometry.push_back(new Triangle(top, corner3, corner1,  incolor, reflType));
 
     std::cout << "Added a tetrahedron to the scene!" << std::endl << std::endl;
 }
 
 void Scene::addSphere(vec3 inCenter, float radius, vec3 inColor, int inReflType, float inRoughness) {
-    spheres.push_back(Sphere(inCenter, radius, inColor, inReflType, inRoughness));
     
-    std::cout << "Added a sphere with center: " << glm::to_string(inCenter) << "color: " << glm::to_string(inColor) << "radius: " << radius << " to the scene!" << std::endl << std::endl;
+    //Polymorphism
+    geometry.push_back(new Sphere(inCenter, radius, inColor, inReflType, inRoughness));
+    
+    std::cout << "Added a sphere with center: " << glm::to_string(inCenter) << ", color: " << glm::to_string(inColor) << ", radius: " << radius << " to the scene!" << std::endl << std::endl;
 }
 
 void Scene::addPointLight(vec3 inCenter) {
@@ -99,28 +102,25 @@ glm::vec3 Scene::getPointOnAreaLight(float u, float v)
     return lights[0].v0 + u * v1 + v * v2;
 }
 
-vec3* Scene::findIntersection(Ray &arg) {
-        
-    for(int i = 0; i < (int)scene.size(); i++) {
-        scene[i].rayIntersection(arg);
-    }
+vec3* Scene::findIntersection(Ray &ray) {
     
-    for(int i = 0; i < (int)spheres.size(); i++) {
-        spheres[i].rayIntersection(arg);
+    for(int i = 0; i < (int)geometry.size(); i++) {
+        geometry[i]->rayIntersection(ray);
     }
-    arg.sortIntersections();
+    ray.sortIntersections();
     
     //Choose closest intersection by sorting vector of intersections
-    if(arg.intSectPoints.size() > 0) {
-        arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
-        if(arg.intSectPoints[0].tri != nullptr ) {
-            arg.endTri = arg.intSectPoints[0].tri;
+    if(ray.intSectPoints.size() > 0) {
+        ray.intSectPoint = &ray.intSectPoints[0].interSectPoint;
+        if(ray.intSectPoints[0].tri != nullptr ) {
+            ray.endTri = ray.intSectPoints[0].tri;
         }
         else {
-            arg.endSphere = arg.intSectPoints[0].sphere;
+            ray.endSphere = ray.intSectPoints[0].sphere;
         }
+        ray.endObject = ray.intSectPoints[0].object;
     }
-    return arg.intSectPoint;
+    return ray.intSectPoint;
 }
 
 bool Scene::pointInShadow(vec3 &surfPoint, vec3 &lightPoint) {
@@ -144,19 +144,19 @@ bool Scene::pointInShadow(vec3 &surfPoint, vec3 &lightPoint) {
 }
 
 //Whitted ray-tracing & monte carlo
-vec3 Scene::traceRay(Ray* arg, int iteration) {
+vec3 Scene::traceRay(Ray* ray, int iteration) {
 
     //Check for when rays go inbetween triangles
-    if(arg == nullptr || arg->start == nullptr || arg->end == nullptr) {
+    if(ray == nullptr || ray->start == nullptr || ray->end == nullptr) {
         return vec3(0.0f, 0.0f, 0.0f);
     }
     
     //Add intersections to ray
-    findIntersection(*arg);
+    findIntersection(*ray);
     
-    //No intersections found
-    if(arg->intSectPoint == nullptr) {
-        return vec3(0.0f,0.0f,1.0f);
+    //No intersections found, ray goes between triangles. Return black
+    if(ray->intSectPoint == nullptr || ray->endObject) {
+        return vec3(0.0f,0.0f,0.0f);
     }
     
     if( iteration > 20) {
@@ -166,13 +166,13 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     vec3 diffuse = vec3(0.0f);
     
     //Diffuse surface, monte carlo ray tracing
-    if((arg->endTri && arg->endTri->surf.reflectionType == 0) ||
-      (arg->endSphere && arg->endSphere->surf.reflectionType == 0)) {
+    if((ray->endTri && ray->endTri->surf.reflectionType == 0) ||
+      (ray->endSphere && ray->endSphere->surf.reflectionType == 0)) {
         
         //Monte carlo ray
-        arg->monteCarloRay = traceRayMonteCarlo(arg);
+        ray->monteCarloRay = traceRayMonteCarlo(ray);
         
-        vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+        vec3 normal = normalize(ray->endTri ? ray->endTri->normal : ray->endSphere->calcNormal(*ray));
         int samples = 16; //Samples of area light
        
         //Sample area light w "samples" no of random points on area light
@@ -183,12 +183,12 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
            
            vec3 light = getPointOnAreaLight(u, v);
            //If point is illuminated, add BRDF
-           if (!pointInShadow(*arg->intSectPoint, light)) {
-               vec3 rayToLight = normalize(light - *arg->intSectPoint);
+           if (!pointInShadow(*ray->intSectPoint, light)) {
+               vec3 rayToLight = normalize(light - *ray->intSectPoint);
                float cos_theta = dot(normal, rayToLight);
                cos_theta = std::max(cos_theta, 0.0f);
                
-               diffuse += cos_theta * getOrenNayarSurfaceColor(*arg, light);
+               diffuse += cos_theta * getOrenNayarSurfaceColor(*ray, light);
            }
         }
         
@@ -197,48 +197,47 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         
         // Russian roulette, random termination of rays
         float random = (*dis)(*gen);
-        float absorpionProbability = 0.25f;
+        float absorpionProbability = 1.0f;
         float nonTerminationProbability = 1.0f - absorpionProbability;
         if (random > nonTerminationProbability || iteration > 10) {
             return diffuse;
         }
         //Recurse
-        diffuse += 0.8f*traceRay(arg->monteCarloRay, iteration + 1);
+        diffuse += 0.8f*traceRay(ray->monteCarloRay, iteration + 1);
     }
     //Perfectly reflective surface
-    else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
-            (arg->endTri && arg->endTri->surf.reflectionType == 1)) {
+    else if((ray->endSphere && ray->endSphere->surf.reflectionType == 1) ||
+            (ray->endTri && ray->endTri->surf.reflectionType == 1)) {
         
         //Perfectly reflected ray
-        arg->reflectedRay = traceRayPerfectReflection(*arg);
+        ray->reflectedRay = traceRayPerfectReflection(*ray);
         //Recurse
-        diffuse = traceRay(arg->reflectedRay, iteration + 1);
+        diffuse = traceRay(ray->reflectedRay, iteration + 1);
     }
     //Perfectly transparent surface
-    else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
-    (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
+    else if((ray->endSphere && ray->endSphere->surf.reflectionType == 2) ||
+    (ray->endTri && ray->endTri->surf.reflectionType == 2)) {
         
-        float fresnelCoeff = traceRayRefraction(arg);
-        arg->reflectedRay = traceRayPerfectReflection(*arg);
+        float fresnelCoeff = traceRayRefraction(ray);
+        ray->reflectedRay = traceRayPerfectReflection(*ray);
 
         //Brewster angle - reflection is total
-        if(!arg->refractedRay) {
+        if(!ray->refractedRay) {
             fresnelCoeff = 1.0f;
         }
-        
         //Recurse
-        diffuse = (1.0f-fresnelCoeff) * traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff * traceRay(arg->reflectedRay, iteration + 1);
+        diffuse = (1.0f-fresnelCoeff) * traceRay(ray->refractedRay, iteration + 1) + fresnelCoeff * traceRay(ray->reflectedRay, iteration + 1);
     }
     
     return diffuse;
 }
 
-float Scene::traceRayRefraction(Ray *arg){
+float Scene::traceRayRefraction(Ray *ray){
     
     //Normal
-    vec3 N = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+    vec3 N = normalize(ray->endTri ? ray->endTri->normal : ray->endSphere->calcNormal(*ray));
     //Incoming ray
-    vec3 I = normalize(vec3(*arg->end - *arg->start));
+    vec3 I = normalize(vec3(*ray->end - *ray->start));
     //Refracted ray
     vec3 R = vec3(0.0f);
     
@@ -264,31 +263,30 @@ float Scene::traceRayRefraction(Ray *arg){
 
     //Check for brewster angle
     if (R != vec3(0.0f)) {
-        vec3* endRefr = new vec3(*arg->intSectPoint + R);
-        vec3* startRefr = new vec3(*arg->intSectPoint);
+        vec3* endRefr = new vec3(*ray->intSectPoint + R);
+        vec3* startRefr = new vec3(*ray->intSectPoint);
         
-        arg->refractedRay = new Ray(startRefr, endRefr);
+        ray->refractedRay = new Ray(startRefr, endRefr);
     }
 
     return fresnelCoeff;
 }
 
-Ray* Scene::traceRayMonteCarlo(Ray *arg) {
+Ray* Scene::traceRayMonteCarlo(Ray *ray) {
 
     //Setting up the estimator by generating 2 random numbers [0,1]
     float randX = (*dis)(*gen);
     float randY = (*dis)(*gen);
-    float PI = 3.14f;
     
     //Monte Carlo solution with a cosine estimator
-    float azimuth = 2.0f*PI*randX;
+    float azimuth = 2.0f * M_PI * randX;
     float inclination = glm::asin(glm::sqrt(randY));
 
     //Incoming ray
-    vec3 I = normalize(*arg->end - *arg->start);
+    vec3 I = normalize(*ray->end - *ray->start);
     
     //Create local coordinate system from incoming ray and surface normal
-    vec3 z = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+    vec3 z = normalize(ray->endTri ? ray->endTri->normal : ray->endSphere->calcNormal(*ray));
     vec3 x = normalize(I - dot(I, z) * z);
     glm::vec3 y = glm::normalize(glm::cross(z, -x));
     
@@ -300,8 +298,8 @@ Ray* Scene::traceRayMonteCarlo(Ray *arg) {
     outDirGlobal = glm::normalize(glm::rotate(outDirGlobal, azimuth, z));
 
     //Outgoing ray
-    vec3* end = new vec3(*arg->intSectPoint + outDirGlobal);
-    Ray *outRay = new Ray(arg->intSectPoint, end);
+    vec3* end = new vec3(*ray->intSectPoint + outDirGlobal);
+    Ray *outRay = new Ray(ray->intSectPoint, end);
 
     return outRay;
 }

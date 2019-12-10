@@ -17,13 +17,14 @@
 #include "ColorDbl.hpp"
 #include "Surface.hpp"
 #include "glm.hpp"
+#include "Geometry.hpp"
 
 using namespace std;
 using namespace glm;
 
 class Scene;
 
-class Triangle {
+class Triangle : public Geometry {
 public:
     
     vec3 color = vec3(1.0f, 0.0f, 0.0f);
@@ -37,7 +38,7 @@ public:
 		normal = calcNormal();
 	}
 
-	bool rayIntersection(Ray &arg1);
+	bool rayIntersection(Ray &ray) override;
 	vec3 calcNormal();
     void flipNormal();
 

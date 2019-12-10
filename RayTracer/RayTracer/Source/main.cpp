@@ -22,6 +22,7 @@ const float ROUGH = 3.0f;
 #include "Scene.hpp"
 #include "Camera.hpp"
 #include "Sphere.hpp"
+#include "Geometry.hpp"
 
 //External libraries
 #include "matrix.hpp"

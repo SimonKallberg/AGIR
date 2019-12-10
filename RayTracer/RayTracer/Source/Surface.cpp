@@ -21,8 +21,6 @@ float getTransmissCoeff(vec3 &R, vec3 &T, float n1, float n2) {
     return (1.0f-getReflectionCoeff(R, T, n1, n2));
 }
 
-
-
 //Snell's law of refraction
 vec3 calcRefraction(Ray &inRay, vec3 normal, float n1, float n2) {
     
@@ -50,13 +48,3 @@ vec3 calcRefraction(Ray &inRay, vec3 normal, float n1, float n2) {
     
     return normal;
 }
-
-//vec3 Surface::diffuseReflection(vec3 inC)
-//{
-//	return (inC * (reflectionCo/3.1415f));
-//}
-
-//vec3 Surface::specularReflection(vec3 inC)
-//{
-//	return inC;
-//}

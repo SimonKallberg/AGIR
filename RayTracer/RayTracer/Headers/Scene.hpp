@@ -23,6 +23,7 @@
 #include "glm.hpp"
 #include "transform.hpp"
 #include "rotate_vector.hpp"
+#include "Geometry.hpp"
 
 using namespace glm;
 using namespace std;
@@ -41,8 +42,17 @@ public:
         dis = new uniform_real_distribution<float>(0.0f, 1.0f);
         
     }
+    ~Scene() {
+     //Delete vector with pointers to objects
+     for (auto p : geometry)
+      {
+        delete p;
+      }
+      geometry.clear();
+    }
     vector<Triangle> scene;
     vector<Sphere> spheres;
+    vector<Geometry*> geometry;
     vector<PointLight> pointLights;
     vector<Triangle> lights;
     
@@ -54,11 +64,11 @@ public:
     glm::vec3 getPointOnAreaLight(float u, float v);
     
     bool pointInShadow(vec3 &surfPoint, vec3 &lightPoint);
-    vec3* findIntersection(Ray &arg);
-    vec3 traceRay(Ray* arg, int iteration);
-    Ray* traceRayMonteCarlo(Ray *arg);
+    vec3* findIntersection(Ray &ray);
+    vec3 traceRay(Ray* ray, int iteration);
+    Ray* traceRayMonteCarlo(Ray *ray);
     Ray* traceRayPerfectReflection(Ray &inRay);
-    float traceRayRefraction(Ray *arg);
+    float traceRayRefraction(Ray *ray);
     vec3 getLambertianSurfaceColor(Ray &endRay);
     vec3 getOrenNayarSurfaceColor(Ray &endRay, vec3 &lightPoint);
 };

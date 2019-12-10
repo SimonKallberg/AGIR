@@ -7,3 +7,9 @@
 //
 
 #include "Geometry.hpp"
+
+//Pure virtual destructor, must declare body in C++
+Geometry::~Geometry()
+{
+    //std::cout << "Pure virtual destructor is called" << std::endl;
+}

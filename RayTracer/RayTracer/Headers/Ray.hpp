@@ -16,7 +16,8 @@
 #include <vector>
 #include "glm.hpp"
 #include "string_cast.hpp"
-#include <algorithm>	
+#include <algorithm>
+#include "Geometry.hpp"
 
 using namespace std;
 using namespace glm;
@@ -30,6 +31,7 @@ struct intersection {
     float distance = -1.0f;
     Triangle* tri = nullptr;
     Sphere* sphere = nullptr;
+    Geometry* object = nullptr; 
 };
 
 class Ray {
@@ -63,6 +65,7 @@ public:
     vector<intersection> intSectPoints;
 	Triangle* endTri = nullptr;
     Sphere* endSphere = nullptr;
+    Geometry* endObject = nullptr;
 	vec3 color = vec3(0.0f, 0.0f, 0.0f);
 
 	friend ostream& operator<<(ostream& out, const Ray& v1);

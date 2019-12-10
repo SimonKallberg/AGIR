@@ -32,6 +32,7 @@ Ray::~Ray() {
     end = nullptr;
     endTri = nullptr;
     endSphere = nullptr;
+    endObject = nullptr;
 }
 
 void Ray::sortIntersections() {

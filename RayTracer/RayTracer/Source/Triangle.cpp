@@ -22,16 +22,16 @@ vec3 Triangle::calcNormal() {
     return normal;
 }
 
-bool Triangle::rayIntersection(Ray &p)
+bool Triangle::rayIntersection(Ray &ray)
 {
     //Start ray
-    vec3 T = (*p.start-v0);
+    vec3 T = (*ray.start-v0);
     //Edge 1
     vec3 E1 = (v1-v0);
     //Edge 2
     vec3 E2 = (v2-v0);
     //Direction
-    vec3 D = normalize(*p.end - *p.start);
+    vec3 D = normalize(*ray.end - *ray.start);
     //Edge normal
     vec3 P = cross(D, E2);
     //Determinant
@@ -58,9 +58,9 @@ bool Triangle::rayIntersection(Ray &p)
     }
     
     if(t > 0.001f && t < 1000000.0f) {
-        vec3 intersection = *p.start + (t*D);
-        float distance = glm::length(intersection - *p.start);
-        p.intSectPoints.push_back({intersection, distance, this, nullptr});
+        vec3 intersection = *ray.start + (t*D);
+        float distance = glm::length(intersection - *ray.start);
+        ray.intSectPoints.push_back({intersection, distance, this, nullptr, this});
         return true;
     }
     return false;

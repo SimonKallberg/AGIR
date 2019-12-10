@@ -8,11 +8,12 @@
 #ifndef Camera_hpp
 #define Camera_hpp
 
-
+//Libraries
 #include <stdio.h>
+#include <iostream>
+//Headers
 #include "vec3.hpp"
 #include "Pixel.hpp"
-#include <iostream>
 #include "bitmap_image.hpp"
 #include "matrix.hpp"
 #include "Ray.hpp"
@@ -23,7 +24,6 @@
 
 using namespace glm;
 using namespace std;
-
 
 class Camera {
 public:

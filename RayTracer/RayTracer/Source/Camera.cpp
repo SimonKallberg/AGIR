@@ -54,14 +54,12 @@ void Camera::render()
             else if(x == CAMERA_WIDTH*3/4 && y == CAMERA_HEIGHT*3/4) {
                 cout << "75% done..." << endl;
             }
-
+            //Anti-aliasing - move ray randomly
+            uniform_real_distribution<float> randStepSizeWidth(-deltaWidth, deltaWidth);
+            uniform_real_distribution<float> randStepSizeHeight(-deltaHeight, deltaHeight);
             //Shoot out 4 rays per ray to implement supersampling
             vec3 colorOfPixel = vec3(0.0f,0.0f,0.0f);
             for(int i = 0; i < samplesPerPixel; i++) {
-                
-                //Anti-aliasing - move ray randomly
-                uniform_real_distribution<float> randStepSizeWidth(-deltaWidth, deltaWidth);
-                uniform_real_distribution<float> randStepSizeHeight(-deltaHeight, deltaHeight);
                 
                 float randHeight = randStepSizeWidth(*theScene->gen);
                 float randWidth = randStepSizeWidth(*theScene->gen);

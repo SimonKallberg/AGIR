@@ -98,7 +98,7 @@ bool Sphere::rayIntersection(Ray &ray)
             //ray.intersection = ray.intersection + ray.objectNormal * 0.0001;
             
             float distance = length(intersection-*ray.start);
-            ray.intSectPoints.push_back({vec3(intersection), distance , nullptr, this});
+            ray.intSectPoints.push_back({vec3(intersection), distance , nullptr, this, this});
 
             return true;
         }
