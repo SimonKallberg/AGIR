@@ -46,6 +46,7 @@ public:
     vector<Sphere> spheres;
     vector<Triangle> lights;
     vector<PointLight> pointLights;
+    vector<Triangle> lights;
     
     void initialize();
     void addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType = 0, float inRoughness = 0.0f);

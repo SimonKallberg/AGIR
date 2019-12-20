@@ -32,6 +32,16 @@ void Camera::render()
 		{
             //Calculate ray from eye through the pixel
             Ray theRay = calcRay(x,y);
+            
+            if( x == 200 && y == 400) {
+                cout << "25% done..." << endl;
+            }
+            else if(x == 400 && y == 400) {
+                cout << "50% done..." << endl;
+            }
+            else if(x == 600 && y == 400) {
+                cout << "75% done..." << endl;
+            }
 
             if( x == 200 && y == 400) {
                 cout << "25% done..." << endl;
@@ -44,11 +54,11 @@ void Camera::render()
             }
             //Shoot out 4 rays per ray to implement anti aliasing
             vec3 colorOfPixel = vec3(0.0f,0.0f,0.0f);
-            //for(int i = 0; i < 3; i++) {
+            for(int i = 0; i < 3; i++) {
                 colorOfPixel = colorOfPixel + theScene->traceRay(&theRay, 0);
-            //}
+            }
             //Take average of the 4 rays and write to pixel plane
-            plane(x, y).color = colorOfPixel; //* 0.25
+            plane(x, y).color = colorOfPixel * 0.25f;
 		}
 	}
 //    //Debugging

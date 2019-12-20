@@ -7,13 +7,14 @@
 
 #include "Scene.hpp"
 
-
-
 void Scene::initialize()
 {
     std::cout << "Setting up triangles...." << std::endl;
     
     //Setting up a room shaped as a polygon
+    // Wall 1 - yellow
+    scene.push_back(Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
+    scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f, -5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
     
     //Wall2 - matte light pink
     scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f),vec3(10.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f ,-5.0f), vec3(0.23f, 0.31f, 0.27f)));
@@ -46,13 +47,8 @@ void Scene::initialize()
     scene.push_back(Triangle(vec3(0.0f,6.0f,-5.0f), vec3(10.0f,6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
     scene.push_back(Triangle(vec3(10.0f,6.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(0.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
     scene.push_back(Triangle(vec3(10.0f,6.0f,-5.0f), vec3(13.0f,0.0f,-5.0f), vec3(10.0f,-6.0f,-5.0f), vec3(1.0f, 1.0f, 1.0f)));
-    
-    // Wall 1 - yellow
-    scene.push_back(Triangle(vec3(-3.0f, 0.0f, 5.0f), vec3(0.0f, 6.0f, 5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(0.36f, 0.45f, 0.63f)));
-    scene.push_back(Triangle(vec3(0.0f, 6.0f, 5.0f), vec3(0.0f, 6.0f, -5.0f), vec3(-3.0f, 0.0f, -5.0f), vec3(1.0f, 1.0f, 0.0f)));
+   
 }
-
-
 
 void Scene::addTetrahedron(vec3 inV, float scale, vec3 incolor, int reflType, float inRoughness) {
 	
@@ -83,18 +79,23 @@ void Scene::addSphere(vec3 inCenter, float radius, vec3 inColor, int inReflType,
     std::cout << "Added a sphere with center: " << glm::to_string(inCenter) << "color: " << glm::to_string(inColor) << "radius: " << radius << " to the scene!" << std::endl << std::endl;
 }
 
+void Scene::addPointLight(vec3 inCenter) {
+    pointLights.push_back(PointLight(inCenter));
+    
+    std::cout << "Added a pointlight with center: " << glm::to_string(inCenter) << "to the scene!" << std::endl << std::endl;
+}
+
 void Scene::addAreaLight(vec3 v0, vec3 v1, vec3 v2, vec3 v3) {
     lights.push_back(Triangle(v0, v2, v1, vec3(1.0f), 3));
     lights.push_back(Triangle(v0, v3, v2, vec3(1.0f), 3));
-    scene.push_back(Triangle(v0, v2, v1, vec3(1.0f), 3));
-    scene.push_back(Triangle(v0, v3, v2, vec3(1.0f), 3));
+    std::cout << "Added an area light! " << endl;
 }
 
 //u & v is between 0 and 1
 glm::vec3 Scene::getPointOnAreaLight(float u, float v)
 {
-    glm::vec3 v1 = lights[0].v0 - lights[0].v1;
-    glm::vec3 v2 = lights[1].v2 - lights[0].v1;
+    glm::vec3 v1 = lights[0].v2 - lights[0].v0;
+    glm::vec3 v2 = lights[1].v1 - lights[1].v0; //OK
     return lights[0].v0 + u * v1 + v * v2;
 }
 
@@ -108,7 +109,7 @@ vec3* Scene::findIntersection(Ray &arg) {
     }
     arg.sortIntersections();
     
-    //Choose closest intersection
+    //Choose closest intersection by sorting vector of intersections
     if(arg.intSectPoints.size() > 0) {
         arg.intSectPoint = &arg.intSectPoints[0].interSectPoint;
         if(arg.intSectPoints[0].tri != nullptr ) {
@@ -121,25 +122,20 @@ vec3* Scene::findIntersection(Ray &arg) {
     return arg.intSectPoint;
 }
 
-void Scene::addPointLight(vec3 inCenter) {
-    pointLights.push_back(PointLight(inCenter));
+bool Scene::pointInShadow(vec3 &surfPoint, vec3 &lightPoint) {
     
-    std::cout << "Added a pointlight with center: " << glm::to_string(inCenter) << "to the scene!" << std::endl << std::endl;
-}
-
-bool Scene::isInShadow(Ray &theRay) {
-    
-    findIntersection(theRay);
+    Ray rayToLight = Ray(&surfPoint, &lightPoint);
+    findIntersection(rayToLight);
     
     //Check if an object is intersecting ray to light
-    for(int i = 0; i < theRay.intSectPoints.size(); i++) {
+    if(rayToLight.intSectPoints.size() > 0) {
         //Check so distance to light is greater than distance to intersecting object
-        float distToLight = glm::length(*theRay.end - *theRay.start);
-        float distToIntersection = glm::length(theRay.intSectPoints[i].interSectPoint - *theRay.start); //Ugly solution
+        float distToLight = glm::length(*rayToLight.end - *rayToLight.start);
+        float distToIntersection = glm::length(rayToLight.intSectPoints[0].interSectPoint - *rayToLight.start); //Ugly solution
+        int material = rayToLight.endTri ? rayToLight.endTri->surf.reflectionType : rayToLight.endSphere->surf.reflectionType;
         
-        int material = theRay.intSectPoints[i].tri ? theRay.intSectPoints[i].tri->surf.reflectionType : theRay.intSectPoints[i].sphere->surf.reflectionType;
-        
-        if( material != 2 && distToIntersection < distToLight ){
+        //No shadow for transparent objects
+        if(material != 2 && distToIntersection < distToLight ){
             return true;
         }
     }
@@ -159,10 +155,11 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     
     //No intersections found
     if(arg->intSectPoint == nullptr) {
-        return vec3(0.0f,0.0f,1.0f);
+        return vec3(0.0f,0.0f,0.0f);
     }
-    if(iteration > 10) {
-        return vec3(1.0f,0.0f,0.0f);
+    
+    if( iteration > 20) {
+        return vec3(0.0f,0.0f,0.0f);
     }
     
     vec3 diffuse = vec3(0.0f);
@@ -240,37 +237,39 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
 
         //Monte carlo ray
         arg->monteCarloRay = traceRayMonteCarlo(arg);
-
-        vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
-
-        float u = 0.0f;
-        float v = 0.0f;
-        int N_samples = 16;
-        //If intersection point is not in shadow, set it to BRDF
-        for(int i = 0; i < N_samples; i++) {
-            u = (*dis)(*gen);
-            v = (*dis)(*gen);
-
-            Ray shadowRay = Ray(arg->intSectPoint, new vec3(getPointOnAreaLight(u, v)));
-            vec3 direction = normalize(*shadowRay.end - *shadowRay.start);
-
-            float cos_theta = glm::dot(direction, normal);
-            float cos_light_angle = glm::dot(normal, -1.0f*normalize(*shadowRay.end - *shadowRay.start));
-            float light_solid_angle = 4.0f / N_samples * glm::clamp(cos_light_angle, 0.0f, 1.0f) / glm::pow(glm::length(direction), 2) / (M_PI * 2);
-
-            if(!isInShadow(shadowRay)) {
-                diffuse += cos_theta * getLambertianBRDF(*arg) * cos_light_angle * light_solid_angle;
-            }
-        }
-//         Russian roulette, random termination of rays
-//        float random = (*dis)(*gen);
-//        float absorpionProbability = 0.15f;
-//        float nonTerminationProbability = iteration == 0 ? 1.0 : 1.0f - absorpionProbability;
-//        if (random > nonTerminationProbability || iteration > 20)
-//            return vec3(0.0f);
         
+        vec3 normal = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
+        int samples = 16; //Samples of area light
+       
+        //Sample area light w "samples" no of random points on area light
+        for(int i = 0; i < samples; i++) {
+            
+           float u = (*dis)(*gen);
+           float v = (*dis)(*gen);
+           
+           vec3 light = getPointOnAreaLight(u, v);
+           //If point is illuminated, add BRDF
+           if (!pointInShadow(*arg->intSectPoint, light)) {
+               vec3 rayToLight = normalize(light - *arg->intSectPoint);
+               float cos_theta = dot(normal, rayToLight);
+               cos_theta = std::max(cos_theta, 0.0f);
+               
+               diffuse += cos_theta * getOrenNayarSurfaceColor(*arg, light);
+           }
+        }
+        
+        //Average color on no of samples of area light
+        diffuse = diffuse /(float)samples;
+        
+        // Russian roulette, random termination of rays
+        float random = (*dis)(*gen);
+        float absorpionProbability = 1.0f;
+        float nonTerminationProbability = 1.0f - absorpionProbability;
+        if (random > nonTerminationProbability || iteration > 10) {
+            return diffuse;
+        }
         //Recurse
-        diffuse += traceRay(arg->monteCarloRay, iteration + 1);
+        diffuse += 0.8f*(traceRay(arg->monteCarloRay, iteration + 1));
     }
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||
@@ -284,7 +283,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     //Perfectly transparent surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 2) ||
     (arg->endTri && arg->endTri->surf.reflectionType == 2)) {
-
+        
         float fresnelCoeff = traceRayRefraction(arg);
         arg->reflectedRay = traceRayPerfectReflection(*arg);
 
@@ -292,7 +291,9 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
         if(!arg->refractedRay) {
             fresnelCoeff = 1.0f;
         }
-        diffuse = (1.0f-fresnelCoeff)*traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff * traceRay(arg->reflectedRay, iteration + 1);
+        
+        //Recurse
+        diffuse = (1.0f-fresnelCoeff) * traceRay(arg->refractedRay, iteration + 1) + fresnelCoeff * traceRay(arg->reflectedRay, iteration + 1);
     }
     //Emissive surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 3) ||
@@ -305,15 +306,18 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
 
 float Scene::traceRayRefraction(Ray *arg){
     
+    //Normal
     vec3 N = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
     //Incoming ray
     vec3 I = normalize(vec3(*arg->end - *arg->start));
+    //Refracted ray
     vec3 R = vec3(0.0f);
     
+    //Refraction indexes: n1 is first medium, n2 is second
     float n1 = 1.0f;
     float n2 = 1.53f;
     
-    //If the ray is inside an object
+    //Check the ray is inside an object
     if(dot(N, I) > 0.0f) {
         N = -1.0f*N;
         n1 = 1.53f;
@@ -325,7 +329,6 @@ float Scene::traceRayRefraction(Ray *arg){
     float R_0 = pow((n1 - n2)/(n1 + n2), 2);
     float fresnelCoeff = R_0 + (1 - R_0) * pow(1 - glm::dot(N, -1.0f*I),5);
     
-    //vec3 refractionGLM = glm::refract(dir, normal, eta);
     float k = 1.0f - eta * eta * (1.0f - dot(N, I) * dot(N, I));
     if (k > 0.0)
         R = eta * I - (eta * dot(N, I) + sqrt(k)) * N;
@@ -352,12 +355,14 @@ Ray* Scene::traceRayMonteCarlo(Ray *arg) {
     float azimuth = 2.0f*PI*randX;
     float inclination = glm::asin(glm::sqrt(randY));
 
+    //Incoming ray
     vec3 I = normalize(*arg->end - *arg->start);
+    
+    //Create local coordinate system from incoming ray and surface normal
     vec3 z = normalize(arg->endTri ? arg->endTri->normal : arg->endSphere->calcNormal(*arg));
     vec3 x = normalize(I - dot(I, z) * z);
-    
-    //Transform to local coordinate system
     glm::vec3 y = glm::normalize(glm::cross(z, -x));
+    
     //Create outgoing direction
     glm::vec3 outDirGlobal = z;
     
@@ -365,9 +370,9 @@ Ray* Scene::traceRayMonteCarlo(Ray *arg) {
     outDirGlobal = glm::normalize(glm::rotate(outDirGlobal, inclination, y));
     outDirGlobal = glm::normalize(glm::rotate(outDirGlobal, azimuth, z));
 
-    //Add new ray to the tree
-    vec3* endvec3 = new vec3(*arg->intSectPoint + outDirGlobal);
-    Ray *outRay = new Ray(arg->intSectPoint, endvec3);
+    //Outgoing ray
+    vec3* end = new vec3(*arg->intSectPoint + outDirGlobal);
+    Ray *outRay = new Ray(arg->intSectPoint, end);
 
     return outRay;
 }
@@ -385,77 +390,38 @@ Ray* Scene::traceRayPerfectReflection(Ray &inRay) {
 
 vec3 Scene::getLambertianBRDF(Ray &endRay) {
     
+    //Get color of the surface the ray hits
     vec3 albedo = endRay.endTri ? endRay.endTri->color : endRay.endSphere->color;
-    return albedo / (float)M_PI;
-    //If the ray hits a triangle or sphere
-//    vec3 normal = normalize(endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay));
-//    vec3 albedo = endRay.endTri ? endRay.endTri->color : endRay.endSphere->color;
-//
-//    //Add shading to objects that are hit by light
-//    vec3 rayToLight = normalize(pointLights[0].pos - *endRay.intSectPoint);
-//    float alpha = dot(normal, rayToLight);
-//
-//    if ( alpha > 0.0f ) {
-//        return albedo * alpha;
-//    }
-//    else {
-//        return vec3(0.0f,0.0f,0.0f);
-//    }
+    return albedo/((float)M_PI);
 }
 
-vec3 Scene::getOrenNayarBRDF(Ray &endRay) {
+vec3 Scene::getOrenNayarSurfaceColor(Ray &endRay, vec3 &lightPoint) {
     
     //Get normal of triangle or sphere
     vec3 normal = endRay.endTri ? endRay.endTri->normal : endRay.endSphere->calcNormal(endRay);
     //Get surface color of triangle or sphere
     vec3 albedo = endRay.endTri ? endRay.endTri->surf.color : endRay.endSphere->surf.color;
-    //Get surface color of triangle or sphere
+    //Get surface roughness of triangle or sphere
     float roughness = endRay.endTri ? endRay.endTri->surf.roughness : endRay.endSphere->surf.roughness;
-    
-   float sigma2 = roughness * roughness;
-        
+    float sigma2 = roughness * roughness;
+
     vec3 inDir = normalize(*endRay.start - *endRay.intSectPoint);
-    vec3 lightDir = normalize(pointLights[0].pos - *endRay.intSectPoint);
-    vec3 outDir = normalize(*endRay.monteCarloRay->end - *endRay.intSectPoint);
+    vec3 lightDir = normalize(lightPoint - *endRay.intSectPoint);
+    
+    //Calculate angles
+    float theta_view =  acos(dot(inDir, normal));
+    float theta_light = acos(dot(lightDir, normal));
+    vec3 ortogonalToNormal = normalize(inDir - dot(inDir, normal) * normal);
+    float phi_view = acos(dot(inDir, ortogonalToNormal));
+    float phi_light = acos(dot(lightDir, ortogonalToNormal));
 
-    float A = 1 - 0.5 * sigma2 / (sigma2 + 0.57);
+    //Variables used in Oren Nayar formula
+    float A = 1 - 0.5 * sigma2 / (sigma2 + 0.33); //kbladin 0.57
     float B = 0.45 * sigma2 / (sigma2 + 0.09);
-    float cos_theta_d1 = glm::dot(inDir, normal);
-    float cos_theta_d2 = glm::dot(lightDir, normal);
-    float theta = glm::acos(cos_theta_d2);
-    float theta_d1 = glm::acos(cos_theta_d1);
-    float alpha = glm::max(theta, theta_d1);
-    float beta = glm::min(theta, theta_d1);
-    float cos_d1_d2 = glm::dot(inDir, lightDir);
+    float alpha = glm::max(theta_light, theta_view);
+    float beta = glm::min(theta_light, theta_view);
 
-    return albedo / 3.14f * cos_theta_d2 * 
-    (A + (B * glm::max(0.0f, cos_d1_d2)) * glm::sin(alpha) * glm::tan(beta));
-    
-    
-   /*
-    float A = 1.0f - (0.5f * sigma2/2.0f*(sigma2 + 0.33f));
-    float B = 0.45f * sigma2/(sigma2+ 0.09f);
-    
-    //float L = max(0.0, dotProduct(normal, lightDir));
-    //float V = max(0.0, dotProduct(normal, inDir));
-    //float P = max(0.0, dotProduct(lightDir-normal*L, inDir-normal*V));
-    
-    //vec3 Lr = albedo  * ( A + B * P * sqrt((1-L*L)*(1-V*V))/max(L,V));
-    
-    
-    float cos_thetaR = dot(inDir, normal);
-    float cos_thetaI = dot(lightDir, normal);
-    
-    float cos_phiI = dot(normalize(lightDir - normal), normalize(inDir - normal));
-    
-    float thetaR = glm::acos(cos_thetaR);
-    float thetaI = glm::acos(cos_thetaI);
-    float alphaAngle = std::max(thetaR, thetaI);
-    float betaAngle = std::min(thetaR, thetaI);
-       
-    vec3 Lr =  albedo * ( A + (B * glm::max(0.0f, cos_phiI) * glm::sin(alphaAngle) * glm::tan(betaAngle)));
-
-    return Lr;*/
-   
+    //Oren Nayar equation
+    return albedo / (float)M_PI * (A + (B * glm::max(0.0f, cos(phi_light - phi_view))) * glm::sin(alpha) * glm::tan(beta));
 }
 
