@@ -156,11 +156,11 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
     
     //No intersections found
     if(arg->intSectPoint == nullptr) {
-        return vec3(0.0f,0.0f,1.0f);
+        return vec3(0.0f,0.0f,0.0f);
     }
     
     if( iteration > 20) {
-        return vec3(1.0f,0.0f,0.0f);
+        return vec3(0.0f,0.0f,0.0f);
     }
     
     vec3 diffuse = vec3(0.0f);
