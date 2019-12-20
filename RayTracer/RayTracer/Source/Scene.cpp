@@ -203,7 +203,7 @@ vec3 Scene::traceRay(Ray* arg, int iteration) {
             return diffuse;
         }
         //Recurse
-        diffuse += normalize(traceRay(arg->monteCarloRay, iteration + 1));
+        diffuse += 0.8f*(traceRay(arg->monteCarloRay, iteration + 1));
     }
     //Perfectly reflective surface
     else if((arg->endSphere && arg->endSphere->surf.reflectionType == 1) ||

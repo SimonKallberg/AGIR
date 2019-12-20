@@ -39,7 +39,7 @@ int main()
     myScene.initialize();
     
 	//Add objects
-    //myScene.addTetrahedron(vec3(7.0f, -2.0f, 0.0f), 2.5f, vec3(1.0f, 1.0f, 1.0f), DIFFUSE, 1.0f);
+    myScene.addTetrahedron(vec3(7.0f, -3.0f, 3.0f), 1.0f, vec3(1.0f, 1.0f, 1.0f), DIFFUSE, 1.0f);
     myScene.addSphere(vec3(6.0f, 2.0f, 2.5f), 0.5f, vec3(0.5f, 0.5f, 0.5f), TRANSPARENT);
     myScene.addSphere(vec3(10.0f, -2.0f, 1.0f), 1.0f, vec3(1.0f, 1.0f, 1.0f), DIFFUSE, 0.0f);
     myScene.addSphere(vec3(10.0f, 2.0f, 1.0f), 1.0f, vec3(1.0f, 1.0f, 1.0f), DIFFUSE, 1.0f);

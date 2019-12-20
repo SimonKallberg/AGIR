@@ -45,11 +45,11 @@ void Camera::render()
 
             //Shoot out 4 rays per ray to implement anti aliasing
             vec3 colorOfPixel = vec3(0.0f,0.0f,0.0f);
-            //for(int i = 0; i < 3; i++) {
+            for(int i = 0; i < 3; i++) {
                 colorOfPixel = colorOfPixel + theScene->traceRay(&theRay, 0);
-            //}
+            }
             //Take average of the 4 rays and write to pixel plane
-            plane(x, y).color = colorOfPixel; //* 0.25
+            plane(x, y).color = colorOfPixel * 0.25f;
 		}
 	}
 //    //Debugging
